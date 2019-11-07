@@ -135,7 +135,7 @@ def calculate_newSpeed(
 
 
 def read_weights(value_dicts, mainDir):
-    path = os.path.join(mainDir, 'PSO', 'weights_runParameters.json')
+    path = os.path.join(mainDir, 'weights_runParameters.json')
     param_dict = gf.read_parameters(path)[0]
     weight_dict = {
         'w_init': [],

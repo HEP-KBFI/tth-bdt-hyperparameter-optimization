@@ -1,4 +1,4 @@
- import struct
+import struct
 
 # Code for reading MNIST files
 def read_images(images_name):

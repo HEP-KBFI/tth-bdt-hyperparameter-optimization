@@ -4,7 +4,7 @@ import os
 import xgboost as xgb
 from tthAnalysis.bdtHyperparameterOptimization import filereader as fr
 from sklearn.metrics import confusion_matrix
-from hyper import roccurve as rc
+from tthAnalysis.bdtHyperparameterOptimization import roccurve as rc
 
 
 def initialize_values(value_dicts):
