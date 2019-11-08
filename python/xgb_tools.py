@@ -58,7 +58,7 @@ def prepare_params_calc(value_dicts):
         return reduct_value_dicts
 
 
-def parameter_evaluation(parameter_dict, data_dict):
+def parameter_evaluation(parameter_dict, data_dict, nthread):
     params = {
         'verbosity': 1,
         'objective': 'multi:softprob',
@@ -90,7 +90,7 @@ def ensemble_fitnesses(parameter_dicts, data_dict):
     pred_tests = []
     for parameter_dict in parameter_dicts:
         fitness, pred_train, pred_test = parameter_evaluation(
-            parameter_dict, data_dict)
+            parameter_dict, data_dict, nthread)
         fitnesses.append(fitness)
         pred_trains.append(pred_train)
         pred_tests.append(pred_test)

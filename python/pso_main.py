@@ -201,7 +201,7 @@ def run_pso(
     i = 1
     print(":::::::: Initializing :::::::::")
     fitnesses, pred_trains, pred_tests = calculate_fitnesses(
-        parameter_dicts, data_dict)
+        parameter_dicts, data_dict, nthread)
     index = np.argmax(fitnesses)
     result_dict = {
         'data_dict': data_dict,
@@ -219,7 +219,7 @@ def run_pso(
         print(" --- Compactness: ", compactness, " ---")
         parameter_dicts = new_parameters
         fitnesses, pred_trains, pred_tests = calculate_fitnesses(
-            parameter_dicts, data_dict)
+            parameter_dicts, data_dict, nthread)
         best_fitnesses = find_bestFitnesses(fitnesses, best_fitnesses)
         personal_bests = calculate_personal_bests(
             fitnesses, best_fitnesses, parameter_dicts, personal_bests)
