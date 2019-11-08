@@ -157,9 +157,8 @@ def calculate_improvement_wAVG(avg_scores, improvements, threshold):
 
 
 def calculate_improvement_wSTDEV(parameter_dicts):
-    reduct_param = prepare_params_calc(parameter_dicts)
-    keys = reduct_param[0].keys()
-    list_dict = values_to_list_dict(keys, reduct_param)
+    keys = parameter_dicts[0].keys()
+    list_dict = values_to_list_dict(keys, parameter_dicts)
     mean_COV = calculate_dict_mean_coeff_of_variation(list_dict)
     return mean_COV
 
