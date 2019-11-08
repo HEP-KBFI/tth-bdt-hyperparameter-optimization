@@ -61,7 +61,7 @@ def prepare_params_calc(value_dicts):
 
 def parameter_evaluation(parameter_dict, data_dict, nthread):
     params = {
-        'verbosity': 1,
+        'silent': 1,
         'objective': 'multi:softprob',
         'num_class': 10,
         'nthread': nthread,
