@@ -187,10 +187,9 @@ def run_pso(
     data_dict,
     value_dicts,
     calculate_fitnesses,
-    number_parameters
+    number_parameters,
+    parameter_dicts
 ):
-    parameter_dicts = prepare_run_params( # liigutada algusesse.
-        nthread, value_dicts, sample_size)
     w = w_init
     w_step = (w_fin - w_init)/iterations
     new_parameters = parameter_dicts
