@@ -22,6 +22,7 @@ from tthAnalysis.bdtHyperparameterOptimization.mnist_filereader import create_da
 from tthAnalysis.bdtHyperparameterOptimization.universal import read_parameters
 from tthAnalysis.bdtHyperparameterOptimization.universal import save_results
 from tthAnalysis.bdtHyperparameterOptimization.pso_main import read_weights
+from tthAnalysis.bdtHyperparameterOptimization.pso_main import run_pso
 
 np.random.seed(1)
 
