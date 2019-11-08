@@ -31,7 +31,7 @@ def prepare_newDay(
     c2
 ):
     current_speeds = calculate_newSpeed(
-        personal_bests, param_dicts, best_parameters,
+        personal_bests, parameter_dicts, best_parameters,
         w, current_speeds, c1, c2
     )
     new_parameters = calculate_newValue(
