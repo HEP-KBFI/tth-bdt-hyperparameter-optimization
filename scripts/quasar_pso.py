@@ -23,7 +23,7 @@ from tthAnalysis.bdtHyperparameterOptimization.universal import read_parameters
 from tthAnalysis.bdtHyperparameterOptimization.universal import save_results
 from tthAnalysis.bdtHyperparameterOptimization.pso_main import read_weights
 from tthAnalysis.bdtHyperparameterOptimization.pso_main import run_pso
-from tthAnalysis.bdtHyperparameterOptimization.pso_main import prepare_run_params
+from tthAnalysis.bdtHyperparameterOptimization.xgb_tools import prepare_run_params
 
 np.random.seed(1)
 
