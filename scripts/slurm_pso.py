@@ -14,11 +14,20 @@ Options:
 
 '''
 import numpy as np
-from tthAnalysis.bdtHyperparameterOptimization import global_functions as gf
+from tthAnalysis.bdtHyperparameterOptimization.global_functions import prepare_run_params
+from tthAnalysis.bdtHyperparameterOptimization.global_functions import calculate_improvement_wSTDEV
+from tthAnalysis.bdtHyperparameterOptimization.global_functions import prepare_params_calc
+from tthAnalysis.bdtHyperparameterOptimization.global_functions import create_datasets
+from tthAnalysis.bdtHyperparameterOptimization.global_functions import read_parameters
+from tthAnalysis.bdtHyperparameterOptimization.global_functions import save_results
 import docopt
 import os
-from tthAnalysis.bdtHyperparameterOptimization import pso_main as pm
-from tthAnalysis.bdtHyperparameterOptimization import slurm_main as sm
+from tthAnalysis.bdtHyperparameterOptimization.pso_main import find_bestFitnesses
+from tthAnalysis.bdtHyperparameterOptimization.pso_main import calculate_personal_bests
+from tthAnalysis.bdtHyperparameterOptimization.pso_main import read_weights
+from tthAnalysis.bdtHyperparameterOptimization.pso_main import prepare_newDay
+from tthAnalysis.bdtHyperparameterOptimization.slurm_main import run_iteration
+
 np.random.seed(1)
 
 
@@ -36,7 +45,7 @@ def run_pso(
     value_dicts,
     templateDir
 ):
-    parameter_dicts = gf.prepare_run_params(
+    parameter_dicts = prepare_run_params(
         nthread, value_dicts, sample_size)
     w = w_init
     w_step = (w_fin - w_init)/iterations
@@ -45,10 +54,10 @@ def run_pso(
     # improvements = []
     # improvement = 1
     compactness_threshold = 0.1
-    compactness = gf.calculate_improvement_wSTDEV(parameter_dicts)
+    compactness = calculate_improvement_wSTDEV(parameter_dicts)
     i = 1
     print(':::::::: Initializing :::::::::')
-    fitnesses, pred_trains, pred_tests = sm.run_iteration(
+    fitnesses, pred_trains, pred_tests = run_iteration(
         outputDir, parameter_dicts, sample_dir,
         nthread, templateDir, sample_size
     )
@@ -63,21 +72,21 @@ def run_pso(
     }
     personal_bests = parameter_dicts
     best_fitnesses = fitnesses
-    different_parameters = gf.prepare_params_calc(
+    different_parameters = prepare_params_calc(
         result_dict['best_parameters'])
     current_speeds = np.zeros((sample_size, len(different_parameters)))
     while i <= iterations and compactness_threshold < compactness:
         print('::::::: Iteration: ', i, ' ::::::::')
         print(' --- Compactness: ', compactness, ' ---')
         parameter_dicts = new_parameters
-        fitnesses, pred_trains, pred_tests = sm.run_iteration(
+        fitnesses, pred_trains, pred_tests = run_iteration(
             outputDir, parameter_dicts, sample_dir,
             nthread, templateDir, sample_size
         )
-        best_fitnesses = pm.find_bestFitnesses(fitnesses, best_fitnesses)
-        personal_bests = pm.calculate_personal_bests(
+        best_fitnesses = find_bestFitnesses(fitnesses, best_fitnesses)
+        personal_bests = calculate_personal_bests(
             fitnesses, best_fitnesses, parameter_dicts, personal_bests)
-        new_parameters = pm.prepare_newDay(
+        new_parameters = prepare_newDay(
             personal_bests, parameter_dicts,
             result_dict['best_parameters'],
             current_speeds, w, nthread, value_dicts
@@ -90,8 +99,8 @@ def run_pso(
             result_dict['best_fitness'] = max(fitnesses)
         avg_scores = np.mean(fitnesses)
         result_dict['avg_scores'].append(avg_scores)
-        compactness = gf.calculate_improvement_wSTDEV(parameter_dicts)
-        # improvements, improvement = gf.calculate_improvement_wAVG(
+        compactness = calculate_improvement_wSTDEV(parameter_dicts)
+        # improvements, improvement = calculate_improvement_wAVG(
         #     result_dict['avg_scores'],
         #     improvements,
         #     threshold
@@ -106,10 +115,10 @@ def main(param_file, nthread, sample_dir, outputDir, mainDir):
     if not os.path.isdir(outputDir):
         os.makedirs(outputDir)
     print("::::::: Loading data ::::::::")
-    data_dict = gf.create_datasets(sample_dir, nthread)
+    data_dict = create_datasets(sample_dir, nthread)
     print("::::::: Reading parameters :::::::")
-    value_dicts = gf.read_parameters(param_file)
-    weight_dict = pm.read_weights(value_dicts, mainDir)
+    value_dicts = read_parameters(param_file)
+    weight_dict = read_weights(value_dicts, mainDir)
     w_init = np.array(weight_dict['w_init'])
     w_fin = np.array(weight_dict['w_fin'])
     iterations = weight_dict['iterations']
@@ -120,7 +129,7 @@ def main(param_file, nthread, sample_dir, outputDir, mainDir):
         sample_dir, param_file, nthread, sample_size,
         w_init, w_fin, c1, c2, iterations,
         data_dict, value_dicts, templateDir)
-    gf.save_results(result_dict, outputDir)
+    save_results(result_dict, outputDir)
 
 
 if __name__ == '__main__':

@@ -15,13 +15,13 @@ Options:
 '''
 import numpy as np
 import xgboost as xgb
-from tthAnalysis.bdtHyperparameterOptimization import prepare_run_params
-from tthAnalysis.bdtHyperparameterOptimization import calculate_improvement_wSTDEV
-from tthAnalysis.bdtHyperparameterOptimization import ensemble_fitnesses
-from tthAnalysis.bdtHyperparameterOptimization import prepare_params_calc
-from tthAnalysis.bdtHyperparameterOptimization import create_datasets
-from tthAnalysis.bdtHyperparameterOptimization import read_parameters
-from tthAnalysis.bdtHyperparameterOptimization import save_results
+from tthAnalysis.bdtHyperparameterOptimization.global_functions import prepare_run_params
+from tthAnalysis.bdtHyperparameterOptimization.global_functions import calculate_improvement_wSTDEV
+from tthAnalysis.bdtHyperparameterOptimization.global_functions import ensemble_fitnesses
+from tthAnalysis.bdtHyperparameterOptimization.global_functions import prepare_params_calc
+from tthAnalysis.bdtHyperparameterOptimization.global_functions import create_datasets
+from tthAnalysis.bdtHyperparameterOptimization.global_functions import read_parameters
+from tthAnalysis.bdtHyperparameterOptimization.global_functions import save_results
 
 import docopt
 import os
