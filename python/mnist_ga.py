@@ -15,13 +15,13 @@ Options:
 import numpy as np
 import xgboost as xgb
 import docopt, random, os
-from tthAnalysis.bdtHyperparameterOptimization.global_functions import prepare_run_params
-from tthAnalysis.bdtHyperparameterOptimization.global_functions import ensemble_fitnesses
-from tthAnalysis.bdtHyperparameterOptimization.global_functions import calculate_improvement_wAVG
-from tthAnalysis.bdtHyperparameterOptimization.global_functions import prepare_run_params
-from tthAnalysis.bdtHyperparameterOptimization.global_functions import read_parameters
-from tthAnalysis.bdtHyperparameterOptimization.global_functions import create_datasets
-from tthAnalysis.bdtHyperparameterOptimization.global_functions import save_results
+from tthAnalysis.bdtHyperparameterOptimization.universal import prepare_run_params
+from tthAnalysis.bdtHyperparameterOptimization.universal import ensemble_fitnesses
+from tthAnalysis.bdtHyperparameterOptimization.universal import calculate_improvement_wAVG
+from tthAnalysis.bdtHyperparameterOptimization.universal import prepare_run_params
+from tthAnalysis.bdtHyperparameterOptimization.universal import read_parameters
+from tthAnalysis.bdtHyperparameterOptimization.mnist_filereader import create_datasets
+from tthAnalysis.bdtHyperparameterOptimization.universal import save_results
 
 # Selection of two parents from a population based on the tournament method.
 def selection(pop, fitnesses, t_size = 3, t_prob = 0.75):

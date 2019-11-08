@@ -15,11 +15,11 @@ import matplotlib.pyplot as plt
 import xgboost
 import glob
 import os
-from tthAnalysis.bdtHyperparameterOptimization.global_functions import create_datasets
-from tthAnalysis.bdtHyperparameterOptimization.global_functions import parameter_evaluation
-from tthAnalysis.bdtHyperparameterOptimization.global_functions import main_f1_calculate
-from tthAnalysis.bdtHyperparameterOptimization.global_functions import best_to_file
-from tthAnalysis.bdtHyperparameterOptimization.roccurve import roc
+from tthAnalysis.bdtHyperparameterOptimization.mnist_filereader import create_datasets
+from tthAnalysis.bdtHyperparameterOptimization.universal import parameter_evaluation
+from tthAnalysis.bdtHyperparameterOptimization.universal import main_f1_calculate
+from tthAnalysis.bdtHyperparameterOptimization.universal import best_to_file
+from tthAnalysis.bdtHyperparameterOptimization.universal import roc
 import json
 import docopt
 

@@ -11,10 +11,10 @@ Options:
     --outputDir=DIR         Directory for plots and parameters
 
 '''
-from tthAnalysis.bdtHyperparameterOptimization.global_functions import read_parameters
-from tthAnalysis.bdtHyperparameterOptimization.global_functions import create_datasets
-from tthAnalysis.bdtHyperparameterOptimization.global_functions import ensemble_fitnesses
-from tthAnalysis.bdtHyperparameterOptimization.global_functions import save_results
+from tthAnalysis.bdtHyperparameterOptimization.universal import read_parameters
+from tthAnalysis.bdtHyperparameterOptimization.universal import save_results
+from tthAnalysis.bdtHyperparameterOptimization.filereader import create_datasets
+from tthAnalysis.bdtHyperparameterOptimization.xgb_tools import ensemble_fitnesses
 import docopt
 from itertools import product
 import numpy as np

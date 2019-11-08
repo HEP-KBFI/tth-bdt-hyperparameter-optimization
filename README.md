@@ -1,21 +1,17 @@
-# tth-bdt-hyperparameter-optimization [![Build Status](https://travis-ci.org/dianarand/hyper.svg?branch=master)](https://travis-ci.org/dianarand/hyper)
-Evolutionary algorithms for hyperparameter optimization for XGBoost (with MNIST numbers dataset for testing).
-Python tools for Hyperparameter optimization of machine learning algorithms (BDT and NN) 
+# tth-bdt-hyperparameter-optimization [![Build Status](https://github.com/HEP-KBFI/tth-bdt-hyperparameter-optimization.svg?branch=master)](https://github.com/HEP-KBFI/tth-bdt-hyperparameter-optimization)
+Evolutionary algorithms for hyperparameter optimization for BDT (XGBoost) and NN (with MNIST numbers dataset for testing).
+
 
 ## Installation
 
 If running with CMSSW:
-````
+
+````console
 git clone https://github.com/HEP-KBFI/tth-bdt-hyperparameter-optimization.git $CMSSW_BASE/src/tthAnalysis/bdtHyperparameterOptimization
 ````
 
-Run the following:
-````
-pip install -r requirements.txt
-pip install .
-````
 
-# Particle Swarm Optimization (PSO)
+## Particle Swarm Optimization (PSO)
 
 <img src="README/pso_overview1.png" alt="Sensitivity" width="400"/>
 <img src="README/pso_overview2.png" alt="Sensitivity" width="400"/>

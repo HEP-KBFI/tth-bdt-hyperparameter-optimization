@@ -14,12 +14,12 @@ Options:
 
 '''
 import numpy as np
-from tthAnalysis.bdtHyperparameterOptimization.global_functions import prepare_run_params
-from tthAnalysis.bdtHyperparameterOptimization.global_functions import calculate_improvement_wSTDEV
-from tthAnalysis.bdtHyperparameterOptimization.global_functions import prepare_params_calc
-from tthAnalysis.bdtHyperparameterOptimization.global_functions import create_datasets
-from tthAnalysis.bdtHyperparameterOptimization.global_functions import read_parameters
-from tthAnalysis.bdtHyperparameterOptimization.global_functions import save_results
+from tthAnalysis.bdtHyperparameterOptimization.universal import prepare_run_params
+from tthAnalysis.bdtHyperparameterOptimization.universal import calculate_improvement_wSTDEV
+from tthAnalysis.bdtHyperparameterOptimization.universal import prepare_params_calc
+from tthAnalysis.bdtHyperparameterOptimization.mnist_filereader import create_datasets
+from tthAnalysis.bdtHyperparameterOptimization.universal import read_parameters
+from tthAnalysis.bdtHyperparameterOptimization.universal import save_results
 import docopt
 import os
 from tthAnalysis.bdtHyperparameterOptimization.pso_main import find_bestFitnesses

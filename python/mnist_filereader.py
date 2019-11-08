@@ -63,3 +63,28 @@ def read_dataset(images_name, labels_name):
     labels = read_labels(labels_name)
     assert len(images) == len(labels)
     return (images, labels)
+
+
+def create_datasets(sample_dir, nthread): # MNIST
+    image_file = os.path.join(sample_dir, 'train-images-idx3-ubyte')
+    label_file = os.path.join(sample_dir, 'train-labels-idx1-ubyte')
+    training_images, training_labels = read_dataset(image_file, label_file)
+    image_file = os.path.join(sample_dir, 't10k-images-idx3-ubyte')
+    label_file = os.path.join(sample_dir, 't10k-labels-idx1-ubyte')
+    testing_images, testing_labels = read_dataset(image_file, label_file)
+    dtrain = xgb.DMatrix(
+        np.asmatrix(training_images),
+        label=training_labels,
+        nthread=nthread
+    )
+    dtest = xgb.DMatrix(
+        np.asmatrix(testing_images),
+        label=testing_labels,
+        nthread=nthread
+    )
+    data_dict = {
+        'dtrain': dtrain,
+        'dtest': dtest,
+        'training_labels': training_labels,
+        'testing_labels': testing_labels}
+    return data_dict
