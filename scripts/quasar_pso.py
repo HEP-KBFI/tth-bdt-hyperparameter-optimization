@@ -41,10 +41,13 @@ def main(param_file, nthread, sample_dir, outputDir, mainDir):
     sample_size = weight_dict['sample_size']
     c1 = weight_dict['c1']
     c2 = weight_dict['c2']
+    number_parameters = 7 # Read from file
     result_dict = run_pso(
-        sample_dir, param_file, nthread, sample_size,
+        sample_dir, nthread, sample_size,
         w_init, w_fin, c1, c2, iterations,
-        data_dict, value_dicts, ensemble_fitnesses)
+        data_dict, value_dicts, ensemble_fitnesses,
+        number_parameters
+    )
     save_results(result_dict, outputDir)
 
 

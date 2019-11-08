@@ -177,7 +177,6 @@ def weight_normalization(param_dict):
 
 def run_pso(
     sample_dir,
-    param_file,
     nthread,
     sample_size,
     w_init,
