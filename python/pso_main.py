@@ -82,7 +82,7 @@ def calculate_newValue(
         'objective': 'multi:softprob',
         'num_class': 10,
         'nthread': nthread,
-        'seed': 1
+        'seed': 1,
     }
     for current_speed, parameter_dict in zip(current_speeds, parameter_dicts):
         new_value = {}

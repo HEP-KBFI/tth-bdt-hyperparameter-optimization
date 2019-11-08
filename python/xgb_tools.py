@@ -73,7 +73,8 @@ def parameter_evaluation(parameter_dict, data_dict, nthread):
     model = xgb.train(
         parameters,
         data_dict['dtrain'],
-        num_boost_round=int(num_boost_round)
+        num_boost_round=int(num_boost_round),
+        verbose_eval=False
     )
     pred_train = model.predict(data_dict['dtrain'])
     pred_test = model.predict(data_dict['dtest'])
