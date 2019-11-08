@@ -1,6 +1,7 @@
 import numpy as np
 import xgboost as xgb
-from tthAnalysis.bdtHyperparameterOptimization import global_functions as gf
+from tthAnalysis.bdtHyperparameterOptimization.global_functions import prepare_params_calc
+from tthAnalysis.bdtHyperparameterOptimization.global_functions import read_parameters
 import docopt
 import os
 np.random.seed(1)
@@ -40,11 +41,11 @@ def prepare_all_calculation(
     best_parameters
 ):
     calc_dict = {}
-    calc_dict['personal_bests'] = gf.prepare_params_calc(
+    calc_dict['personal_bests'] = prepare_params_calc(
         personal_bests)
-    calc_dict['parameter_dicts'] = gf.prepare_params_calc(
+    calc_dict['parameter_dicts'] = prepare_params_calc(
         parameter_dicts)
-    calc_dict['best_parameters'] = gf.prepare_params_calc(
+    calc_dict['best_parameters'] = prepare_params_calc(
         best_parameters)
     return calc_dict
 
@@ -136,7 +137,7 @@ def calculate_newSpeed(
 
 def read_weights(value_dicts, mainDir):
     path = os.path.join(mainDir, 'weights_runParameters.json')
-    param_dict = gf.read_parameters(path)[0]
+    param_dict = read_parameters(path)[0]
     weight_dict = {
         'w_init': [],
         'w_fin': [],

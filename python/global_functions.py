@@ -2,9 +2,10 @@ import numpy as np
 import json
 import os
 import xgboost as xgb
-from tthAnalysis.bdtHyperparameterOptimization import filereader as fr
+from tthAnalysis.bdtHyperparameterOptimization.filereader import read_dataset
 from sklearn.metrics import confusion_matrix
-from tthAnalysis.bdtHyperparameterOptimization import roccurve as rc
+from tthAnalysis.bdtHyperparameterOptimization.roccurve import roc
+from tthAnalysis.bdtHyperparameterOptimization.roccurve import plotting
 
 
 def initialize_values(value_dicts):
@@ -89,10 +90,10 @@ def best_to_file(best_values, outputDir, assesment):
 def create_datasets(sample_dir, nthread):
     image_file = os.path.join(sample_dir, 'train-images-idx3-ubyte')
     label_file = os.path.join(sample_dir, 'train-labels-idx1-ubyte')
-    training_images, training_labels = fr.read_dataset(image_file, label_file)
+    training_images, training_labels = read_dataset(image_file, label_file)
     image_file = os.path.join(sample_dir, 't10k-images-idx3-ubyte')
     label_file = os.path.join(sample_dir, 't10k-labels-idx1-ubyte')
-    testing_images, testing_labels = fr.read_dataset(image_file, label_file)
+    testing_images, testing_labels = read_dataset(image_file, label_file)
     dtrain = xgb.DMatrix(
         np.asmatrix(training_images),
         label=training_labels,
@@ -244,16 +245,16 @@ def save_results(result_dict, outputDir, roc=True):
         result_dict['pred_train'],
         result_dict['pred_test'],
         result_dict['data_dict'])
-    x_train, y_train = rc.roc(
+    x_train, y_train = roc(
         data_dict['training_labels'], result_dict['pred_train'])
-    x_test, y_test = rc.roc(
+    x_test, y_test = roc(
         data_dict['testing_labels'], result_dict['pred_test'])
     test_AUC = np.trapz(y_test, x_test)
     train_AUC = np.trapz(y_train, x_train)
     assessment['train_AUC'] = (-1) * train_AUC
     assessment['test_AUC'] = (-1) * test_AUC
     if roc:
-        rc.plotting(
+        plotting(
             outputDir,
             x_train, y_train,
             x_test, y_test,
