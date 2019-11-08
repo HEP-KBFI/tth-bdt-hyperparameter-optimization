@@ -1,4 +1,5 @@
 import numpy as np
+import xgboost as xgb
 from tthAnalysis.bdtHyperparameterOptimization.universal import get_most_probable
 from tthAnalysis.bdtHyperparameterOptimization.universal import calculate_conf_matrix
 from tthAnalysis.bdtHyperparameterOptimization.universal import calculate_f1_score
