@@ -15,7 +15,13 @@ Options:
 import numpy as np
 import xgboost as xgb
 import docopt, random, os
-from tthAnalysis.bdtHyperparameterOptimization import global_functions
+from tthAnalysis.bdtHyperparameterOptimization.universal import prepare_run_params
+from tthAnalysis.bdtHyperparameterOptimization.universal import ensemble_fitnesses
+from tthAnalysis.bdtHyperparameterOptimization.universal import calculate_improvement_wAVG
+from tthAnalysis.bdtHyperparameterOptimization.universal import prepare_run_params
+from tthAnalysis.bdtHyperparameterOptimization.universal import read_parameters
+from tthAnalysis.bdtHyperparameterOptimization.mnist_filereader import create_datasets
+from tthAnalysis.bdtHyperparameterOptimization.universal import save_results
 
 # Selection of two parents from a population based on the tournament method.
 def selection(pop, fitnesses, t_size = 3, t_prob = 0.75):
@@ -226,7 +232,7 @@ def create_subpopulations(settings, parameters):
             sub_size = size//num
 
         # Generate subpopulation
-        sub_population = global_functions.prepare_run_params(settings['nthread'], parameters, sub_size)
+        sub_population = prepare_run_params(settings['nthread'], parameters, sub_size)
         subpopulations.append(sub_population)
 
     return subpopulations
@@ -281,7 +287,7 @@ def evolve(population, settings, data, parameters, final = False):
 
         # Calculate fitness of the population
         fitnesses, pred_trains, pred_tests = (
-            global_functions.ensemble_fitnesses(population, data)
+            ensemble_fitnesses(population, data)
         )
 
         # Save results
@@ -290,7 +296,7 @@ def evolve(population, settings, data, parameters, final = False):
         worst_scores.append(min(fitnesses))
 
         # Calculate improvement
-        improvements, improvement = global_functions.calculate_improvement_wAVG(
+        improvements, improvement = calculate_improvement_wAVG(
             avg_scores, improvements, settings['threshold'])
 
         iteration += 1
@@ -329,7 +335,7 @@ def evolution(settings, data, parameters):
     else:
 
         # Create one population
-        population = global_functions.prepare_run_params(settings['nthread'], parameters, settings['pop_size'])
+        population = prepare_run_params(settings['nthread'], parameters, settings['pop_size'])
 
         # Evolve population
         population, scores_dicts, fitnesses, pred_trains, pred_tests = evolve(
@@ -355,18 +361,18 @@ def evolution(settings, data, parameters):
 def main(sample_dir, nthread, output_dir, param_file, sett_file):
 
     # Load settings for genetic algorithm
-    settings_dict = global_functions.read_parameters(sett_file)[0]
+    settings_dict = read_parameters(sett_file)[0]
     settings_dict.update({'nthread': nthread})
 
     # Load data
-    data_dict = global_functions.create_datasets(sample_dir, nthread)
+    data_dict = create_datasets(sample_dir, nthread)
 
     # Load parameters for optimization
-    param_dict = global_functions.read_parameters(param_file)
+    param_dict = read_parameters(param_file)
 
     # Run genetic algorithm and save results
     result = evolution(settings_dict, data_dict, param_dict)
-    global_functions.save_results(result, output_dir)
+    save_results(result, output_dir)
 
 
 if __name__ == '__main__':

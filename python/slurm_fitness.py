@@ -10,7 +10,9 @@ Options:
 
 '''
 import numpy as np
-from tthAnalysis.bdtHyperparameterOptimization import global_functions as gf
+from tthAnalysis.bdtHyperparameterOptimization.universal import read_parameters
+from tthAnalysis.bdtHyperparameterOptimization.mnist_filereader import create_datasets
+from tthAnalysis.bdtHyperparameterOptimization.universal import parameter_evaluation
 import docopt
 import json
 from pathlib import Path
@@ -33,11 +35,11 @@ def save_info(score, pred_train, pred_test, saveDir):
 
 
 def main(parameterFile, sample_dir, nthread):
-    parameter_dict = gf.read_parameters(parameterFile)[0]
-    data_dict = gf.create_datasets(sample_dir, nthread)
+    parameter_dict = read_parameters(parameterFile)[0]
+    data_dict = create_datasets(sample_dir, nthread)
     path = Path(parameterFile)
     saveDir = os.path.abspath(path.parent)
-    score, pred_train, pred_test = gf.parameter_evaluation(
+    score, pred_train, pred_test = parameter_evaluation(
         parameter_dict, data_dict)
     save_info(score, pred_train, pred_test, saveDir)
 

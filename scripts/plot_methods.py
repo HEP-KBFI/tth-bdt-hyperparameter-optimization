@@ -15,8 +15,11 @@ import matplotlib.pyplot as plt
 import xgboost
 import glob
 import os
-from tthAnalysis.bdtHyperparameterOptimization import global_functions
-from tthAnalysis.bdtHyperparameterOptimization import roccurve as rc
+from tthAnalysis.bdtHyperparameterOptimization.mnist_filereader import create_datasets
+from tthAnalysis.bdtHyperparameterOptimization.universal import parameter_evaluation
+from tthAnalysis.bdtHyperparameterOptimization.universal import main_f1_calculate
+from tthAnalysis.bdtHyperparameterOptimization.universal import best_to_file
+from tthAnalysis.bdtHyperparameterOptimization.universal import roc
 import json
 import docopt
 
@@ -31,9 +34,9 @@ def parse_directories(parentDir):
 
 def plot_single(data_dict, pred_test, pred_train, path):
     foldername = path.split("/")[-2]
-    x_train, y_train = rc.roc(
+    x_train, y_train = roc(
         data_dict['training_labels'], pred_train)
-    x_test, y_test = rc.roc(
+    x_test, y_test = roc(
         data_dict['testing_labels'], pred_test)
     plt.plot(
         x_train, y_train, lw=0.75, linestyle='--',
@@ -53,13 +56,13 @@ def read_parameters(path):
 
 
 def main(parentDir, nthread, sampleDir, outputDir):
-    data_dict = global_functions.create_datasets(sampleDir, nthread)
+    data_dict = create_datasets(sampleDir, nthread)
     paths = parse_directories(parentDir)
     for i, path in enumerate(paths):
         result_dict = {}
         parameters = read_parameters(path)
         parameters['nthread'] = nthread
-        score, pred_train, pred_test = global_functions.parameter_evaluation(
+        score, pred_train, pred_test = parameter_evaluation(
             parameters, data_dict)
         result_dict['pred_train'] = pred_train
         result_dict['pred_test'] = pred_test
@@ -68,14 +71,14 @@ def main(parentDir, nthread, sampleDir, outputDir):
         outputDir1 = os.path.join(outputDir, str(i))
         if not os.path.exists(outputDir1):
             os.makedirs(outputDir1)
-        assessment = global_functions.main_f1_calculate(
+        assessment = main_f1_calculate(
             result_dict['pred_train'],
             result_dict['pred_test'],
             result_dict['data_dict']
         )
         assessment['train_AUC'] = (-1) * train_AUC
         assessment['test_AUC'] = (-1) * test_AUC
-        global_functions.best_to_file(
+        best_to_file(
             parameters, outputDir1, assessment)
         plot_single(data_dict, pred_test, pred_train, path)
     plotOut = os.path.join(outputDir, 'roc_combined.png')
