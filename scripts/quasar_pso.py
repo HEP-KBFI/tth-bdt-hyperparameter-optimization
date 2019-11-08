@@ -17,7 +17,7 @@ import numpy as np
 import xgboost as xgb
 import docopt
 import os
-from tthAnalysis.bdtHyperparameterOptimization.universal import ensemble_fitnesses
+from tthAnalysis.bdtHyperparameterOptimization.xgb_tools import ensemble_fitnesses
 from tthAnalysis.bdtHyperparameterOptimization.mnist_filereader import create_datasets
 from tthAnalysis.bdtHyperparameterOptimization.universal import read_parameters
 from tthAnalysis.bdtHyperparameterOptimization.universal import save_results
