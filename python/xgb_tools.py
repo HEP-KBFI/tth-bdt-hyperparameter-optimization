@@ -86,7 +86,7 @@ def parameter_evaluation(parameter_dict, data_dict, nthread):
     return score, pred_train, pred_test
 
 
-def ensemble_fitnesses(parameter_dicts, data_dict, nthread):
+def ensemble_fitnesses(parameter_dicts, data_dict, nthread, *args):
     fitnesses = []
     pred_trains = []
     pred_tests = []

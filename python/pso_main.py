@@ -188,7 +188,8 @@ def run_pso(
     value_dicts,
     calculate_fitnesses,
     number_parameters,
-    parameter_dicts
+    parameter_dicts,
+    *args
 ):
     w = w_init
     w_step = (w_fin - w_init)/iterations
@@ -201,7 +202,8 @@ def run_pso(
     i = 1
     print(":::::::: Initializing :::::::::")
     fitnesses, pred_trains, pred_tests = calculate_fitnesses(
-        parameter_dicts, data_dict, nthread)
+        parameter_dicts, data_dict, nthread, outputDir, sample_dir,
+        templateDir, sample_size)
     index = np.argmax(fitnesses)
     result_dict = {
         'data_dict': data_dict,
