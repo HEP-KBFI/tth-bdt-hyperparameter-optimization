@@ -102,7 +102,7 @@ def calculate_newValue(
 
 def calculate_newSpeed(
     personal_bests,
-    param_dicts,
+    parameter_dicts,
     best_parameters,
     w,
     current_speeds,
