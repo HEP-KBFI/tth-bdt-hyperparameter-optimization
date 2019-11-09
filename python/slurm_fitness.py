@@ -40,7 +40,7 @@ def main(parameterFile, sample_dir, nthread):
     path = Path(parameterFile)
     saveDir = str(path.parent)
     score, pred_train, pred_test = parameter_evaluation(
-        parameter_dict, data_dict)
+        parameter_dict, data_dict, nthread)
     save_info(score, pred_train, pred_test, saveDir)
 
 
