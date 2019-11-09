@@ -31,13 +31,14 @@ def prepare_jobFile(
     nthread,
     sample_nr,
     outputDir,
-    templateDir
+    mainDir
 ):
+    templateDir = os.path.join(mainDir, 'data')
     jobFile = os.path.join(outputDir, 'parameter_' + str(sample_nr) + '.sh')
     template_file = os.path.join(templateDir, 'submit_template.sh')
     errorFile = os.path.join(outputDir, 'error')
     outputFile = os.path.join(outputDir, 'output')
-    runScript = os.path.join(templateDir, 'slurm_fitness.py')
+    runScript = os.path.join(mainDir, 'python', 'slurm_fitness.py')
     copyfile(template_file, jobFile)
     with open(jobFile, 'a') as fh:
         fh.writelines('''
@@ -60,7 +61,7 @@ def run_iteration(
     nthread,
     outputDir,
     sample_dir,
-    templateDir,
+    mainDir,
     sample_size
 ):
     parameters_to_file(outputDir, parameter_dicts)
@@ -69,7 +70,7 @@ def run_iteration(
         sample_nr = get_sample_nr(parameterFile)
         jobFile = prepare_jobFile(
             parameterFile, sample_dir, nthread,
-            sample_nr, outputDir, templateDir
+            sample_nr, outputDir, mainDir
         )
         run_job(jobFile)
     wait_iteration(outputDir, sample_size)

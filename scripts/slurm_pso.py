@@ -3,12 +3,12 @@ Particle swarm optimization for the hyperparameters optimization of XGBoost.
 (MNIST numbers). Version for slurm.
 Call with 'python3'
 
-Usage: quasar_pso.py --sample_dir=DIR --nthread=INT --param_file=PTH --outputDir=DIR --mainDir=DIR
+Usage: quasar_pso.py --sample_dir=DIR --nthread=INT --paramDir=DIR --outputDir=DIR --mainDir=DIR
 
 Options:
     --sample_dir=DIR        Directory of the sample
     --nthread=INT           Number of threads to use
-    --param_file=PTH        Path to the parameters file
+    --paramDir=DIR          Path to the parameters file
     --outputDir=DIR         Directory for plots and parameters
     --mainDir=DIR           Directory of the main scripts (../hyper/hyper)
 
@@ -31,11 +31,12 @@ np.random.seed(1)
 def main(param_file, nthread, sample_dir, outputDir, mainDir):
     if not os.path.isdir(outputDir):
         os.makedirs(outputDir)
-    print("::::::: Loading data ::::::::")
+    print('::::::: Loading data ::::::::')
     data_dict = create_datasets(sample_dir, nthread)
-    print("::::::: Reading parameters :::::::")
+    print('::::::: Reading parameters :::::::')
+    param_file = os.path.join(paramDir, 'xgb_parameters.json')
     value_dicts = read_parameters(param_file)
-    weight_dict = read_weights(value_dicts, mainDir)
+    weight_dict = read_weights(value_dicts, paramDir)
     w_init = np.array(weight_dict['w_init'])
     w_fin = np.array(weight_dict['w_fin'])
     iterations = weight_dict['iterations']
@@ -57,11 +58,11 @@ def main(param_file, nthread, sample_dir, outputDir, mainDir):
 if __name__ == '__main__':
     try:
         arguments = docopt.docopt(__doc__)
-        param_file = arguments['--param_file']
+        paramDir = arguments['--paramDir']
         nthread = int(arguments['--nthread'])
         sample_dir = arguments['--sample_dir']
         outputDir = arguments['--outputDir']
         mainDir = arguments['--mainDir']
-        main(param_file, nthread, sample_dir, outputDir, mainDir)
+        main(paramDir, nthread, sample_dir, outputDir, mainDir)
     except docopt.DocoptExit as e:
         print(e)

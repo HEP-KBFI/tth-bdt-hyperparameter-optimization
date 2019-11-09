@@ -165,7 +165,7 @@ def run_pso(
     number_parameters,
     parameter_dicts,
     outputDir,
-    templateDir
+    mainDir
 ):
     w = w_init
     w_step = (w_fin - w_init)/iterations
@@ -179,7 +179,7 @@ def run_pso(
     print(":::::::: Initializing :::::::::")
     fitnesses, pred_trains, pred_tests = calculate_fitnesses(
         parameter_dicts, data_dict, nthread, outputDir, sample_dir,
-        templateDir, sample_size)
+        mainDir, sample_size)
     index = np.argmax(fitnesses)
     result_dict = {
         'data_dict': data_dict,
