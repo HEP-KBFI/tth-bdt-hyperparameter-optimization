@@ -220,7 +220,7 @@ def create_subpopulations(settings, parameters):
     return subpopulations
 
 # Evolve subpopulations separately and then merge them into one
-def sub_evolution(subpopulations, settings, data, parameters):
+def sub_evolution(subpopulations, settings, data, parameters, nthread):
 
     # Initialization
     best_scores = {}
@@ -303,7 +303,7 @@ def evolution(settings, data, parameters, nthread):
         subpopulations = create_subpopulations(settings, parameters)
 
         # Evolve subpopulations
-        merged_population, scores_dict = sub_evolution(subpopulations, settings, data, parameters)
+        merged_population, scores_dict = sub_evolution(subpopulations, settings, data, parameters, nthread)
 
         # Evolve merged population
         print(('\n::::: Merged population  :::::'))
