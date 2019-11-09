@@ -1,9 +1,7 @@
 import numpy as np
 import xgboost as xgb
-# from tthAnalysis.bdtHyperparameterOptimization.xgb_tools import prepare_params_calc
 from tthAnalysis.bdtHyperparameterOptimization.universal import read_parameters
 from tthAnalysis.bdtHyperparameterOptimization.universal import calculate_improvement_wSTDEV
-# from tthAnalysis.bdtHyperparameterOptimization.xgb_tools import prepare_run_params # also from XGBoost
 import docopt
 import os
 np.random.seed(1)
@@ -31,27 +29,12 @@ def prepare_newDay(
     c2
 ):
     current_speeds = calculate_newSpeed(
-        personal_bests, param_dicts, best_parameters,
+        personal_bests, parameter_dicts, best_parameters,
         w, current_speeds, c1, c2
     )
     new_parameters = calculate_newValue(
         current_speeds, parameter_dicts, nthread, value_dicts)
     return new_parameters
-
-# shouldn't be xgb dependant here
-# def prepare_all_calculation(
-#     personal_bests,
-#     parameter_dicts,
-#     best_parameters
-# ):
-#     calc_dict = {}
-#     calc_dict['personal_bests'] = prepare_params_calc(
-#         personal_bests)
-#     calc_dict['parameter_dicts'] = prepare_params_calc(
-#         parameter_dicts)
-#     calc_dict['best_parameters'] = prepare_params_calc(
-#         best_parameters)
-#     return calc_dict
 
 
 def calculate_personal_bests(
@@ -77,13 +60,6 @@ def calculate_newValue(
     value_dicts
 ):
     new_values = []
-    params = {
-        'silent': 1,
-        'objective': 'multi:softprob',
-        'num_class': 10,
-        'nthread': nthread,
-        'seed': 1
-    }
     for current_speed, parameter_dict in zip(current_speeds, parameter_dicts):
         new_value = {}
         i = 0
@@ -95,14 +71,13 @@ def calculate_newValue(
             if new_value[key] < value_dicts[i]['range_start']:
                 new_value[key] = value_dicts[i]['range_start']
             i += 1
-        new_value.update(params)
         new_values.append(new_value)
     return new_values
 
 
 def calculate_newSpeed(
     personal_bests,
-    param_dicts,
+    parameter_dicts,
     best_parameters,
     w,
     current_speeds,
@@ -130,8 +105,8 @@ def calculate_newSpeed(
         social_array = np.array(social_array)
         new_speed = (
             w * inertia
-            + c1 * r1 * cognitive_array
-            + c2 * r2 * social_array
+            + c1 * (r1 * cognitive_array)
+            + c2 * (r2 * social_array)
         )
         new_speeds.append(new_speed)
         i = i + 1
@@ -177,7 +152,6 @@ def weight_normalization(param_dict):
 
 def run_pso(
     sample_dir,
-    param_file,
     nthread,
     sample_size,
     w_init,
@@ -188,10 +162,11 @@ def run_pso(
     data_dict,
     value_dicts,
     calculate_fitnesses,
-    number_parameters
+    number_parameters,
+    parameter_dicts,
+    outputDir,
+    mainDir
 ):
-    parameter_dicts = prepare_run_params( # liigutada algusesse.
-        nthread, value_dicts, sample_size)
     w = w_init
     w_step = (w_fin - w_init)/iterations
     new_parameters = parameter_dicts
@@ -203,7 +178,8 @@ def run_pso(
     i = 1
     print(":::::::: Initializing :::::::::")
     fitnesses, pred_trains, pred_tests = calculate_fitnesses(
-        parameter_dicts, data_dict)
+        parameter_dicts, data_dict, nthread, outputDir, sample_dir,
+        mainDir, sample_size)
     index = np.argmax(fitnesses)
     result_dict = {
         'data_dict': data_dict,
@@ -221,7 +197,8 @@ def run_pso(
         print(" --- Compactness: ", compactness, " ---")
         parameter_dicts = new_parameters
         fitnesses, pred_trains, pred_tests = calculate_fitnesses(
-            parameter_dicts, data_dict)
+            parameter_dicts, data_dict, nthread, outputDir, sample_dir,
+            mainDir, sample_size)
         best_fitnesses = find_bestFitnesses(fitnesses, best_fitnesses)
         personal_bests = calculate_personal_bests(
             fitnesses, best_fitnesses, parameter_dicts, personal_bests)

@@ -1,27 +1,9 @@
-"""
-Genetic algorithm for optimizing the hyperparameters of XGBoost. (MNIST nbr)
-Call with 'python3'
-
-Usage: mnist_ga.py --sample_dir=DIR --nthread=INT --output_dir=DIR --param_file=PTH --sett_file=PTH
-
-Options:
-    --sample_dir=DIR        The location of MNIST number sample
-    --nthread=INT           Number of threads to be used (recommended = # of cores)
-    --output_dir=DIR        Output directory for the results
-    --param_file=PTH        Path to parameters file
-    --sett_file=PTH         Path to settings file
-
-"""
 import numpy as np
 import xgboost as xgb
 import docopt, random, os
-from tthAnalysis.bdtHyperparameterOptimization.universal import prepare_run_params
-from tthAnalysis.bdtHyperparameterOptimization.universal import ensemble_fitnesses
+from tthAnalysis.bdtHyperparameterOptimization.xgb_tools import prepare_run_params
+from tthAnalysis.bdtHyperparameterOptimization.xgb_tools import ensemble_fitnesses
 from tthAnalysis.bdtHyperparameterOptimization.universal import calculate_improvement_wAVG
-from tthAnalysis.bdtHyperparameterOptimization.universal import prepare_run_params
-from tthAnalysis.bdtHyperparameterOptimization.universal import read_parameters
-from tthAnalysis.bdtHyperparameterOptimization.mnist_filereader import create_datasets
-from tthAnalysis.bdtHyperparameterOptimization.universal import save_results
 
 # Selection of two parents from a population based on the tournament method.
 def selection(pop, fitnesses, t_size = 3, t_prob = 0.75):
@@ -186,7 +168,7 @@ def elitism(population, fitnesses, elites):
 # Add missing parameters to an offspring
 def add_parameters(offspring, nthread):
     params = {
-        'verbosity': 1,
+        'silent': 1,
         'objective': 'multi:softprob',
         'num_class': 10,
         'nthread': nthread,
@@ -238,7 +220,7 @@ def create_subpopulations(settings, parameters):
     return subpopulations
 
 # Evolve subpopulations separately and then merge them into one
-def sub_evolution(subpopulations, settings, data, parameters):
+def sub_evolution(subpopulations, settings, data, parameters, nthread):
 
     # Initialization
     best_scores = {}
@@ -250,7 +232,7 @@ def sub_evolution(subpopulations, settings, data, parameters):
     # Evolution for each subpopulation
     for population in subpopulations:
         print('\n::::: Subpopulation: ', sub_iteration, ' :::::')
-        final_population, scores_dict = evolve(population, settings, data, parameters)
+        final_population, scores_dict = evolve(population, settings, data, parameters, nthread)
 
         # Saving results in dictionaries (key indicates the subpopulation)
         best_scores[sub_iteration] = scores_dict['best_scores']
@@ -267,7 +249,7 @@ def sub_evolution(subpopulations, settings, data, parameters):
     return merged_population, scores_dict
 
 # Evolve a population until reaching the threshold or maximum number of iterations
-def evolve(population, settings, data, parameters, final = False):
+def evolve(population, settings, data, parameters, nthread, final = False):
 
     # Initialization
     best_scores = []
@@ -287,7 +269,7 @@ def evolve(population, settings, data, parameters, final = False):
 
         # Calculate fitness of the population
         fitnesses, pred_trains, pred_tests = (
-            ensemble_fitnesses(population, data)
+            ensemble_fitnesses(population, data, nthread)
         )
 
         # Save results
@@ -310,7 +292,7 @@ def evolve(population, settings, data, parameters, final = False):
     return population, scores_dict
 
 
-def evolution(settings, data, parameters):
+def evolution(settings, data, parameters, nthread):
 
     if settings['sub_pops'] > 1:
 
@@ -321,12 +303,12 @@ def evolution(settings, data, parameters):
         subpopulations = create_subpopulations(settings, parameters)
 
         # Evolve subpopulations
-        merged_population, scores_dict = sub_evolution(subpopulations, settings, data, parameters)
+        merged_population, scores_dict = sub_evolution(subpopulations, settings, data, parameters, nthread)
 
         # Evolve merged population
         print(('\n::::: Merged population  :::::'))
         population, final_scores_dict, fitnesses, pred_trains, pred_tests = evolve(
-            merged_population, settings, data, parameters, True)
+            merged_population, settings, data, parameters, nthread, True)
 
         scores_dict['best_scores'].update({'final': final_scores_dict['best_scores']})
         scores_dict['avg_scores'].update({'final': final_scores_dict['avg_scores']})
@@ -339,7 +321,7 @@ def evolution(settings, data, parameters):
 
         # Evolve population
         population, scores_dicts, fitnesses, pred_trains, pred_tests = evolve(
-            population, settings, data, parameters, True)
+            population, settings, data, parameters, nthread, True)
 
     # Finalize results
     index = np.argmax(fitnesses)
@@ -356,35 +338,3 @@ def evolution(settings, data, parameters):
         'data_dict': data
     }
     return result
-
-
-def main(sample_dir, nthread, output_dir, param_file, sett_file):
-
-    # Load settings for genetic algorithm
-    settings_dict = read_parameters(sett_file)[0]
-    settings_dict.update({'nthread': nthread})
-
-    # Load data
-    data_dict = create_datasets(sample_dir, nthread)
-
-    # Load parameters for optimization
-    param_dict = read_parameters(param_file)
-
-    # Run genetic algorithm and save results
-    result = evolution(settings_dict, data_dict, param_dict)
-    save_results(result, output_dir)
-
-
-if __name__ == '__main__':
-    try:
-        arguments = docopt.docopt(__doc__)
-        sample_dir = arguments['--sample_dir']
-        nthread = int(arguments['--nthread'])
-        output_dir = arguments['--output_dir']
-        if not os.path.isdir(output_dir):
-            os.makedirs(output_dir)
-        param_file = arguments['--param_file']
-        sett_file = arguments['--sett_file']
-        main(sample_dir, nthread, output_dir, param_file, sett_file)
-    except docopt.DocoptExit as e:
-        print(e)

@@ -1,4 +1,8 @@
 import struct
+import os
+import xgboost as xgb
+import numpy as np
+
 
 # Code for reading MNIST files
 def read_images(images_name):
@@ -65,7 +69,7 @@ def read_dataset(images_name, labels_name):
     return (images, labels)
 
 
-def create_datasets(sample_dir, nthread): # MNIST
+def create_datasets(sample_dir, nthread): # MNIST & XGBoost
     image_file = os.path.join(sample_dir, 'train-images-idx3-ubyte')
     label_file = os.path.join(sample_dir, 'train-labels-idx1-ubyte')
     training_images, training_labels = read_dataset(image_file, label_file)

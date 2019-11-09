@@ -8,6 +8,9 @@ If running with CMSSW:
 
 ````console
 git clone https://github.com/HEP-KBFI/tth-bdt-hyperparameter-optimization.git $CMSSW_BASE/src/tthAnalysis/bdtHyperparameterOptimization
+pip install pathlib --user
+pip install timeout-decorator --user
+pip install docopt --user
 ````
 
 

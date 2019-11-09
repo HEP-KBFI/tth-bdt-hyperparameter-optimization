@@ -1,4 +1,5 @@
 import numpy as np
+import xgboost as xgb
 from tthAnalysis.bdtHyperparameterOptimization.universal import get_most_probable
 from tthAnalysis.bdtHyperparameterOptimization.universal import calculate_conf_matrix
 from tthAnalysis.bdtHyperparameterOptimization.universal import calculate_f1_score
@@ -58,9 +59,9 @@ def prepare_params_calc(value_dicts):
         return reduct_value_dicts
 
 
-def parameter_evaluation(parameter_dict, data_dict):
+def parameter_evaluation(parameter_dict, data_dict, nthread):
     params = {
-        'verbosity': 1,
+        'silent': 1,
         'objective': 'multi:softprob',
         'num_class': 10,
         'nthread': nthread,
@@ -72,7 +73,8 @@ def parameter_evaluation(parameter_dict, data_dict):
     model = xgb.train(
         parameters,
         data_dict['dtrain'],
-        num_boost_round=int(num_boost_round)
+        num_boost_round=int(num_boost_round),
+        verbose_eval=False
     )
     pred_train = model.predict(data_dict['dtrain'])
     pred_test = model.predict(data_dict['dtest'])
@@ -83,14 +85,14 @@ def parameter_evaluation(parameter_dict, data_dict):
     score = calculate_f1_score(test_confusionMatrix)[1]
     return score, pred_train, pred_test
 
-
-def ensemble_fitnesses(parameter_dicts, data_dict):
+# parameter evaluation as argument for the function. Move to universal
+def ensemble_fitnesses(parameter_dicts, data_dict, nthread, *args):
     fitnesses = []
     pred_trains = []
     pred_tests = []
     for parameter_dict in parameter_dicts:
         fitness, pred_train, pred_test = parameter_evaluation(
-            parameter_dict, data_dict)
+            parameter_dict, data_dict, nthread)
         fitnesses.append(fitness)
         pred_trains.append(pred_train)
         pred_tests.append(pred_test)

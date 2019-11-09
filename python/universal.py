@@ -2,10 +2,13 @@ import numpy as np
 import json
 import os
 import xgboost as xgb
+import matplotlib
+matplotlib.use('agg')
 import matplotlib.pyplot as plt
 import itertools
 from sklearn.metrics import confusion_matrix
-
+import warnings
+warnings.filterwarnings('ignore', category=RuntimeWarning)
 
 def read_parameters(param_file):
     value_dicts = []
@@ -17,8 +20,8 @@ def read_parameters(param_file):
 
 
 def best_to_file(best_values, outputDir, assesment):
-    outputPath = os.path.join(outputDir, "best_parameters.json")
-    with open(outputPath, "w") as f:
+    outputPath = os.path.join(outputDir, 'best_parameters.json')
+    with open(outputPath, 'w') as f:
         json.dump(best_values, f)
         f.write('\n')
         json.dump(assesment, f)
@@ -118,7 +121,7 @@ def main_f1_calculate(pred_train, pred_test, data_dict):
     return assessment
 
 
-def save_results(result_dict, outputDir, roc=True):
+def save_results(result_dict, outputDir, plotROC=True):
     if not os.path.exists(outputDir):
         os.makedirs(outputDir)
     data_dict = result_dict['data_dict']
@@ -134,7 +137,7 @@ def save_results(result_dict, outputDir, roc=True):
     train_AUC = np.trapz(y_train, x_train)
     assessment['train_AUC'] = (-1) * train_AUC
     assessment['test_AUC'] = (-1) * test_AUC
-    if roc:
+    if plotROC:
         plotting(
             outputDir,
             x_train, y_train,
@@ -157,9 +160,8 @@ def calculate_improvement_wAVG(avg_scores, improvements, threshold):
 
 
 def calculate_improvement_wSTDEV(parameter_dicts):
-    reduct_param = prepare_params_calc(parameter_dicts)
-    keys = reduct_param[0].keys()
-    list_dict = values_to_list_dict(keys, reduct_param)
+    keys = parameter_dicts[0].keys()
+    list_dict = values_to_list_dict(keys, parameter_dicts)
     mean_COV = calculate_dict_mean_coeff_of_variation(list_dict)
     return mean_COV
 

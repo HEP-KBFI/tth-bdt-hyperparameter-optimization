@@ -12,7 +12,7 @@ Options:
 import numpy as np
 from tthAnalysis.bdtHyperparameterOptimization.universal import read_parameters
 from tthAnalysis.bdtHyperparameterOptimization.mnist_filereader import create_datasets
-from tthAnalysis.bdtHyperparameterOptimization.universal import parameter_evaluation
+from tthAnalysis.bdtHyperparameterOptimization.xgb_tools import parameter_evaluation
 import docopt
 import json
 from pathlib import Path
@@ -38,9 +38,9 @@ def main(parameterFile, sample_dir, nthread):
     parameter_dict = read_parameters(parameterFile)[0]
     data_dict = create_datasets(sample_dir, nthread)
     path = Path(parameterFile)
-    saveDir = os.path.abspath(path.parent)
+    saveDir = str(path.parent)
     score, pred_train, pred_test = parameter_evaluation(
-        parameter_dict, data_dict)
+        parameter_dict, data_dict, nthread)
     save_info(score, pred_train, pred_test, saveDir)
 
 
