@@ -118,7 +118,7 @@ def main_f1_calculate(pred_train, pred_test, data_dict):
     return assessment
 
 
-def save_results(result_dict, outputDir, roc=True):
+def save_results(result_dict, outputDir, plotROC=True):
     if not os.path.exists(outputDir):
         os.makedirs(outputDir)
     data_dict = result_dict['data_dict']
@@ -134,7 +134,7 @@ def save_results(result_dict, outputDir, roc=True):
     train_AUC = np.trapz(y_train, x_train)
     assessment['train_AUC'] = (-1) * train_AUC
     assessment['test_AUC'] = (-1) * test_AUC
-    if roc:
+    if plotROC:
         plotting(
             outputDir,
             x_train, y_train,
