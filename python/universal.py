@@ -7,7 +7,8 @@ matplotlib.use('agg')
 import matplotlib.pyplot as plt
 import itertools
 from sklearn.metrics import confusion_matrix
-
+import warnings
+warnings.filterwarnings('ignore')
 
 def read_parameters(param_file):
     value_dicts = []
