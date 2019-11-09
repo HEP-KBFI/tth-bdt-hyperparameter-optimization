@@ -2,6 +2,6 @@
 
 LOCATION=$PWD
 git pull
-cd $CMS_BASE/src
+cd ~/CMSSW_10_2_10/src
 scram b -j 8
 cd $LOCATION

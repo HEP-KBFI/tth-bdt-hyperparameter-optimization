@@ -164,7 +164,7 @@ def run_pso(
     calculate_fitnesses,
     number_parameters,
     parameter_dicts,
-    *kwargs
+    **kwargs
 ):
     w = w_init
     w_step = (w_fin - w_init)/iterations
