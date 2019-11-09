@@ -33,7 +33,7 @@ def main(sample_dir, nthread, output_dir, param_file, sett_file):
     param_dict = read_parameters(param_file)
 
     # Run genetic algorithm and save results
-    result = evolution(settings_dict, data_dict, param_dict)
+    result = evolution(settings_dict, data_dict, param_dict, nthread)
     save_results(result, output_dir)
 
 

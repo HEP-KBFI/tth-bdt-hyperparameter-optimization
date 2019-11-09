@@ -85,7 +85,7 @@ def parameter_evaluation(parameter_dict, data_dict, nthread):
     score = calculate_f1_score(test_confusionMatrix)[1]
     return score, pred_train, pred_test
 
-
+# parameter evaluation as argument for the function. Move to universal
 def ensemble_fitnesses(parameter_dicts, data_dict, nthread, *args):
     fitnesses = []
     pred_trains = []

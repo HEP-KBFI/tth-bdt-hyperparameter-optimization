@@ -249,7 +249,7 @@ def sub_evolution(subpopulations, settings, data, parameters):
     return merged_population, scores_dict
 
 # Evolve a population until reaching the threshold or maximum number of iterations
-def evolve(population, settings, data, parameters, final = False):
+def evolve(population, settings, data, parameters, nthread, final = False):
 
     # Initialization
     best_scores = []
@@ -269,7 +269,7 @@ def evolve(population, settings, data, parameters, final = False):
 
         # Calculate fitness of the population
         fitnesses, pred_trains, pred_tests = (
-            ensemble_fitnesses(population, data)
+            ensemble_fitnesses(population, data, nthread)
         )
 
         # Save results
@@ -292,7 +292,7 @@ def evolve(population, settings, data, parameters, final = False):
     return population, scores_dict
 
 
-def evolution(settings, data, parameters):
+def evolution(settings, data, parameters, nthread):
 
     if settings['sub_pops'] > 1:
 
@@ -308,7 +308,7 @@ def evolution(settings, data, parameters):
         # Evolve merged population
         print(('\n::::: Merged population  :::::'))
         population, final_scores_dict, fitnesses, pred_trains, pred_tests = evolve(
-            merged_population, settings, data, parameters, True)
+            merged_population, settings, data, parameters, nthread, True)
 
         scores_dict['best_scores'].update({'final': final_scores_dict['best_scores']})
         scores_dict['avg_scores'].update({'final': final_scores_dict['avg_scores']})
@@ -321,7 +321,7 @@ def evolution(settings, data, parameters):
 
         # Evolve population
         population, scores_dicts, fitnesses, pred_trains, pred_tests = evolve(
-            population, settings, data, parameters, True)
+            population, settings, data, parameters, nthread, True)
 
     # Finalize results
     index = np.argmax(fitnesses)
