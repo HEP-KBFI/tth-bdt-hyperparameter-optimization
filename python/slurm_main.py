@@ -109,7 +109,7 @@ def read_fitness(outputDir):
 
 def get_sample_nr(path):
     path1 = Path(path)
-    parent_path = path1.parent
+    parent_path = str(path1.parent)
     sample_nr = int(parent_path.split('/')[-1])
     return sample_nr
 
