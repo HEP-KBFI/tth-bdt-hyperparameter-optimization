@@ -38,7 +38,7 @@ def main(parameterFile, sample_dir, nthread):
     parameter_dict = read_parameters(parameterFile)[0]
     data_dict = create_datasets(sample_dir, nthread)
     path = Path(parameterFile)
-    saveDir = os.path.abspath(path.parent)
+    saveDir = str(path.parent)
     score, pred_train, pred_test = parameter_evaluation(
         parameter_dict, data_dict)
     save_info(score, pred_train, pred_test, saveDir)
