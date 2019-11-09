@@ -197,7 +197,8 @@ def run_pso(
         print(" --- Compactness: ", compactness, " ---")
         parameter_dicts = new_parameters
         fitnesses, pred_trains, pred_tests = calculate_fitnesses(
-            parameter_dicts, data_dict, nthread)
+            parameter_dicts, data_dict, nthread, outputDir, sample_dir,
+            mainDir, sample_size)
         best_fitnesses = find_bestFitnesses(fitnesses, best_fitnesses)
         personal_bests = calculate_personal_bests(
             fitnesses, best_fitnesses, parameter_dicts, personal_bests)
