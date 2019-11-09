@@ -2,6 +2,8 @@ import numpy as np
 import json
 import os
 import xgboost as xgb
+import matplotlib
+matplotlib.use('agg')
 import matplotlib.pyplot as plt
 import itertools
 from sklearn.metrics import confusion_matrix
@@ -17,8 +19,8 @@ def read_parameters(param_file):
 
 
 def best_to_file(best_values, outputDir, assesment):
-    outputPath = os.path.join(outputDir, "best_parameters.json")
-    with open(outputPath, "w") as f:
+    outputPath = os.path.join(outputDir, 'best_parameters.json')
+    with open(outputPath, 'w') as f:
         json.dump(best_values, f)
         f.write('\n')
         json.dump(assesment, f)
