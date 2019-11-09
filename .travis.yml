@@ -1,0 +1,15 @@
+language: python
+python:
+  - '2.7'
+install:
+  - pip install -r requirements.txt --user
+env:
+  - TEST_CMSSW_VERSION=CMSSW_10_2_10 SCRAM_ARCH=slc6_amd64_gcc700
+before_install:
+  - git clone source /cvmfs/cms.cern.ch/cmsset_default.sh
+  - export SCRAM_ARCH=slc6_amd64_gcc700
+  - cmsrel CMSSW_10_2_10
+  - cd $_/src/
+  - cmsenv
+script:
+  - py.test ./tests
