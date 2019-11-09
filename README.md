@@ -1,4 +1,4 @@
-# tth-bdt-hyperparameter-optimization [![Build Status](https://github.com/HEP-KBFI/tth-bdt-hyperparameter-optimization.svg?branch=master)](https://github.com/HEP-KBFI/tth-bdt-hyperparameter-optimization)
+# tth-bdt-hyperparameter-optimization [![Build Status](https://travis-ci.org/HEP-KBFI/tth-bdt-hyperparameter-optimization.svg?branch=master)](https://travis-ci.org/HEP-KBFI/tth-bdt-hyperparameter-optimization)
 Evolutionary algorithms for hyperparameter optimization for BDT (XGBoost) and NN (with MNIST numbers dataset for testing).
 
 
