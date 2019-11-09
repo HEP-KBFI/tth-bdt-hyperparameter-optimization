@@ -49,8 +49,8 @@ def main(param_file, nthread, sample_dir, outputDir, mainDir):
         sample_dir, nthread, sample_size,
         w_init, w_fin, c1, c2, iterations,
         data_dict, value_dicts, run_iteration,
-        number_parameters, parameter_dicts, outputDir=outputDir,
-        templateDir=mainDir
+        number_parameters, parameter_dicts, outputDir,
+        mainDir
     )
 
 
