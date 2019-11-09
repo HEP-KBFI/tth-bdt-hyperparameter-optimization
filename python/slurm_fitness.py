@@ -12,7 +12,7 @@ Options:
 import numpy as np
 from tthAnalysis.bdtHyperparameterOptimization.universal import read_parameters
 from tthAnalysis.bdtHyperparameterOptimization.mnist_filereader import create_datasets
-from tthAnalysis.bdtHyperparameterOptimization.universal import parameter_evaluation
+from tthAnalysis.bdtHyperparameterOptimization.xgb_tools import parameter_evaluation
 import docopt
 import json
 from pathlib import Path
