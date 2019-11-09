@@ -29,11 +29,11 @@ def prepare_jobFile(
     parameterFile,
     sample_dir,
     nthread,
-    job_nr,
+    sample_nr,
     outputDir,
     templateDir
 ):
-    jobFile = os.path.join(outputDir, 'parameter_' + str(job_nr) + '.sh')
+    jobFile = os.path.join(outputDir, 'parameter_' + str(sample_nr) + '.sh')
     template_file = os.path.join(templateDir, 'submit_template.sh')
     errorFile = os.path.join(outputDir, 'error')
     outputFile = os.path.join(outputDir, 'output')
@@ -56,8 +56,8 @@ def run_job(jobFile):
 
 def run_iteration(
     parameter_dicts,
-    nthread,
     data_dict,
+    nthread,
     outputDir,
     sample_dir,
     templateDir,
