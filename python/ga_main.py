@@ -232,7 +232,7 @@ def sub_evolution(subpopulations, settings, data, parameters):
     # Evolution for each subpopulation
     for population in subpopulations:
         print('\n::::: Subpopulation: ', sub_iteration, ' :::::')
-        final_population, scores_dict = evolve(population, settings, data, parameters)
+        final_population, scores_dict = evolve(population, settings, data, parameters, nthread)
 
         # Saving results in dictionaries (key indicates the subpopulation)
         best_scores[sub_iteration] = scores_dict['best_scores']
