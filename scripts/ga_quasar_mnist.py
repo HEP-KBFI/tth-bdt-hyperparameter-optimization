@@ -22,15 +22,15 @@ from tthAnalysis.bdtHyperparameterOptimization.ga_main import evolution
 
 def main(sample_dir, nthread, output_dir, param_file, sett_file):
 
-    # Load settings for genetic algorithm
+    print("::::::: Reading GA settings & XGBoost parameters :::::::")
     settings_dict = read_parameters(sett_file)[0]
     settings_dict.update({'nthread': nthread})
 
-    # Load data
-    data_dict = create_datasets(sample_dir, nthread)
-
     # Load parameters for optimization
     param_dict = read_parameters(param_file)
+
+    print("::::::: Loading data ::::::::")
+    data_dict = create_datasets(sample_dir, nthread)
 
     # Run genetic algorithm and save results
     result = evolution(settings_dict, data_dict, param_dict, nthread)
