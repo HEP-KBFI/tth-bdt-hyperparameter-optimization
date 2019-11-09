@@ -13,6 +13,7 @@ Options:
 
 """
 import os
+import docopt
 from tthAnalysis.bdtHyperparameterOptimization.universal import read_parameters
 from tthAnalysis.bdtHyperparameterOptimization.universal import save_results
 from tthAnalysis.bdtHyperparameterOptimization.mnist_filereader import create_datasets
