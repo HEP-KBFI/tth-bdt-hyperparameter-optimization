@@ -77,13 +77,13 @@ def calculate_newValue(
     value_dicts
 ):
     new_values = []
-    params = {
-        'silent': 1,
-        'objective': 'multi:softprob',
-        'num_class': 10,
-        'nthread': nthread,
-        'seed': 1,
-    }
+    # params = {
+    #     'silent': 1,
+    #     'objective': 'multi:softprob',
+    #     'num_class': 10,
+    #     'nthread': nthread,
+    #     'seed': 1,
+    # }
     for current_speed, parameter_dict in zip(current_speeds, parameter_dicts):
         new_value = {}
         i = 0
@@ -95,7 +95,7 @@ def calculate_newValue(
             if new_value[key] < value_dicts[i]['range_start']:
                 new_value[key] = value_dicts[i]['range_start']
             i += 1
-        new_value.update(params)
+        # new_value.update(params)
         new_values.append(new_value)
     return new_values
 
@@ -130,8 +130,8 @@ def calculate_newSpeed(
         social_array = np.array(social_array)
         new_speed = (
             w * inertia
-            + c1 * r1 * cognitive_array
-            + c2 * r2 * social_array
+            + c1 * (r1 * cognitive_array)
+            + c2 * (r2 * social_array)
         )
         new_speeds.append(new_speed)
         i = i + 1
