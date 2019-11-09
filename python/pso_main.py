@@ -1,9 +1,7 @@
 import numpy as np
 import xgboost as xgb
-# from tthAnalysis.bdtHyperparameterOptimization.xgb_tools import prepare_params_calc
 from tthAnalysis.bdtHyperparameterOptimization.universal import read_parameters
 from tthAnalysis.bdtHyperparameterOptimization.universal import calculate_improvement_wSTDEV
-# from tthAnalysis.bdtHyperparameterOptimization.xgb_tools import prepare_run_params # also from XGBoost
 import docopt
 import os
 np.random.seed(1)
@@ -38,21 +36,6 @@ def prepare_newDay(
         current_speeds, parameter_dicts, nthread, value_dicts)
     return new_parameters
 
-# shouldn't be xgb dependant here
-# def prepare_all_calculation(
-#     personal_bests,
-#     parameter_dicts,
-#     best_parameters
-# ):
-#     calc_dict = {}
-#     calc_dict['personal_bests'] = prepare_params_calc(
-#         personal_bests)
-#     calc_dict['parameter_dicts'] = prepare_params_calc(
-#         parameter_dicts)
-#     calc_dict['best_parameters'] = prepare_params_calc(
-#         best_parameters)
-#     return calc_dict
-
 
 def calculate_personal_bests(
     fitnesses,
@@ -77,13 +60,6 @@ def calculate_newValue(
     value_dicts
 ):
     new_values = []
-    # params = {
-    #     'silent': 1,
-    #     'objective': 'multi:softprob',
-    #     'num_class': 10,
-    #     'nthread': nthread,
-    #     'seed': 1,
-    # }
     for current_speed, parameter_dict in zip(current_speeds, parameter_dicts):
         new_value = {}
         i = 0
@@ -95,7 +71,6 @@ def calculate_newValue(
             if new_value[key] < value_dicts[i]['range_start']:
                 new_value[key] = value_dicts[i]['range_start']
             i += 1
-        # new_value.update(params)
         new_values.append(new_value)
     return new_values
 
@@ -189,7 +164,7 @@ def run_pso(
     calculate_fitnesses,
     number_parameters,
     parameter_dicts,
-    *args
+    *kwargs
 ):
     w = w_init
     w_step = (w_fin - w_init)/iterations

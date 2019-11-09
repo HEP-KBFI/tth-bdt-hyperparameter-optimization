@@ -19,8 +19,6 @@ from tthAnalysis.bdtHyperparameterOptimization.mnist_filereader import create_da
 from tthAnalysis.bdtHyperparameterOptimization.ga_main import evolution
 
 
-
-
 def main(sample_dir, nthread, output_dir, param_file, sett_file):
 
     # Load settings for genetic algorithm
