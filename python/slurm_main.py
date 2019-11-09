@@ -55,10 +55,11 @@ def run_job(jobFile):
 
 
 def run_iteration(
-    outputDir,
     parameter_dicts,
-    sample_dir,
     nthread,
+    data_dict,
+    outputDir,
+    sample_dir,
     templateDir,
     sample_size
 ):
