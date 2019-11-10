@@ -1,5 +1,8 @@
 import numpy as np
-from tthAnalysis.bdtHyperparameterOptimization import xgb_gridSearch as gs
+from tthAnalysis.bdtHyperparameterOptimization.xgb_gridSearch import single_paramSet
+from tthAnalysis.bdtHyperparameterOptimization.xgb_gridSearch import initialize_values
+from tthAnalysis.bdtHyperparameterOptimization.xgb_gridSearch import param_update
+from tthAnalysis.bdtHyperparameterOptimization.xgb_gridSearch import create_all_combinations
 
 
 def test_single_paramSet():
@@ -15,7 +18,7 @@ def test_single_paramSet():
         'second': 6,
         'third': 8
     }
-    result = gs.single_paramSet(parameters, iterations, grid_size)
+    result = single_paramSet(parameters, iterations, grid_size)
     assert result == expected
 
 
@@ -31,7 +34,7 @@ def test_initialize_values1():
         'second': 6.,
         'third': 9.
     }]
-    result = gs.initialize_values(parameters, grid_size)
+    result = initialize_values(parameters, grid_size)
     assert result == expected1
 
 
@@ -58,7 +61,7 @@ def test_initialize_values2():
         'second': 6.,
     }
     expected_l = [expected1, expected2, expected3, expected4]
-    result = gs.initialize_values(parameters, grid_size)
+    result = initialize_values(parameters, grid_size)
     assert result == expected_l
 
 
@@ -96,12 +99,12 @@ def test_param_update():
         'third': 9.
     }
     in_d = [in1, in2]
-    result = gs.param_update(in_d, nthread)
+    result = param_update(in_d, nthread)
     assert result == expected_dicts
 
 
 def test_create_all_combinations():
     nr_parameters = 3
     grid_size = 3
-    result = gs.create_all_combinations(nr_parameters, grid_size)
+    result = create_all_combinations(nr_parameters, grid_size)
     assert len(result) == 27

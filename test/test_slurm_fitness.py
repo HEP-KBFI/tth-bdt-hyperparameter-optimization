@@ -1,4 +1,5 @@
-from tthAnalysis.bdtHyperparameterOptimization import slurm_fitness as sf
+from tthAnalysis.bdtHyperparameterOptimization.slurm_fitness import main
+from tthAnalysis.bdtHyperparameterOptimization.slurm_fitness import save_info
 import numpy as np
 import os 
 import shutil
@@ -20,7 +21,7 @@ def test_save_info():
     saveDir = tmp_folder
     if not os.path.exists(saveDir):
         os.makedirs(saveDir)
-    sf.save_info(score, pred_train, pred_test, saveDir)
+    save_info(score, pred_train, pred_test, saveDir)
     train_path = os.path.join(saveDir, 'pred_train.lst')
     test_path = os.path.join(saveDir, 'pred_test.lst')
     score_path = os.path.join(saveDir, 'score.txt')
@@ -57,7 +58,7 @@ def test_main():
         with gzip.open(fileLoc + '.gz', 'rb') as f_in:
             with open(fileLoc, 'wb') as f_out:
                 shutil.copyfileobj(f_in, f_out)
-    sf.main(parameterFile_newLoc, sampleDir, nthread)
+    main(parameterFile_newLoc, sampleDir, nthread)
 
 
 def test_dummy_delete_files():

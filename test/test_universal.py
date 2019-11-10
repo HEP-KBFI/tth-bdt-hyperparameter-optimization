@@ -1,124 +1,88 @@
 import numpy as np
 import sys
-from tthAnalysis.bdtHyperparameterOptimization import global_functions as gf
 import os
 import shutil
+from tthAnalysis.bdtHyperparameterOptimization.universal import calculate_f1_score
+from tthAnalysis.bdtHyperparameterOptimization.universal import calculate_improvement_wSTDEV
+from tthAnalysis.bdtHyperparameterOptimization.universal import save_results
+from tthAnalysis.bdtHyperparameterOptimization.universal import calculate_dict_mean_coeff_of_variation
+from tthAnalysis.bdtHyperparameterOptimization.universal import create_pairs
+from tthAnalysis.bdtHyperparameterOptimization.universal import normalization
+from tthAnalysis.bdtHyperparameterOptimization.universal import create_mask
+from tthAnalysis.bdtHyperparameterOptimization.universal import get_values
+from tthAnalysis.bdtHyperparameterOptimization.universal import choose_values
+from tthAnalysis.bdtHyperparameterOptimization.universal import plot_costFunction
 dir_path = os.path.dirname(os.path.realpath(__file__))
 resourcesDir = os.path.join(dir_path, 'resources', 'tmp')
 
 
-def test_prepare_params_calc():
-    values = {
-        'num_boost_round': 371,
-        'learning_rate': 0.07,
-        'max_depth': 9,
-        'gamma': 1.9,
-        'min_child_weight': 18,
-        'subsample': 0.9,
-        'colsample_bytree': 0.8,
-        'verbosity': 1,
-        'objective': 'multi:softprob',
-        'num_class': 10,
-        'nthread': 2,
-        'seed': 1
-    }
-    expected = {
-        'num_boost_round': 371,
-        'learning_rate': 0.07,
-        'max_depth': 9,
-        'gamma': 1.9,
-        'min_child_weight': 18,
-        'subsample': 0.9,
-        'colsample_bytree': 0.8,
-    }
-    result = gf.prepare_params_calc(values)
+def test_create_pairs():
+    matrix = [[3, 7, 7], [4, 5, 6], [2, 9, 8]]
+    expected = [
+        (0, 1),
+        (0, 2),
+        (1, 2)
+    ]
+    result = create_pairs(matrix)
     assert result == expected
 
 
-def test_prepare_params_calc2():
-    values = {
-        'num_boost_round': 371,
-        'learning_rate': 0.07,
-        'max_depth': 9,
-        'gamma': 1.9,
-        'min_child_weight': 18,
-        'subsample': 0.9,
-        'colsample_bytree': 0.8,
-        'verbosity': 1,
-        'objective': 'multi:softprob',
-        'num_class': 10,
-        'nthread': 2,
-        'seed': 1
-    }
-    values_list = [
-        values,
-        values,
-        values
+def test_normalization():
+    elems = (4, 6)
+    expected = (0.4, 0.6)
+    result = normalization(elems)
+    assert result == expected
+
+
+def test_create_mask():
+    true_labels = [1, 0, 5, 4, 2]
+    pair = (1, 3)
+    expected = [True, False, False, False, False]
+    result = create_mask(true_labels, pair)
+    assert result == expected
+
+
+def test_get_values():
+    matrix = [[3, 7, 7], [4, 5, 6], [2, 9, 8]]
+    pair = (0, 2)
+    expected = [
+        (0.3, 0.7),
+        (0.4, 0.6),
+        (0.2, 0.8)
     ]
-    expected = {
-        'num_boost_round': 371,
-        'learning_rate': 0.07,
-        'max_depth': 9,
-        'gamma': 1.9,
-        'min_child_weight': 18,
-        'subsample': 0.9,
-        'colsample_bytree': 0.8,
-    }
-    expected_list = [
-        expected,
-        expected,
-        expected
-    ]
-    result = gf.prepare_params_calc(values_list)
-    assert result == expected_list
+    result = get_values(matrix, pair)
+    assert result == expected
 
 
-def test_initialize_values():
-    value_dict1 = {
-        'p_name': 'test1',
-        'range_start': 0,
-        'range_end': 10,
-        'true_int': 'True'
-    }
-    value_dict2 = {
-        'p_name': 'test2',
-        'range_start': 0,
-        'range_end': 10,
-        'true_int': 'False'
-    }
-    value_dicts = [value_dict1, value_dict2]
-    result = gf.initialize_values(value_dicts)
-    assert result['test2'] >= 0 and result['test2'] <= 10
-    assert isinstance(result['test1'], int)
+def test_choose_values():
+    matrix = [[3, 7, 7], [4, 5, 6], [2, 9, 8]]
+    pair = (0, 2)
+    true_labels = [1, 2, 2]
+    labelsOut = np.array([2, 2])
+    elemsOut = np.array([
+        [0.4, 0.6],
+        [0.2, 0.8]
+    ])
+    result = choose_values(matrix, pair, true_labels)
+    print(result[1])
+    assert (result[0] == labelsOut).all()
+    assert (result[1] == elemsOut).all()
 
 
-def test_prepare_run_params():
-    nthread = 28
-    value_dict1 = {
-        'p_name': 'test1',
-        'range_start': 0,
-        'range_end': 10,
-        'true_int': 'True'
-    }
-    value_dict2 = {
-        'p_name': 'test2',
-        'range_start': 0,
-        'range_end': 10,
-        'true_int': 'False'
-    }
-    value_dicts = [value_dict1, value_dict2]
-    sample_size = 3
-    result = gf.prepare_run_params(
-        nthread,
-        value_dicts,
-        sample_size
-    )
-    sum = 0
-    for i in result:
-        if isinstance(i['test1'], int):
-            sum +=1
-    assert len(result) == 3
-    assert sum == 3
+def test_plot_costFunction():
+    avg_scores = [0.9, 0.95, 0.99, 1]
+    error = False
+    try:
+        plot_costFunction(avg_scores, resourcesDir)
+    except:
+        error = True
+    assert error == False
+
+
+def test_dummy_delete_files():
+    if os.path.exists(resourcesDir):
+        shutil.rmtree(resourcesDir)
+
 
 
 def test_calculate_f1_score():
@@ -127,7 +91,7 @@ def test_calculate_f1_score():
         np.array([0, 1, 0]),
         np.array([0, 0, 1])
     ])
-    result = gf.calculate_f1_score(confusionMatrix)
+    result = calculate_f1_score(confusionMatrix)
     assert result[0] == 1
     assert result[1] == 1
 
@@ -168,7 +132,7 @@ def test_calculate_improvement_wSTDEV():
         parameter_dict2,
         parameter_dict3
     ]
-    result = gf.calculate_improvement_wSTDEV(parameter_dicts)
+    result = calculate_improvement_wSTDEV(parameter_dicts)
     expected = np.sqrt(2/3)/2
     np.testing.assert_almost_equal(
         result,
@@ -202,7 +166,7 @@ def test_calculate_dict_mean_coeff_of_variation():
         'b': [10, 20, 30],
         'c': [5, 10, 15]
     }
-    result = gf.calculate_dict_mean_coeff_of_variation(list_dict)
+    result = calculate_dict_mean_coeff_of_variation(list_dict)
     expected = np.sqrt(2/3)/2
     np.testing.assert_almost_equal(
         result,
@@ -241,7 +205,7 @@ def test_save_results():
     }
     error = False
     try:
-        gf.save_results(result_dict, resourcesDir)
+        save_results(result_dict, resourcesDir)
     except:
         error = True
     assert error == False
