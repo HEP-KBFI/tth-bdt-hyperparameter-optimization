@@ -6,7 +6,7 @@ import shutil
 import glob
 import gzip
 import shutil
-from urllib import request
+import urllib2
 dir_path = os.path.dirname(os.path.realpath(__file__))
 resourcesDir = os.path.join(dir_path, 'resources')
 tmp_folder = os.path.join(resourcesDir, 'tmp')
@@ -54,7 +54,7 @@ def test_main():
     for file in file_list:
         fileLoc = os.path.join(sampleDir, file)
         fileUrl = os.path.join(main_url, file + '.gz')
-        urllib.request.urlretrieve(fileUrl, fileLoc + '.gz')
+        urllib2.urlopen(fileUrl, fileLoc + '.gz')
         with gzip.open(fileLoc + '.gz', 'rb') as f_in:
             with open(fileLoc, 'wb') as f_out:
                 shutil.copyfileobj(f_in, f_out)
