@@ -6,7 +6,7 @@ import shutil
 import glob
 import gzip
 import shutil
-import urllib.request
+from urllib import request
 dir_path = os.path.dirname(os.path.realpath(__file__))
 resourcesDir = os.path.join(dir_path, 'resources')
 tmp_folder = os.path.join(resourcesDir, 'tmp')
