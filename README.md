@@ -10,8 +10,11 @@ If running with CMSSW:
 git clone https://github.com/HEP-KBFI/tth-bdt-hyperparameter-optimization.git $CMSSW_BASE/src/tthAnalysis/bdtHyperparameterOptimization
 pip install pathlib --user
 pip install timeout-decorator --user
-pip install docopt --user
+pip install urllib --user
+pip install pytest==5.2.0 --user
 ````
+* attrs==19.1.0 version needed due to 19.2.0 breaking with older version of pytest.
+[update pytest to pytest==5.2.0](https://stackoverflow.com/questions/58189683/typeerror-attrib-got-an-unexpected-keyword-argument-convert)
 
 
 ## Particle Swarm Optimization (PSO)
