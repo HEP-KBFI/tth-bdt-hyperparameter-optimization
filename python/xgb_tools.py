@@ -1,8 +1,8 @@
 import numpy as np
 import xgboost as xgb
-from tthAnalysis.bdtHyperparameterOptimization.xgb_tools import get_most_probable
-from tthAnalysis.bdtHyperparameterOptimization.xgb_tools import calculate_conf_matrix
-from tthAnalysis.bdtHyperparameterOptimization.xgb_tools import calculate_f1_score
+from tthAnalysis.bdtHyperparameterOptimization.universal import get_most_probable
+from tthAnalysis.bdtHyperparameterOptimization.universal import calculate_conf_matrix
+from tthAnalysis.bdtHyperparameterOptimization.universal import calculate_f1_score
 
 
 def initialize_values(value_dicts):
