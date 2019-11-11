@@ -277,6 +277,6 @@ def test_weight_normalization():
 
 def test_read_weights():
     weightPaht = os.path.join(hyper_path, 'data')
-    result = read_weights(value_dicts, hyper_path)
+    result = read_weights(value_dicts, weightPaht)
     assert len(result) == 6
     assert len(result['c1']) == len(value_dicts)

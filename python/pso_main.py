@@ -4,6 +4,7 @@ import xgboost as xgb
 from tthAnalysis.bdtHyperparameterOptimization.universal import read_parameters
 from tthAnalysis.bdtHyperparameterOptimization.universal import calculate_improvement_wSTDEV
 import docopt
+import numbers
 import os
 np.random.seed(1)
 
@@ -38,6 +39,13 @@ def prepare_newDay(
     return new_parameters
 
 
+def checkNumeric(variables):
+    for variable in variables:
+        if not isinstance(variable, numbers.Number):
+            return True
+    return False
+
+
 def calculate_personal_bests(
     fitnesses,
     best_fitnesses,
@@ -47,6 +55,10 @@ def calculate_personal_bests(
     new_dicts = []
     for fitness, best_fitness, parameters, personal_best in zip(
         fitnesses, best_fitnesses, parameter_dicts, personal_bests):
+        nonNumeric = checkNumeric(
+            [fitness, best_fitness, parameters, personal_best])
+        if nonNumeric:
+            raise TypeError
         if fitness > best_fitness:
             new_dicts.append(parameters)
         else:
