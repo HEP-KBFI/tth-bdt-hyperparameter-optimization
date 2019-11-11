@@ -1,8 +1,8 @@
+from __future__ import division
 import struct
 import os
 import xgboost as xgb
 import numpy as np
-from __future__ import division
 
 
 # Code for reading MNIST files
