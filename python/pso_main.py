@@ -56,7 +56,7 @@ def calculate_personal_bests(
     for fitness, best_fitness, parameters, personal_best in zip(
         fitnesses, best_fitnesses, parameter_dicts, personal_bests):
         nonNumeric = checkNumeric(
-            [fitness, best_fitness, parameters, personal_best])
+            [fitness, best_fitness])
         if nonNumeric:
             raise TypeError
         if fitness > best_fitness:
