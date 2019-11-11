@@ -3,6 +3,7 @@ import numpy as np
 import sys
 from tthAnalysis.bdtHyperparameterOptimization import pso_main as pm
 import os
+from pathlib import Path
 dir_path = os.path.dirname(os.path.realpath(__file__))
 hyper_path = str(Path(dir_path).parent)
 
