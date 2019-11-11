@@ -128,31 +128,30 @@ def test_calculate_personal_bests2():
     except TypeError:
         error = True
     assert error == True
-
+    personal_bests,
+    parameter_dicts,
+    best_parameters,
 
 def test_calculate_newSpeed():
     w = 2
     c1 = 2
     c2 = 2
     current_speeds = [1, 1, 1]
-    current_values = [
+    parameter_dicts = [
         {'a': 1, 'b': 1, 'c': 1},
         {'a': 2, 'b': 2, 'c': 2},
         {'a': 3, 'b': 3, 'c': 3}
     ]
-    pb_list = [
+    personal_bests = [
         {'a': 9, 'b': 9, 'c': 9},
         {'a': 8, 'b': 8, 'c': 8},
         {'a': 7, 'b': 7, 'c': 7}
     ]
-    best_params = {'a': 2, 'b': 2, 'c': 2}
-    calc_dict = {
-        'personal_bests': pb_list,
-        'parameter_dicts': current_values,
-        'best_parameters': best_params
-    }
+    best_parameters = {'a': 2, 'b': 2, 'c': 2}
     result = calculate_newSpeed(
-        calc_dict,
+        personal_bests,
+        parameter_dicts,
+        best_parameters,
         w,
         current_speeds,
         c1,

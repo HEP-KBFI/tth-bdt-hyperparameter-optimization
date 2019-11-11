@@ -89,7 +89,7 @@ sample_population = [
         'min_child_weight': 151.16628631591988, 
         'subsample': 0.8293511781634226, 
         'colsample_bytree': 0.3646370163381584, 
-        'verbosity': 1, 
+        'silent': 1, 
         'objective': 'multi:softprob', 
         'num_class': 10, 'nthread': 8, 'seed': 1
     }, 
@@ -101,7 +101,7 @@ sample_population = [
         'min_child_weight': 423.15545834300855, 
         'subsample': 0.8626547033864551, 
         'colsample_bytree': 0.66718371170101, 
-        'verbosity': 1, 
+        'silent': 1, 
         'objective': 'multi:softprob', 
         'num_class': 10, 
         'nthread': 8, 
@@ -115,7 +115,7 @@ sample_population = [
         'min_child_weight': 228.60240399349414, 
         'subsample': 0.8861397134369418, 
         'colsample_bytree': 0.9573894525965381, 
-        'verbosity': 1, 
+        'silent': 1, 
         'objective': 'multi:softprob', 
         'num_class': 10, 
         'nthread': 8, 
@@ -206,7 +206,7 @@ def test_add_parameters():
     calculated = add_parameters(dictionary, nthread)
     result = {
         'test': 1,
-        'verbosity': 1,
+        'silent': 1,
         'objective': 'multi:softprob',
         'num_class': 10,
         'nthread': nthread,
