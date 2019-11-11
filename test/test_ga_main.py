@@ -1,18 +1,20 @@
 from __future__ import division
 import numpy as np
-from tthAnalysis.bdtHyperparameterOptimization.ga_main import Grouping
+from tthAnalysis.bdtHyperparameterOptimization.ga_main import grouping
 from tthAnalysis.bdtHyperparameterOptimization.ga_main import selection
 from tthAnalysis.bdtHyperparameterOptimization.ga_main import create_subpopulations
 from tthAnalysis.bdtHyperparameterOptimization.ga_main import new_population
 from tthAnalysis.bdtHyperparameterOptimization.ga_main import add_parameters
 from tthAnalysis.bdtHyperparameterOptimization.ga_main import crossover
 from tthAnalysis.bdtHyperparameterOptimization.ga_main import elitism
-from tthAnalysis.bdtHyperparameterOptimization.ga_main import Degroup
-from tthAnalysis.bdtHyperparameterOptimization.ga_main import Mutate
+from tthAnalysis.bdtHyperparameterOptimization.ga_main import degroup
+from tthAnalysis.bdtHyperparameterOptimization.ga_main import mutate
+from tthAnalysis.bdtHyperparameterOptimization.ga_main import set_num
+from tthAnalysis.bdtHyperparameterOptimization.ga_main import culling
 import random
 
-# parameters and settings for testing
 
+# parameters and settings for testing
 parameters = [
     {
         'p_name': 'num_boost_round',
@@ -131,12 +133,12 @@ def grouped_sample_population():
     grouped = []
     pos_corr = []
     for element in sample_population:
-        grouped.append(Grouping(element, parameters)[0])
-        pos_corr.append(Grouping(element, parameters)[1])
+        grouped.append(grouping(element, parameters)[0])
+        pos_corr.append(grouping(element, parameters)[1])
     return grouped, pos_corr
 
-# TESTS
 
+# TESTS
 def test_selection():
     calculated = selection(simple_population, fitnesses)
     assert len(calculated) == 2, 'test_selection failed'
@@ -153,7 +155,7 @@ def test_crossover():
 
 def test_grouping():
     for dictionary in sample_population:
-        calculated = Grouping(dictionary, parameters)
+        calculated = grouping(dictionary, parameters)
         for element in calculated:
             assert len(element) == 5, 'test_grouping failed'
         for element in calculated[0]:
@@ -176,7 +178,7 @@ def test_degroup():
     calculated = []
     for element in grouped:
         calculated.append(add_parameters(
-            Degroup(element), settings['nthread']))
+            degroup(element), settings['nthread']))
     assert calculated == sample_population, 'test_degroup failed'
 
 
@@ -185,10 +187,18 @@ def test_mutate():
     for i, element in enumerate(grouped):
         total_calc = []
         for j, group in enumerate(element):
-            calculated = Mutate(group, settings['mut_chance'], random.random(), pos_corr[i][j])
+            calculated = mutate(group, settings['mut_chance'], random.random(), pos_corr[i][j])
             assert len(calculated) == len(group), 'test_mutate failed'
             total_calc.append(calculated)
         assert len(total_calc) == len(element), 'test_mutate failed'
+
+
+def test_set_num():
+    result = [2, 1, 2, 3]
+    calculated = []
+    for num in nums:
+        calculated.append(mnist_ga.set_num(num, simple_population))
+    assert result == calculated, 'test_set_num failed'
 
 
 def test_elitism():
@@ -200,9 +210,22 @@ def test_elitism():
     assert result == calculated, 'test_elitism failed'
 
 
+def test_culling():
+    result = [1, 2, 1, 0]
+    for i, num in enumerate(nums):
+        settings.update({'culling':num})
+        calculated = mnist_ga.culling(sample_population, fitnesses, settings, parameters)
+        assert len(calculated) == len(sample_population), 'test_culling failed'
+        counter = 0
+        for member in calculated:
+            if member in sample_population:
+                counter += 1
+        assert counter == result[i], 'test_culling failed'
+
+
 def test_add_parameters():
     dictionary = {'test': 1}
-    nthread = 16
+    nthread = 8
     calculated = add_parameters(dictionary, nthread)
     result = {
         'test': 1,
