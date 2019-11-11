@@ -12,10 +12,7 @@ Options:
 
 '''
 from __future__ import division
-from tthAnalysis.bdtHyperparameterOptimization.universal import read_parameters
-from tthAnalysis.bdtHyperparameterOptimization.universal import save_results
-from tthAnalysis.bdtHyperparameterOptimization.mnist_filereader import create_datasets
-from tthAnalysis.bdtHyperparameterOptimization.xgb_tools import ensemble_fitnesses
+from tthAnalysis.bdtHyperparameterOptimization import universal
 import docopt
 from itertools import product
 import numpy as np
@@ -74,11 +71,11 @@ def param_update(parameter_dicts, nthread):
 def main(param_file, nthread, sample_dir, outputDir):
     if not os.path.isdir(outputDir):
         os.makedirs(outputDir)
-    parameters = read_parameters(param_file)
+    parameters = universal.read_parameters(param_file)
     parameter_dicts = initialize_values(parameters, GRID_SIZE)
     parameter_dicts = param_update(parameter_dicts, nthread)
-    data_dict = create_datasets(sample_dir, nthread)
-    fitnesses, pred_trains, pred_tests = ensemble_fitnesses(
+    data_dict = universal.create_datasets(sample_dir, nthread)
+    fitnesses, pred_trains, pred_tests = universal.ensemble_fitnesses(
         parameter_dicts, data_dict
     )
     index =  np.argmax(fitnesses)
@@ -88,7 +85,7 @@ def main(param_file, nthread, sample_dir, outputDir):
         'pred_test': pred_tests[index],
         'data_dict': data_dict
     }
-    save_results(result_dict, outputDir, roc=False)
+    universal.save_results(result_dict, outputDir, roc=False)
 
 
 if __name__ == '__main__':

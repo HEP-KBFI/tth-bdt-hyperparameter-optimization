@@ -2,9 +2,8 @@ from __future__ import division
 import numpy as np
 import xgboost as xgb
 import docopt, random, os
-from tthAnalysis.bdtHyperparameterOptimization.xgb_tools import prepare_run_params
-from tthAnalysis.bdtHyperparameterOptimization.xgb_tools import ensemble_fitnesses
-from tthAnalysis.bdtHyperparameterOptimization.universal import calculate_improvement_wAVG
+from tthAnalysis.bdtHyperparameterOptimization import xgb_tools as xt
+from tthAnalysis.bdtHyperparameterOptimization import universal
 
 # Selection of two parents from a population based on the tournament method.
 def selection(pop, fitnesses, t_size = 3, t_prob = 0.75):
@@ -215,7 +214,7 @@ def create_subpopulations(settings, parameters):
             sub_size = size//num
 
         # Generate subpopulation
-        sub_population = prepare_run_params(settings['nthread'], parameters, sub_size)
+        sub_population = xt.prepare_run_params(settings['nthread'], parameters, sub_size)
         subpopulations.append(sub_population)
 
     return subpopulations
@@ -270,7 +269,7 @@ def evolve(population, settings, data, parameters, nthread, final = False):
 
         # Calculate fitness of the population
         fitnesses, pred_trains, pred_tests = (
-            ensemble_fitnesses(population, data, nthread)
+            xt.ensemble_fitnesses(population, data, nthread)
         )
 
         # Save results
@@ -279,7 +278,7 @@ def evolve(population, settings, data, parameters, nthread, final = False):
         worst_scores.append(min(fitnesses))
 
         # Calculate improvement
-        improvements, improvement = calculate_improvement_wAVG(
+        improvements, improvement = universal.calculate_improvement_wAVG(
             avg_scores, improvements, settings['threshold'])
 
         iteration += 1
@@ -318,7 +317,7 @@ def evolution(settings, data, parameters, nthread):
     else:
 
         # Create one population
-        population = prepare_run_params(settings['nthread'], parameters, settings['pop_size'])
+        population = xt.prepare_run_params(settings['nthread'], parameters, settings['pop_size'])
 
         # Evolve population
         population, scores_dicts, fitnesses, pred_trains, pred_tests = evolve(

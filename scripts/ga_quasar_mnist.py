@@ -15,27 +15,26 @@ Options:
 from __future__ import division
 import os
 import docopt
-from tthAnalysis.bdtHyperparameterOptimization.universal import read_parameters
-from tthAnalysis.bdtHyperparameterOptimization.universal import save_results
-from tthAnalysis.bdtHyperparameterOptimization.mnist_filereader import create_datasets
-from tthAnalysis.bdtHyperparameterOptimization.ga_main import evolution
+from tthAnalysis.bdtHyperparameterOptimization import universal
+from tthAnalysis.bdtHyperparameterOptimization import mnist_filereader as mf
+from tthAnalysis.bdtHyperparameterOptimization import ga_main ga
 
 
 def main(sample_dir, nthread, output_dir, param_file, sett_file):
 
     print("::::::: Reading GA settings & XGBoost parameters :::::::")
-    settings_dict = read_parameters(sett_file)[0]
+    settings_dict = universal.read_parameters(sett_file)[0]
     settings_dict.update({'nthread': nthread})
 
     # Load parameters for optimization
-    param_dict = read_parameters(param_file)
+    param_dict = universal.read_parameters(param_file)
 
     print("::::::: Loading data ::::::::")
-    data_dict = create_datasets(sample_dir, nthread)
+    data_dict = mf.create_datasets(sample_dir, nthread)
 
     # Run genetic algorithm and save results
-    result = evolution(settings_dict, data_dict, param_dict, nthread)
-    save_results(result, output_dir)
+    result = ga.evolution(settings_dict, data_dict, param_dict, nthread)
+    universal.save_results(result, output_dir)
 
 
 if __name__ == '__main__':

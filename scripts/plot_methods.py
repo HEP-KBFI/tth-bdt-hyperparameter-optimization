@@ -16,11 +16,8 @@ import matplotlib.pyplot as plt
 import xgboost
 import glob
 import os
-from tthAnalysis.bdtHyperparameterOptimization.mnist_filereader import create_datasets
-from tthAnalysis.bdtHyperparameterOptimization.universal import parameter_evaluation
-from tthAnalysis.bdtHyperparameterOptimization.universal import main_f1_calculate
-from tthAnalysis.bdtHyperparameterOptimization.universal import best_to_file
-from tthAnalysis.bdtHyperparameterOptimization.universal import roc
+from tthAnalysis.bdtHyperparameterOptimization import mnist_filereader as mf
+from tthAnalysis.bdtHyperparameterOptimization import universal
 import json
 import docopt
 
@@ -35,9 +32,9 @@ def parse_directories(parentDir):
 
 def plot_single(data_dict, pred_test, pred_train, path):
     foldername = path.split("/")[-2]
-    x_train, y_train = roc(
+    x_train, y_train = universal.roc(
         data_dict['training_labels'], pred_train)
-    x_test, y_test = roc(
+    x_test, y_test = universal.roc(
         data_dict['testing_labels'], pred_test)
     plt.plot(
         x_train, y_train, lw=0.75, linestyle='--',
@@ -50,20 +47,20 @@ def plot_single(data_dict, pred_test, pred_train, path):
 
 
 def read_parameters(path):
-    value_dicts = global_functions.read_parameters(path)
+    value_dicts = universal.read_parameters(path)
     parameters = value_dicts[0]
     return parameters
 #### add default parameters
 
 
 def main(parentDir, nthread, sampleDir, outputDir):
-    data_dict = create_datasets(sampleDir, nthread)
-    paths = parse_directories(parentDir)
+    data_dict = mf.create_datasets(sampleDir, nthread)
+    paths = universal.parse_directories(parentDir)
     for i, path in enumerate(paths):
         result_dict = {}
-        parameters = read_parameters(path)
+        parameters = universal.read_parameters(path)
         parameters['nthread'] = nthread
-        score, pred_train, pred_test = parameter_evaluation(
+        score, pred_train, pred_test = universal.parameter_evaluation(
             parameters, data_dict)
         result_dict['pred_train'] = pred_train
         result_dict['pred_test'] = pred_test
@@ -72,16 +69,16 @@ def main(parentDir, nthread, sampleDir, outputDir):
         outputDir1 = os.path.join(outputDir, str(i))
         if not os.path.exists(outputDir1):
             os.makedirs(outputDir1)
-        assessment = main_f1_calculate(
+        assessment = universal.main_f1_calculate(
             result_dict['pred_train'],
             result_dict['pred_test'],
             result_dict['data_dict']
         )
         assessment['train_AUC'] = (-1) * train_AUC
         assessment['test_AUC'] = (-1) * test_AUC
-        best_to_file(
+        universal.best_to_file(
             parameters, outputDir1, assessment)
-        plot_single(data_dict, pred_test, pred_train, path)
+        universal.plot_single(data_dict, pred_test, pred_train, path)
     plotOut = os.path.join(outputDir, 'roc_combined.png')
     plt.xlabel('Proportion of false values')
     plt.ylabel('Proportion of true values')

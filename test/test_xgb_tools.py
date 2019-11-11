@@ -1,8 +1,5 @@
 from __future__ import division
-from tthAnalysis.bdtHyperparameterOptimization.xgb_tools import prepare_run_params
-from tthAnalysis.bdtHyperparameterOptimization.xgb_tools import initialize_values
-from tthAnalysis.bdtHyperparameterOptimization.xgb_tools import prepare_params_calc
-
+from tthAnalysis.bdtHyperparameterOptimization import xgb_tools as xt
 
 # currently not used?
 def test_prepare_params_calc():
@@ -29,7 +26,7 @@ def test_prepare_params_calc():
         'subsample': 0.9,
         'colsample_bytree': 0.8,
     }
-    result = prepare_params_calc(values)
+    result = xt.prepare_params_calc(values)
     assert result == expected
 
 # currently not used?
@@ -67,7 +64,7 @@ def test_prepare_params_calc2():
         expected,
         expected
     ]
-    result = prepare_params_calc(values_list)
+    result = xt.prepare_params_calc(values_list)
     assert result == expected_list
 
 
@@ -85,7 +82,7 @@ def test_initialize_values():
         'true_int': 'False'
     }
     value_dicts = [value_dict1, value_dict2]
-    result = initialize_values(value_dicts)
+    result = xt.initialize_values(value_dicts)
     assert result['test2'] >= 0 and result['test2'] <= 10
     assert isinstance(result['test1'], int)
 
@@ -106,7 +103,7 @@ def test_prepare_run_params():
     }
     value_dicts = [value_dict1, value_dict2]
     sample_size = 3
-    result = prepare_run_params(
+    result = xt.prepare_run_params(
         nthread,
         value_dicts,
         sample_size

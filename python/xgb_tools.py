@@ -1,9 +1,7 @@
 from __future__ import division
 import numpy as np
 import xgboost as xgb
-from tthAnalysis.bdtHyperparameterOptimization.universal import get_most_probable
-from tthAnalysis.bdtHyperparameterOptimization.universal import calculate_conf_matrix
-from tthAnalysis.bdtHyperparameterOptimization.universal import calculate_f1_score
+from tthAnalysis.bdtHyperparameterOptimization import universal
 
 
 def initialize_values(value_dicts):
@@ -28,6 +26,7 @@ def prepare_run_params(nthread, value_dicts, sample_size):
         run_param = initialize_values(value_dicts)
         run_params.append(run_param)
     return run_params
+
 
 # currently not used?
 def prepare_params_calc(value_dicts):
@@ -80,10 +79,10 @@ def parameter_evaluation(parameter_dict, data_dict, nthread):
     pred_train = model.predict(data_dict['dtrain'])
     pred_test = model.predict(data_dict['dtest'])
     # score = calculate_fitness(pred_train, pred_test, data_dict)
-    prob_train, prob_test = get_most_probable(pred_train, pred_test)
-    train_confusionMatrix, test_confusionMatrix = calculate_conf_matrix(
+    prob_train, prob_test = universal.get_most_probable(pred_train, pred_test)
+    train_confusionMatrix, test_confusionMatrix = universal.calculate_conf_matrix(
         prob_train, prob_test, data_dict)
-    score = calculate_f1_score(test_confusionMatrix)[1]
+    score = universal.calculate_f1_score(test_confusionMatrix)[1]
     return score, pred_train, pred_test
 
 

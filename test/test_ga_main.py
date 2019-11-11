@@ -1,14 +1,6 @@
 from __future__ import division
 import numpy as np
-from tthAnalysis.bdtHyperparameterOptimization.ga_main import Grouping
-from tthAnalysis.bdtHyperparameterOptimization.ga_main import selection
-from tthAnalysis.bdtHyperparameterOptimization.ga_main import create_subpopulations
-from tthAnalysis.bdtHyperparameterOptimization.ga_main import new_population
-from tthAnalysis.bdtHyperparameterOptimization.ga_main import add_parameters
-from tthAnalysis.bdtHyperparameterOptimization.ga_main import crossover
-from tthAnalysis.bdtHyperparameterOptimization.ga_main import elitism
-from tthAnalysis.bdtHyperparameterOptimization.ga_main import Degroup
-from tthAnalysis.bdtHyperparameterOptimization.ga_main import Mutate
+from tthAnalysis.bdtHyperparameterOptimization import ga_main as gm
 import random
 
 # parameters and settings for testing
@@ -131,64 +123,64 @@ def grouped_sample_population():
     grouped = []
     pos_corr = []
     for element in sample_population:
-        grouped.append(Grouping(element, parameters)[0])
-        pos_corr.append(Grouping(element, parameters)[1])
+        grouped.append(gm.Grouping(element, parameters)[0])
+        pos_corr.append(gm.Grouping(element, parameters)[1])
     return grouped, pos_corr
 
 # TESTS
 
 def test_selection():
-    calculated = selection(simple_population, fitnesses)
-    assert len(calculated) == 2, 'test_selection failed'
+    calculated = gm.selection(simple_population, fitnesses)
+    assert len(calculated) == 2, 'test_gm.selection failed'
     for parent in calculated:
-        assert parent in simple_population, 'test_selection failed'
+        assert parent in simple_population, 'test_gm.selection failed'
 
 
 def test_crossover():
     parents = sample_population[0:2]
-    calculated = add_parameters(
-        crossover(parents, settings['mut_chance'], parameters), settings['nthread'])
+    calculated = gm.add_parameters(
+        gm.crossover(parents, settings['mut_chance'], parameters), settings['nthread'])
     assert len(calculated) == len(parents[0]), 'test_crossover failed'
 
 
-def test_grouping():
+def test_Grouping():
     for dictionary in sample_population:
-        calculated = Grouping(dictionary, parameters)
+        calculated = gm.Grouping(dictionary, parameters)
         for element in calculated:
-            assert len(element) == 5, 'test_grouping failed'
+            assert len(element) == 5, 'test_gm.Grouping failed'
         for element in calculated[0]:
             for key in element.keys():
-                assert element[key] == dictionary[key], 'test_grouping failed'
+                assert element[key] == dictionary[key], 'test_gm.Grouping failed'
         for element in calculated[1]:
             i = 0
             try:
                 if element != parameters[i]['true_corr']:
                     i += 1
                 else:
-                    assert element == parameters[i]['true_corr'], 'test_grouping failed'
+                    assert element == parameters[i]['true_corr'], 'test_gm.Grouping failed'
                     i += 1
             except:
-                raise AssertionError('test_grouping failed')
+                raise AssertionError('test_gm.Grouping failed')
 
 
-def test_degroup():
+def test_Degroup():
     grouped, pos_corr = grouped_sample_population()
     calculated = []
     for element in grouped:
-        calculated.append(add_parameters(
-            Degroup(element), settings['nthread']))
-    assert calculated == sample_population, 'test_degroup failed'
+        calculated.append(gm.add_parameters(
+            gm.Degroup(element), settings['nthread']))
+    assert calculated == sample_population, 'test_gm.Degroup failed'
 
 
-def test_mutate():
+def test_Mutate():
     grouped, pos_corr = grouped_sample_population()
     for i, element in enumerate(grouped):
         total_calc = []
         for j, group in enumerate(element):
-            calculated = Mutate(group, settings['mut_chance'], random.random(), pos_corr[i][j])
-            assert len(calculated) == len(group), 'test_mutate failed'
+            calculated = gm.Mutate(group, settings['mut_chance'], random.random(), pos_corr[i][j])
+            assert len(calculated) == len(group), 'test_gm.Mutate failed'
             total_calc.append(calculated)
-        assert len(total_calc) == len(element), 'test_mutate failed'
+        assert len(total_calc) == len(element), 'test_gm.Mutate failed'
 
 
 def test_elitism():
@@ -196,14 +188,14 @@ def test_elitism():
     result = [[3, 2], [3], [3, 2], [3, 2, 1]]
     calculated = []
     for num in nums:
-        calculated.append(elitism(simple_population, fitnesses, num))
-    assert result == calculated, 'test_elitism failed'
+        calculated.append(gm.elitism(simple_population, fitnesses, num))
+    assert result == calculated, 'test_gm.elitism failed'
 
 
 def test_add_parameters():
     dictionary = {'test': 1}
     nthread = 16
-    calculated = add_parameters(dictionary, nthread)
+    calculated = gm.add_parameters(dictionary, nthread)
     result = {
         'test': 1,
         'silent': 1,
@@ -212,13 +204,13 @@ def test_add_parameters():
         'nthread': nthread,
         'seed': 1,
     }
-    assert result == calculated, 'test_add_parameters failed'
+    assert result == calculated, 'test_gm.add_parameters failed'
 
 
 def test_new_population():
     settings.update({'pop_size':3})
-    calculated = new_population(sample_population, fitnesses, settings, parameters)
-    assert len(calculated) == len(sample_population), 'test_new_population failed'
+    calculated = gm.new_population(sample_population, fitnesses, settings, parameters)
+    assert len(calculated) == len(sample_population), 'test_gm.new_population failed'
 
 
 def test_create_subpopulations():
@@ -236,9 +228,9 @@ def test_create_subpopulations():
         for num in nums:
             j = 0
             settings.update({'pop_size':size, 'sub_pops':num})
-            calculated = create_subpopulations(settings, parameters)
-            assert len(calculated) == len(result[i]), "test_create_subpopulations failed"
+            calculated = gm.create_subpopulations(settings, parameters)
+            assert len(calculated) == len(result[i]), "test_gm.create_subpopulations failed"
             for element in calculated:
-                assert len(element) == result[i][j], "test_create_subpopulations failed"
+                assert len(element) == result[i][j], "test_gm.create_subpopulations failed"
                 j += 1
             i += 1
