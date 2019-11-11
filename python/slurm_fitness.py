@@ -11,9 +11,9 @@ Options:
 '''
 from __future__ import division
 import numpy as np
-from tthAnalysis.bdtHyperparameterOptimization.universal import read_parameters
-from tthAnalysis.bdtHyperparameterOptimization.mnist_filereader import create_datasets
-from tthAnalysis.bdtHyperparameterOptimization.xgb_tools import parameter_evaluation
+from tthAnalysis.bdtHyperparameterOptimization import universal
+from tthAnalysis.bdtHyperparameterOptimization import mnist_filereader as mf
+from tthAnalysis.bdtHyperparameterOptimization import xgb_tools as xt
 import docopt
 import json
 from pathlib import Path
@@ -36,11 +36,11 @@ def save_info(score, pred_train, pred_test, saveDir):
 
 
 def main(parameterFile, sample_dir, nthread):
-    parameter_dict = read_parameters(parameterFile)[0]
-    data_dict = create_datasets(sample_dir, nthread)
+    parameter_dict = universal.read_parameters(parameterFile)[0]
+    data_dict = mf.create_datasets(sample_dir, nthread)
     path = Path(parameterFile)
     saveDir = str(path.parent)
-    score, pred_train, pred_test = parameter_evaluation(
+    score, pred_train, pred_test = xt.parameter_evaluation(
         parameter_dict, data_dict, nthread)
     save_info(score, pred_train, pred_test, saveDir)
 

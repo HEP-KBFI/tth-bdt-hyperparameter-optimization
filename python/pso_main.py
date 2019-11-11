@@ -1,8 +1,7 @@
 from __future__ import division
 import numpy as np
 import xgboost as xgb
-from tthAnalysis.bdtHyperparameterOptimization.universal import read_parameters
-from tthAnalysis.bdtHyperparameterOptimization.universal import calculate_improvement_wSTDEV
+from tthAnalysis.bdtHyperparameterOptimization import universal
 import docopt
 import numbers
 import os
@@ -128,7 +127,7 @@ def calculate_newSpeed(
 
 def read_weights(value_dicts, mainDir):
     path = os.path.join(mainDir, 'weights_runParameters.json')
-    param_dict = read_parameters(path)[0]
+    param_dict = universal.read_parameters(path)[0]
     weight_dict = {
         'w_init': [],
         'w_fin': [],
@@ -187,7 +186,7 @@ def run_pso(
     # improvements = []
     # improvement = 1
     compactness_threshold = 0.1
-    compactness = calculate_improvement_wSTDEV(parameter_dicts)
+    compactness = universal.calculate_improvement_wSTDEV(parameter_dicts)
     i = 1
     print(":::::::: Initializing :::::::::")
     fitnesses, pred_trains, pred_tests = calculate_fitnesses(
@@ -229,7 +228,7 @@ def run_pso(
             result_dict['best_fitness'] = max(fitnesses)
         avg_scores = np.mean(fitnesses)
         result_dict['avg_scores'].append(avg_scores)
-        compactness = calculate_improvement_wSTDEV(parameter_dicts)
+        compactness = universal.calculate_improvement_wSTDEV(parameter_dicts)
         # improvements, improvement = gf.calculate_improvement_wAVG(
         #     result_dict['avg_scores'],
         #     improvements,

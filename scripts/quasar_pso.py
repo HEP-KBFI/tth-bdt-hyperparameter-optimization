@@ -18,14 +18,10 @@ import numpy as np
 import xgboost as xgb
 import docopt
 import os
-from tthAnalysis.bdtHyperparameterOptimization.xgb_tools import ensemble_fitnesses
-from tthAnalysis.bdtHyperparameterOptimization.mnist_filereader import create_datasets
-from tthAnalysis.bdtHyperparameterOptimization.universal import read_parameters
-from tthAnalysis.bdtHyperparameterOptimization.universal import save_results
-from tthAnalysis.bdtHyperparameterOptimization.pso_main import read_weights
-from tthAnalysis.bdtHyperparameterOptimization.pso_main import run_pso
-from tthAnalysis.bdtHyperparameterOptimization.xgb_tools import prepare_run_params
-
+from tthAnalysis.bdtHyperparameterOptimization import mnist_filereader  as mf
+from tthAnalysis.bdtHyperparameterOptimization import universal
+from tthAnalysis.bdtHyperparameterOptimization import pso_main as pm
+from tthAnalysis.bdtHyperparameterOptimization import xgb_tools as xt
 np.random.seed(1)
 
 
@@ -35,8 +31,8 @@ def main(param_file, nthread, sample_dir, outputDir, mainDir):
     print("::::::: Loading data ::::::::")
     data_dict = create_datasets(sample_dir, nthread)
     print("::::::: Reading parameters :::::::")
-    value_dicts = read_parameters(param_file)
-    weight_dict = read_weights(value_dicts, mainDir)
+    value_dicts = universal.read_parameters(param_file)
+    weight_dict = universal.read_weights(value_dicts, mainDir)
     w_init = np.array(weight_dict['w_init'])
     w_fin = np.array(weight_dict['w_fin'])
     iterations = weight_dict['iterations']
@@ -44,16 +40,16 @@ def main(param_file, nthread, sample_dir, outputDir, mainDir):
     c1 = weight_dict['c1']
     c2 = weight_dict['c2']
     number_parameters = 7 # Read from file
-    parameter_dicts = prepare_run_params(
+    parameter_dicts = xt.prepare_run_params(
         nthread, value_dicts, sample_size)
-    result_dict = run_pso(
+    result_dict = pm.run_pso(
         sample_dir, nthread, sample_size,
         w_init, w_fin, c1, c2, iterations,
-        data_dict, value_dicts, ensemble_fitnesses,
+        data_dict, value_dicts, xt.ensemble_fitnesses,
         number_parameters, parameter_dicts,
         outputDir, mainDir
     )
-    save_results(result_dict, outputDir)
+    universal.save_results(result_dict, outputDir)
 
 
 if __name__ == '__main__':

@@ -1,12 +1,7 @@
 from __future__ import division
 import numpy as np
 import sys
-from tthAnalysis.bdtHyperparameterOptimization.pso_main import calculate_personal_bests
-from tthAnalysis.bdtHyperparameterOptimization.pso_main import calculate_newSpeed
-from tthAnalysis.bdtHyperparameterOptimization.pso_main import calculate_newValue
-from tthAnalysis.bdtHyperparameterOptimization.pso_main import weight_normalization
-from tthAnalysis.bdtHyperparameterOptimization.pso_main import read_weights
-from pathlib import Path
+from tthAnalysis.bdtHyperparameterOptimization import pso_main as pm
 import os
 dir_path = os.path.dirname(os.path.realpath(__file__))
 hyper_path = str(Path(dir_path).parent)
@@ -72,7 +67,7 @@ value_dicts = [
 ]
 
 
-def test_calculate_personal_bests():
+def test_pm.calculate_personal_bests():
     fitnesses = [0.9, 1, 0.9]
     best_fitnesses = [0.8, 0.9, 1]
     parameter_dicts = [
@@ -90,7 +85,7 @@ def test_calculate_personal_bests():
         {'a': 2, 'b': 2, 'c': 2},
         {'a': 7, 'b': 7, 'c': 7}
     ]
-    calculated_pb = calculate_personal_bests(
+    calculated_pb = pm.calculate_personal_bests(
         fitnesses,
         best_fitnesses,
         parameter_dicts,
@@ -99,7 +94,7 @@ def test_calculate_personal_bests():
     assert result == calculated_pb
 
 
-def test_calculate_personal_bests2():
+def test_pm.calculate_personal_bests2():
     fitnesses = ['a', 1, 0.9]
     best_fitnesses = [0.8, 0.9, 1]
     parameter_dicts = [
@@ -119,7 +114,7 @@ def test_calculate_personal_bests2():
     ]
     error = False
     try:
-        calculated_pb = calculate_personal_bests(
+        calculated_pb = pm.calculate_personal_bests(
             fitnesses,
             best_fitnesses,
             parameter_dicts,
@@ -130,7 +125,7 @@ def test_calculate_personal_bests2():
     assert error == True
 
 
-def test_calculate_newSpeed():
+def test_pm.calculate_newSpeed():
     w = 2
     c1 = 2
     c2 = 2
@@ -146,7 +141,7 @@ def test_calculate_newSpeed():
         {'a': 7, 'b': 7, 'c': 7}
     ]
     best_parameters = {'a': 2, 'b': 2, 'c': 2}
-    result = calculate_newSpeed(
+    result = pm.calculate_newSpeed(
         personal_bests,
         parameter_dicts,
         best_parameters,
@@ -160,7 +155,7 @@ def test_calculate_newSpeed():
     assert result[2][0] >= 0 and result[2][0] <= 10
 
 
-def test_calculate_newSpeed2():
+def test_pm.calculate_newSpeed2():
     w = 2
     c1 = 2
     c2 = 2
@@ -192,7 +187,7 @@ def test_calculate_newSpeed2():
     best_params = values
     error = False
     try:
-        result = calculate_newSpeed(
+        result = pm.calculate_newSpeed(
             w,
             current_values,
             current_speeds,
@@ -206,7 +201,7 @@ def test_calculate_newSpeed2():
     assert error == True
 
 
-def test_calculate_newValue():
+def test_pm.calculate_newValue():
     parameter_dict = {
         'num_boost_round': 0,
         'learning_rate': 0,
@@ -242,12 +237,12 @@ def test_calculate_newValue():
         values,
         values
     ]
-    result = calculate_newValue(
+    result = pm.calculate_newValue(
         current_speeds, parameter_dicts, nthread, value_dicts)
     assert result == expected
 
 
-def test_weight_normalization():
+def test_pm.weight_normalization():
     param_dict = {
         'iterations': 2,
         'sample_size': 3,
@@ -257,7 +252,7 @@ def test_weight_normalization():
         'c1': 2,
         'c2': 2
     }
-    result = weight_normalization(param_dict)
+    result = pm.weight_normalization(param_dict)
     np.testing.assert_almost_equal(
         result['w_init'],
         0.18,
@@ -275,8 +270,8 @@ def test_weight_normalization():
     )
 
 
-def test_read_weights():
+def test_pm.read_weights():
     weightPaht = os.path.join(hyper_path, 'data')
-    result = read_weights(value_dicts, weightPaht)
+    result = pm.read_weights(value_dicts, weightPaht)
     assert len(result) == 6
     assert len(result['c1']) == len(value_dicts)

@@ -3,17 +3,7 @@ import numpy as np
 import sys
 import os
 import shutil
-from tthAnalysis.bdtHyperparameterOptimization.universal import calculate_f1_score
-from tthAnalysis.bdtHyperparameterOptimization.universal import calculate_improvement_wSTDEV
-from tthAnalysis.bdtHyperparameterOptimization.universal import save_results
-from tthAnalysis.bdtHyperparameterOptimization.universal import calculate_dict_mean_coeff_of_variation
-from tthAnalysis.bdtHyperparameterOptimization.universal import create_pairs
-from tthAnalysis.bdtHyperparameterOptimization.universal import normalization
-from tthAnalysis.bdtHyperparameterOptimization.universal import create_mask
-from tthAnalysis.bdtHyperparameterOptimization.universal import get_values
-from tthAnalysis.bdtHyperparameterOptimization.universal import choose_values
-from tthAnalysis.bdtHyperparameterOptimization.universal import plot_costFunction
-from tthAnalysis.bdtHyperparameterOptimization.universal import values_to_list_dict
+from tthAnalysis.bdtHyperparameterOptimization import universal
 dir_path = os.path.dirname(os.path.realpath(__file__))
 resourcesDir = os.path.join(dir_path, 'resources', 'tmp')
 
@@ -25,14 +15,14 @@ def test_create_pairs():
         (0, 2),
         (1, 2)
     ]
-    result = create_pairs(matrix)
+    result = universal.create_pairs(matrix)
     assert result == expected
 
 
 def test_normalization():
     elems = (4, 6)
     expected = (0.4, 0.6)
-    result = normalization(elems)
+    result = universal.normalization(elems)
     assert result == expected
 
 
@@ -40,7 +30,7 @@ def test_create_mask():
     true_labels = [1, 0, 5, 4, 2]
     pair = (1, 3)
     expected = [True, False, False, False, False]
-    result = create_mask(true_labels, pair)
+    result = universal.create_mask(true_labels, pair)
     assert result == expected
 
 
@@ -52,7 +42,7 @@ def test_get_values():
         (0.4, 0.6),
         (0.2, 0.8)
     ]
-    result = get_values(matrix, pair)
+    result = universal.get_values(matrix, pair)
     assert result == expected
 
 
@@ -65,7 +55,7 @@ def test_choose_values():
         [0.4, 0.6],
         [0.2, 0.8]
     ])
-    result = choose_values(matrix, pair, true_labels)
+    result = universal.choose_values(matrix, pair, true_labels)
     print(result[1])
     assert (result[0] == labelsOut).all()
     assert (result[1] == elemsOut).all()
@@ -75,7 +65,7 @@ def test_plot_costFunction():
     avg_scores = [0.9, 0.95, 0.99, 1]
     error = False
     try:
-        plot_costFunction(avg_scores, resourcesDir)
+        universal.plot_costFunction(avg_scores, resourcesDir)
     except:
         error = True
     assert error == False
@@ -93,7 +83,7 @@ def test_calculate_f1_score():
         np.array([0, 1, 0]),
         np.array([0, 0, 1])
     ])
-    result = calculate_f1_score(confusionMatrix)
+    result = universal.calculate_f1_score(confusionMatrix)
     assert result[0] == 1
     assert result[1] == 1
 
@@ -119,7 +109,7 @@ def test_calculate_improvement_wSTDEV():
         parameter_dict2,
         parameter_dict3
     ]
-    result = calculate_improvement_wSTDEV(parameter_dicts)
+    result = universal.calculate_improvement_wSTDEV(parameter_dicts)
     expected = np.sqrt(2/3)/2
     np.testing.assert_almost_equal(
         result,
@@ -138,7 +128,7 @@ def test_values_to_list_dict():
         parameter_dict3
     ]
     keys = ['a', 'b', 'c']
-    result = values_to_list_dict(keys, parameter_dicts)
+    result = universal.values_to_list_dict(keys, parameter_dicts)
     expected = {
         'a': [1, 4, 7],
         'b': [2, 5, 8],
@@ -153,7 +143,7 @@ def test_calculate_dict_mean_coeff_of_variation():
         'b': [10, 20, 30],
         'c': [5, 10, 15]
     }
-    result = calculate_dict_mean_coeff_of_variation(list_dict)
+    result = universal.calculate_dict_mean_coeff_of_variation(list_dict)
     expected = np.sqrt(2/3)/2
     np.testing.assert_almost_equal(
         result,
@@ -192,7 +182,7 @@ def test_save_results():
     }
     error = False
     try:
-        save_results(result_dict, resourcesDir)
+        universal.save_results(result_dict, resourcesDir)
     except:
         error = True
     assert error == False
