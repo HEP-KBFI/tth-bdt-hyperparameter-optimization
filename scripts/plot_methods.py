@@ -11,6 +11,7 @@ Options:
     --outputDir=DIR         Directory for plots and parameters
 
 '''
+from __future__ import division
 import matplotlib.pyplot as plt
 import xgboost
 import glob

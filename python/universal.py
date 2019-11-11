@@ -1,3 +1,4 @@
+from __future__ import division
 import numpy as np
 import json
 import os
@@ -8,7 +9,6 @@ import matplotlib.pyplot as plt
 import itertools
 from sklearn.metrics import confusion_matrix
 import warnings
-from __future__ import division
 warnings.filterwarnings('ignore', category=RuntimeWarning)
 
 def read_parameters(param_file):

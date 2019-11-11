@@ -1,3 +1,4 @@
+from __future__ import division
 from tthAnalysis.bdtHyperparameterOptimization.slurm_fitness import main
 from tthAnalysis.bdtHyperparameterOptimization.slurm_fitness import save_info
 import numpy as np
@@ -7,7 +8,6 @@ import glob
 import gzip
 import shutil
 import urllib2
-from __future__ import division
 dir_path = os.path.dirname(os.path.realpath(__file__))
 resourcesDir = os.path.join(dir_path, 'resources')
 tmp_folder = os.path.join(resourcesDir, 'tmp')

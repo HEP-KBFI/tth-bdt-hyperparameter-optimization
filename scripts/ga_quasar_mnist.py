@@ -12,6 +12,7 @@ Options:
     --sett_file=PTH         Path to settings file
 
 """
+from __future__ import division
 import os
 import docopt
 from tthAnalysis.bdtHyperparameterOptimization.universal import read_parameters

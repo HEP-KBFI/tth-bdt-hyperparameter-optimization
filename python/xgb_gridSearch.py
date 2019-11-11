@@ -11,12 +11,12 @@ Options:
     --outputDir=DIR         Directory for plots and parameters
 
 '''
+from __future__ import division
 from tthAnalysis.bdtHyperparameterOptimization.universal import read_parameters
 from tthAnalysis.bdtHyperparameterOptimization.universal import save_results
 from tthAnalysis.bdtHyperparameterOptimization.mnist_filereader import create_datasets
 from tthAnalysis.bdtHyperparameterOptimization.xgb_tools import ensemble_fitnesses
 import docopt
-from __future__ import division
 from itertools import product
 import numpy as np
 import os

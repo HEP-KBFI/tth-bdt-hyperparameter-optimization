@@ -1,3 +1,4 @@
+from __future__ import division
 from tthAnalysis.bdtHyperparameterOptimization.slurm_main import parameters_to_file
 from tthAnalysis.bdtHyperparameterOptimization.slurm_main import lists_from_file
 from tthAnalysis.bdtHyperparameterOptimization.slurm_main import create_result_lists
@@ -8,7 +9,6 @@ from tthAnalysis.bdtHyperparameterOptimization.slurm_main import prepare_jobFile
 from tthAnalysis.bdtHyperparameterOptimization.slurm_main import check_error
 from tthAnalysis.bdtHyperparameterOptimization.slurm_main import read_fitness
 import numpy as np
-from __future__ import division
 import os 
 import shutil
 import glob

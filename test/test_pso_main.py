@@ -1,3 +1,4 @@
+from __future__ import division
 import numpy as np
 import sys
 from tthAnalysis.bdtHyperparameterOptimization.pso_main import calculate_personal_bests
@@ -6,7 +7,6 @@ from tthAnalysis.bdtHyperparameterOptimization.pso_main import calculate_newValu
 from tthAnalysis.bdtHyperparameterOptimization.pso_main import weight_normalization
 from tthAnalysis.bdtHyperparameterOptimization.pso_main import read_weights
 from pathlib import Path
-from __future__ import division
 import os
 dir_path = os.path.dirname(os.path.realpath(__file__))
 hyper_path = Path(dir_path).parent

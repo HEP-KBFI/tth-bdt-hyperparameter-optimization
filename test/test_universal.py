@@ -1,8 +1,8 @@
+from __future__ import division
 import numpy as np
 import sys
 import os
 import shutil
-from __future__ import division
 from tthAnalysis.bdtHyperparameterOptimization.universal import calculate_f1_score
 from tthAnalysis.bdtHyperparameterOptimization.universal import calculate_improvement_wSTDEV
 from tthAnalysis.bdtHyperparameterOptimization.universal import save_results

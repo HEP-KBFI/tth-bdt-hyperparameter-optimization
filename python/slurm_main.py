@@ -1,6 +1,7 @@
 '''
 To get the same output as in the normal case, call 'run_iteration'
 '''
+from __future__ import division
 import numpy as np
 import os
 import json
@@ -10,7 +11,6 @@ import glob
 from pathlib import Path
 from shutil import copyfile
 import time
-from __future__ import division
 
 
 def parameters_to_file(outputDir, parameter_dicts):

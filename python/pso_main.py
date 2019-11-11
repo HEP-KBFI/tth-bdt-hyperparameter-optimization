@@ -1,10 +1,10 @@
+from __future__ import division
 import numpy as np
 import xgboost as xgb
 from tthAnalysis.bdtHyperparameterOptimization.universal import read_parameters
 from tthAnalysis.bdtHyperparameterOptimization.universal import calculate_improvement_wSTDEV
 import docopt
 import os
-from __future__ import division
 np.random.seed(1)
 
 

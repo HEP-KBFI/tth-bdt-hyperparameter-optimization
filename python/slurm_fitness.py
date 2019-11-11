@@ -9,6 +9,7 @@ Options:
     -n --nthread=INT            Number of threads to use
 
 '''
+from __future__ import division
 import numpy as np
 from tthAnalysis.bdtHyperparameterOptimization.universal import read_parameters
 from tthAnalysis.bdtHyperparameterOptimization.mnist_filereader import create_datasets
@@ -18,7 +19,6 @@ import json
 from pathlib import Path
 import os
 import csv
-from __future__ import division
 
 
 def save_info(score, pred_train, pred_test, saveDir):
