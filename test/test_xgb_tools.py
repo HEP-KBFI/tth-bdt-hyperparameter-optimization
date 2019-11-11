@@ -4,7 +4,7 @@ from tthAnalysis.bdtHyperparameterOptimization.xgb_tools import initialize_value
 from tthAnalysis.bdtHyperparameterOptimization.xgb_tools import prepare_params_calc
 
 
-
+# currently not used?
 def test_prepare_params_calc():
     values = {
         'num_boost_round': 371,
@@ -32,7 +32,7 @@ def test_prepare_params_calc():
     result = prepare_params_calc(values)
     assert result == expected
 
-
+# currently not used?
 def test_prepare_params_calc2():
     values = {
         'num_boost_round': 371,

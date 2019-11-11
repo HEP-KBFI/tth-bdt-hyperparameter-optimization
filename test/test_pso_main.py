@@ -9,7 +9,7 @@ from tthAnalysis.bdtHyperparameterOptimization.pso_main import read_weights
 from pathlib import Path
 import os
 dir_path = os.path.dirname(os.path.realpath(__file__))
-hyper_path = Path(dir_path).parent
+hyper_path = str(Path(dir_path).parent)
 
 
 value_dicts = [

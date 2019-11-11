@@ -102,32 +102,17 @@ def test_calculate_improvement_wSTDEV():
     parameter_dict1 = {
         'a': 1,
         'b': 10,
-        'c': 5,
-        'verbosity': 1,
-        'objective': 'multi:softprob',
-        'num_class': 10,
-        'nthread': 2,
-        'seed': 1
+        'c': 5
     }
     parameter_dict2 = {
         'a': 2,
         'b': 20,
-        'c': 10,
-        'verbosity': 1,
-        'objective': 'multi:softprob',
-        'num_class': 10,
-        'nthread': 2,
-        'seed': 1
+        'c': 10
     }
     parameter_dict3 = {
         'a': 3,
         'b': 30,
-        'c': 15,
-        'verbosity': 1,
-        'objective': 'multi:softprob',
-        'num_class': 10,
-        'nthread': 2,
-        'seed': 1
+        'c': 15
     }
     parameter_dicts = [
         parameter_dict1,
