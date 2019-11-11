@@ -21,7 +21,7 @@ def initialize_values(value_dicts):
 
 
 def prepare_run_params(nthread, value_dicts, sample_size):
-    run_params = []
+    run_params = []main
     for i in range(sample_size):
         run_param = initialize_values(value_dicts)
         run_params.append(run_param)
