@@ -10,6 +10,7 @@ import glob
 from pathlib import Path
 from shutil import copyfile
 import time
+from __future__ import division
 
 
 def parameters_to_file(outputDir, parameter_dicts):

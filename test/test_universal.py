@@ -2,6 +2,7 @@ import numpy as np
 import sys
 import os
 import shutil
+from __future__ import division
 from tthAnalysis.bdtHyperparameterOptimization.universal import calculate_f1_score
 from tthAnalysis.bdtHyperparameterOptimization.universal import calculate_improvement_wSTDEV
 from tthAnalysis.bdtHyperparameterOptimization.universal import save_results
@@ -12,6 +13,7 @@ from tthAnalysis.bdtHyperparameterOptimization.universal import create_mask
 from tthAnalysis.bdtHyperparameterOptimization.universal import get_values
 from tthAnalysis.bdtHyperparameterOptimization.universal import choose_values
 from tthAnalysis.bdtHyperparameterOptimization.universal import plot_costFunction
+from tthAnalysis.bdtHyperparameterOptimization.universal import values_to_list_dict
 dir_path = os.path.dirname(os.path.realpath(__file__))
 resourcesDir = os.path.join(dir_path, 'resources', 'tmp')
 
@@ -151,7 +153,7 @@ def test_values_to_list_dict():
         parameter_dict3
     ]
     keys = ['a', 'b', 'c']
-    result = gf.values_to_list_dict(keys, parameter_dicts)
+    result = values_to_list_dict(keys, parameter_dicts)
     expected = {
         'a': [1, 4, 7],
         'b': [2, 5, 8],

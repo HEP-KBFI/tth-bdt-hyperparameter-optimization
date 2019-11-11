@@ -18,6 +18,7 @@ import json
 from pathlib import Path
 import os
 import csv
+from __future__ import division
 
 
 def save_info(score, pred_train, pred_test, saveDir):

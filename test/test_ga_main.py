@@ -1,4 +1,5 @@
 import numpy as np
+from __future__ import division
 from tthAnalysis.bdtHyperparameterOptimization.ga_main import Grouping
 from tthAnalysis.bdtHyperparameterOptimization.ga_main import selection
 from tthAnalysis.bdtHyperparameterOptimization.ga_main import create_subpopulations

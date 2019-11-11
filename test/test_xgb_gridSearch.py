@@ -1,4 +1,5 @@
 import numpy as np
+from __future__ import division
 from tthAnalysis.bdtHyperparameterOptimization.xgb_gridSearch import single_paramSet
 from tthAnalysis.bdtHyperparameterOptimization.xgb_gridSearch import initialize_values
 from tthAnalysis.bdtHyperparameterOptimization.xgb_gridSearch import param_update

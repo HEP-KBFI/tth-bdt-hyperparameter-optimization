@@ -1,6 +1,7 @@
 import numpy as np
 import xgboost as xgb
 import docopt, random, os
+from __future__ import division
 from tthAnalysis.bdtHyperparameterOptimization.xgb_tools import prepare_run_params
 from tthAnalysis.bdtHyperparameterOptimization.xgb_tools import ensemble_fitnesses
 from tthAnalysis.bdtHyperparameterOptimization.universal import calculate_improvement_wAVG

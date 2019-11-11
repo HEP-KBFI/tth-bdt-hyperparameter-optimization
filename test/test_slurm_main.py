@@ -8,6 +8,7 @@ from tthAnalysis.bdtHyperparameterOptimization.slurm_main import prepare_jobFile
 from tthAnalysis.bdtHyperparameterOptimization.slurm_main import check_error
 from tthAnalysis.bdtHyperparameterOptimization.slurm_main import read_fitness
 import numpy as np
+from __future__ import division
 import os 
 import shutil
 import glob
