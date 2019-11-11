@@ -128,9 +128,7 @@ def test_calculate_personal_bests2():
     except TypeError:
         error = True
     assert error == True
-    personal_bests,
-    parameter_dicts,
-    best_parameters,
+
 
 def test_calculate_newSpeed():
     w = 2
@@ -232,11 +230,6 @@ def test_calculate_newValue():
         'min_child_weight': 1,
         'subsample': 1,
         'colsample_bytree': 1,
-        # 'verbosity': 1,
-        # 'objective': 'multi:softprob',
-        # 'num_class': 10,
-        # 'nthread': nthread,
-        # 'seed': 1
     }
     current_speed = [1, 1, 1, 1, 1, 1, 1]
     current_speeds = [
@@ -283,6 +276,7 @@ def test_weight_normalization():
 
 
 def test_read_weights():
+    weightPaht = os.path.join(hyper_path, 'data')
     result = read_weights(value_dicts, hyper_path)
     assert len(result) == 6
     assert len(result['c1']) == len(value_dicts)
