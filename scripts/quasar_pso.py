@@ -13,6 +13,7 @@ Options:
     --mainDir=DIR           Directory of the main scripts (../hyper/hyper)
 
 '''
+from __future__ import division
 import numpy as np
 import xgboost as xgb
 import docopt

@@ -9,6 +9,7 @@ Options:
     -n --nthread=INT            Number of threads to use
 
 '''
+from __future__ import division
 import numpy as np
 from tthAnalysis.bdtHyperparameterOptimization.universal import read_parameters
 from tthAnalysis.bdtHyperparameterOptimization.mnist_filereader import create_datasets

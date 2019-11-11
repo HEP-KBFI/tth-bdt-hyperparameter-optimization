@@ -1,5 +1,14 @@
+from __future__ import division
 import numpy as np
-from tthAnalysis.bdtHyperparameterOptimization import mnist_ga 
+from tthAnalysis.bdtHyperparameterOptimization.ga_main import Grouping
+from tthAnalysis.bdtHyperparameterOptimization.ga_main import selection
+from tthAnalysis.bdtHyperparameterOptimization.ga_main import create_subpopulations
+from tthAnalysis.bdtHyperparameterOptimization.ga_main import new_population
+from tthAnalysis.bdtHyperparameterOptimization.ga_main import add_parameters
+from tthAnalysis.bdtHyperparameterOptimization.ga_main import crossover
+from tthAnalysis.bdtHyperparameterOptimization.ga_main import elitism
+from tthAnalysis.bdtHyperparameterOptimization.ga_main import Degroup
+from tthAnalysis.bdtHyperparameterOptimization.ga_main import Mutate
 import random
 
 # parameters and settings for testing
@@ -80,7 +89,7 @@ sample_population = [
         'min_child_weight': 151.16628631591988, 
         'subsample': 0.8293511781634226, 
         'colsample_bytree': 0.3646370163381584, 
-        'verbosity': 1, 
+        'silent': 1, 
         'objective': 'multi:softprob', 
         'num_class': 10, 'nthread': 8, 'seed': 1
     }, 
@@ -92,7 +101,7 @@ sample_population = [
         'min_child_weight': 423.15545834300855, 
         'subsample': 0.8626547033864551, 
         'colsample_bytree': 0.66718371170101, 
-        'verbosity': 1, 
+        'silent': 1, 
         'objective': 'multi:softprob', 
         'num_class': 10, 
         'nthread': 8, 
@@ -106,7 +115,7 @@ sample_population = [
         'min_child_weight': 228.60240399349414, 
         'subsample': 0.8861397134369418, 
         'colsample_bytree': 0.9573894525965381, 
-        'verbosity': 1, 
+        'silent': 1, 
         'objective': 'multi:softprob', 
         'num_class': 10, 
         'nthread': 8, 
@@ -122,27 +131,29 @@ def grouped_sample_population():
     grouped = []
     pos_corr = []
     for element in sample_population:
-        grouped.append(mnist_ga.Grouping(element, parameters)[0])
-        pos_corr.append(mnist_ga.Grouping(element, parameters)[1])
+        grouped.append(Grouping(element, parameters)[0])
+        pos_corr.append(Grouping(element, parameters)[1])
     return grouped, pos_corr
 
 # TESTS
 
 def test_selection():
-    calculated = mnist_ga.selection(simple_population, fitnesses)
+    calculated = selection(simple_population, fitnesses)
     assert len(calculated) == 2, 'test_selection failed'
     for parent in calculated:
         assert parent in simple_population, 'test_selection failed'
 
+
 def test_crossover():
     parents = sample_population[0:2]
-    calculated = mnist_ga.add_parameters(
-        mnist_ga.crossover(parents, settings['mut_chance'], parameters), settings['nthread'])
+    calculated = add_parameters(
+        crossover(parents, settings['mut_chance'], parameters), settings['nthread'])
     assert len(calculated) == len(parents[0]), 'test_crossover failed'
+
 
 def test_grouping():
     for dictionary in sample_population:
-        calculated = mnist_ga.Grouping(dictionary, parameters)
+        calculated = Grouping(dictionary, parameters)
         for element in calculated:
             assert len(element) == 5, 'test_grouping failed'
         for element in calculated[0]:
@@ -159,39 +170,43 @@ def test_grouping():
             except:
                 raise AssertionError('test_grouping failed')
 
+
 def test_degroup():
     grouped, pos_corr = grouped_sample_population()
     calculated = []
     for element in grouped:
-        calculated.append(mnist_ga.add_parameters(
-            mnist_ga.Degroup(element), settings['nthread']))
+        calculated.append(add_parameters(
+            Degroup(element), settings['nthread']))
     assert calculated == sample_population, 'test_degroup failed'
+
 
 def test_mutate():
     grouped, pos_corr = grouped_sample_population()
     for i, element in enumerate(grouped):
         total_calc = []
         for j, group in enumerate(element):
-            calculated = mnist_ga.Mutate(group, settings['mut_chance'], random.random(), pos_corr[i][j])
+            calculated = Mutate(group, settings['mut_chance'], random.random(), pos_corr[i][j])
             assert len(calculated) == len(group), 'test_mutate failed'
             total_calc.append(calculated)
         assert len(total_calc) == len(element), 'test_mutate failed'
+
 
 def test_elitism():
     nums = [0.5, 1, 2, 3]
     result = [[3, 2], [3], [3, 2], [3, 2, 1]]
     calculated = []
     for num in nums:
-        calculated.append(mnist_ga.elitism(simple_population, fitnesses, num))
+        calculated.append(elitism(simple_population, fitnesses, num))
     assert result == calculated, 'test_elitism failed'
+
 
 def test_add_parameters():
     dictionary = {'test': 1}
     nthread = 16
-    calculated = mnist_ga.add_parameters(dictionary, nthread)
+    calculated = add_parameters(dictionary, nthread)
     result = {
         'test': 1,
-        'verbosity': 1,
+        'silent': 1,
         'objective': 'multi:softprob',
         'num_class': 10,
         'nthread': nthread,
@@ -199,10 +214,12 @@ def test_add_parameters():
     }
     assert result == calculated, 'test_add_parameters failed'
 
+
 def test_new_population():
     settings.update({'pop_size':3})
-    calculated = mnist_ga.new_population(sample_population, fitnesses, settings, parameters)
+    calculated = new_population(sample_population, fitnesses, settings, parameters)
     assert len(calculated) == len(sample_population), 'test_new_population failed'
+
 
 def test_create_subpopulations():
     nums = [1, 2, 3]
@@ -219,7 +236,7 @@ def test_create_subpopulations():
         for num in nums:
             j = 0
             settings.update({'pop_size':size, 'sub_pops':num})
-            calculated = mnist_ga.create_subpopulations(settings, parameters)
+            calculated = create_subpopulations(settings, parameters)
             assert len(calculated) == len(result[i]), "test_create_subpopulations failed"
             for element in calculated:
                 assert len(element) == result[i][j], "test_create_subpopulations failed"

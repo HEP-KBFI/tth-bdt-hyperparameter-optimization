@@ -1,10 +1,15 @@
+from __future__ import division
 import numpy as np
 import sys
-from tthAnalysis.bdtHyperparameterOptimization import pso_main as pso
+from tthAnalysis.bdtHyperparameterOptimization.pso_main import calculate_personal_bests
+from tthAnalysis.bdtHyperparameterOptimization.pso_main import calculate_newSpeed
+from tthAnalysis.bdtHyperparameterOptimization.pso_main import calculate_newValue
+from tthAnalysis.bdtHyperparameterOptimization.pso_main import weight_normalization
+from tthAnalysis.bdtHyperparameterOptimization.pso_main import read_weights
 from pathlib import Path
 import os
 dir_path = os.path.dirname(os.path.realpath(__file__))
-hyper_path = Path(dir_path).parent
+hyper_path = str(Path(dir_path).parent)
 
 
 value_dicts = [
@@ -85,7 +90,7 @@ def test_calculate_personal_bests():
         {'a': 2, 'b': 2, 'c': 2},
         {'a': 7, 'b': 7, 'c': 7}
     ]
-    calculated_pb = pso.calculate_personal_bests(
+    calculated_pb = calculate_personal_bests(
         fitnesses,
         best_fitnesses,
         parameter_dicts,
@@ -114,7 +119,7 @@ def test_calculate_personal_bests2():
     ]
     error = False
     try:
-        calculated_pb = pso.calculate_personal_bests(
+        calculated_pb = calculate_personal_bests(
             fitnesses,
             best_fitnesses,
             parameter_dicts,
@@ -130,24 +135,21 @@ def test_calculate_newSpeed():
     c1 = 2
     c2 = 2
     current_speeds = [1, 1, 1]
-    current_values = [
+    parameter_dicts = [
         {'a': 1, 'b': 1, 'c': 1},
         {'a': 2, 'b': 2, 'c': 2},
         {'a': 3, 'b': 3, 'c': 3}
     ]
-    pb_list = [
+    personal_bests = [
         {'a': 9, 'b': 9, 'c': 9},
         {'a': 8, 'b': 8, 'c': 8},
         {'a': 7, 'b': 7, 'c': 7}
     ]
-    best_params = {'a': 2, 'b': 2, 'c': 2}
-    calc_dict = {
-        'personal_bests': pb_list,
-        'parameter_dicts': current_values,
-        'best_parameters': best_params
-    }
-    result = pso.calculate_newSpeed(
-        calc_dict,
+    best_parameters = {'a': 2, 'b': 2, 'c': 2}
+    result = calculate_newSpeed(
+        personal_bests,
+        parameter_dicts,
+        best_parameters,
         w,
         current_speeds,
         c1,
@@ -190,7 +192,7 @@ def test_calculate_newSpeed2():
     best_params = values
     error = False
     try:
-        result = pso.calculate_newSpeed(
+        result = calculate_newSpeed(
             w,
             current_values,
             current_speeds,
@@ -228,11 +230,6 @@ def test_calculate_newValue():
         'min_child_weight': 1,
         'subsample': 1,
         'colsample_bytree': 1,
-        'verbosity': 1,
-        'objective': 'multi:softprob',
-        'num_class': 10,
-        'nthread': nthread,
-        'seed': 1
     }
     current_speed = [1, 1, 1, 1, 1, 1, 1]
     current_speeds = [
@@ -245,7 +242,7 @@ def test_calculate_newValue():
         values,
         values
     ]
-    result = pso.calculate_newValue(
+    result = calculate_newValue(
         current_speeds, parameter_dicts, nthread, value_dicts)
     assert result == expected
 
@@ -260,7 +257,7 @@ def test_weight_normalization():
         'c1': 2,
         'c2': 2
     }
-    result = pso.weight_normalization(param_dict)
+    result = weight_normalization(param_dict)
     np.testing.assert_almost_equal(
         result['w_init'],
         0.18,
@@ -279,6 +276,7 @@ def test_weight_normalization():
 
 
 def test_read_weights():
-    result = pso.read_weights(value_dicts, hyper_path)
+    weightPaht = os.path.join(hyper_path, 'data')
+    result = read_weights(value_dicts, weightPaht)
     assert len(result) == 6
     assert len(result['c1']) == len(value_dicts)

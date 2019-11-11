@@ -1,11 +1,13 @@
-from tthAnalysis.bdtHyperparameterOptimization import slurm_fitness as sf
+from __future__ import division
+from tthAnalysis.bdtHyperparameterOptimization.slurm_fitness import main
+from tthAnalysis.bdtHyperparameterOptimization.slurm_fitness import save_info
 import numpy as np
 import os 
 import shutil
 import glob
 import gzip
 import shutil
-import urllib.request
+import urllib
 dir_path = os.path.dirname(os.path.realpath(__file__))
 resourcesDir = os.path.join(dir_path, 'resources')
 tmp_folder = os.path.join(resourcesDir, 'tmp')
@@ -20,7 +22,7 @@ def test_save_info():
     saveDir = tmp_folder
     if not os.path.exists(saveDir):
         os.makedirs(saveDir)
-    sf.save_info(score, pred_train, pred_test, saveDir)
+    save_info(score, pred_train, pred_test, saveDir)
     train_path = os.path.join(saveDir, 'pred_train.lst')
     test_path = os.path.join(saveDir, 'pred_test.lst')
     score_path = os.path.join(saveDir, 'score.txt')
@@ -53,11 +55,11 @@ def test_main():
     for file in file_list:
         fileLoc = os.path.join(sampleDir, file)
         fileUrl = os.path.join(main_url, file + '.gz')
-        urllib.request.urlretrieve(fileUrl, fileLoc + '.gz')
+        urllib.urlretrieve(fileUrl, fileLoc + '.gz')
         with gzip.open(fileLoc + '.gz', 'rb') as f_in:
             with open(fileLoc, 'wb') as f_out:
                 shutil.copyfileobj(f_in, f_out)
-    sf.main(parameterFile_newLoc, sampleDir, nthread)
+    main(parameterFile_newLoc, sampleDir, nthread)
 
 
 def test_dummy_delete_files():

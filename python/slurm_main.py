@@ -1,6 +1,7 @@
 '''
 To get the same output as in the normal case, call 'run_iteration'
 '''
+from __future__ import division
 import numpy as np
 import os
 import json

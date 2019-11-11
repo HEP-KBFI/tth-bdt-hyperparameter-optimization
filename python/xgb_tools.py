@@ -1,3 +1,4 @@
+from __future__ import division
 import numpy as np
 import xgboost as xgb
 from tthAnalysis.bdtHyperparameterOptimization.universal import get_most_probable
@@ -28,7 +29,7 @@ def prepare_run_params(nthread, value_dicts, sample_size):
         run_params.append(run_param)
     return run_params
 
-
+# currently not used?
 def prepare_params_calc(value_dicts):
     keys_to_remove = [
         'verbosity',
@@ -84,6 +85,7 @@ def parameter_evaluation(parameter_dict, data_dict, nthread):
         prob_train, prob_test, data_dict)
     score = calculate_f1_score(test_confusionMatrix)[1]
     return score, pred_train, pred_test
+
 
 # parameter evaluation as argument for the function. Move to universal
 def ensemble_fitnesses(parameter_dicts, data_dict, nthread, *args):
