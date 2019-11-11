@@ -174,11 +174,11 @@ def test_calculate_newSpeed2():
         'min_child_weight': 18,
         'subsample': 0.9,
         'colsample_bytree': 0.8,
-        'verbosity': 1,
-        'objective': 'multi:softprob',
-        'num_class': 10,
-        'nthread': 2,
-        'seed': 1
+        # 'verbosity': 1,
+        # 'objective': 'multi:softprob',
+        # 'num_class': 10,
+        # 'nthread': 2,
+        # 'seed': 1
     }
     current_speeds = [1, 1, 1]
     current_values = [
