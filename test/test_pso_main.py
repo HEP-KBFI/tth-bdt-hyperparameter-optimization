@@ -67,7 +67,7 @@ value_dicts = [
 ]
 
 
-def test_pm.calculate_personal_bests():
+def test_calculate_personal_bests():
     fitnesses = [0.9, 1, 0.9]
     best_fitnesses = [0.8, 0.9, 1]
     parameter_dicts = [
@@ -94,7 +94,7 @@ def test_pm.calculate_personal_bests():
     assert result == calculated_pb
 
 
-def test_pm.calculate_personal_bests2():
+def test_calculate_personal_bests2():
     fitnesses = ['a', 1, 0.9]
     best_fitnesses = [0.8, 0.9, 1]
     parameter_dicts = [
@@ -125,7 +125,7 @@ def test_pm.calculate_personal_bests2():
     assert error == True
 
 
-def test_pm.calculate_newSpeed():
+def test_calculate_newSpeed():
     w = 2
     c1 = 2
     c2 = 2
@@ -155,7 +155,7 @@ def test_pm.calculate_newSpeed():
     assert result[2][0] >= 0 and result[2][0] <= 10
 
 
-def test_pm.calculate_newSpeed2():
+def test_calculate_newSpeed2():
     w = 2
     c1 = 2
     c2 = 2
@@ -201,7 +201,7 @@ def test_pm.calculate_newSpeed2():
     assert error == True
 
 
-def test_pm.calculate_newValue():
+def test_calculate_newValue():
     parameter_dict = {
         'num_boost_round': 0,
         'learning_rate': 0,
@@ -242,7 +242,7 @@ def test_pm.calculate_newValue():
     assert result == expected
 
 
-def test_pm.weight_normalization():
+def test_weight_normalization():
     param_dict = {
         'iterations': 2,
         'sample_size': 3,
@@ -270,7 +270,7 @@ def test_pm.weight_normalization():
     )
 
 
-def test_pm.read_weights():
+def test_read_weights():
     weightPaht = os.path.join(hyper_path, 'data')
     result = pm.read_weights(value_dicts, weightPaht)
     assert len(result) == 6
