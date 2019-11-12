@@ -1,5 +1,5 @@
 pathlib
 timeout-decorator
-pluggy==1.6.0
+pluggy==0.6.0
 attrs==19.1.0
 py==1.8.0
