@@ -3,8 +3,8 @@ import numpy as np
 from tthAnalysis.bdtHyperparameterOptimization import ga_main as gm
 import random
 
-# parameters and settings for testing
 
+# parameters and settings for testing
 parameters = [
     {
         'p_name': 'num_boost_round',
@@ -123,12 +123,12 @@ def grouped_sample_population():
     grouped = []
     pos_corr = []
     for element in sample_population:
-        grouped.append(gm.Grouping(element, parameters)[0])
-        pos_corr.append(gm.Grouping(element, parameters)[1])
+        grouped.append(gm.grouping(element, parameters)[0])
+        pos_corr.append(gm.grouping(element, parameters)[1])
     return grouped, pos_corr
 
-# TESTS
 
+# TESTS
 def test_selection():
     calculated = gm.selection(simple_population, fitnesses)
     assert len(calculated) == 2, 'test_gm.selection failed'
@@ -143,44 +143,52 @@ def test_crossover():
     assert len(calculated) == len(parents[0]), 'test_crossover failed'
 
 
-def test_Grouping():
+def test_grouping():
     for dictionary in sample_population:
-        calculated = gm.Grouping(dictionary, parameters)
+        calculated = gm.grouping(dictionary, parameters)
         for element in calculated:
-            assert len(element) == 5, 'test_gm.Grouping failed'
+            assert len(element) == 5, 'test_gm.grouping failed'
         for element in calculated[0]:
             for key in element.keys():
-                assert element[key] == dictionary[key], 'test_gm.Grouping failed'
+                assert element[key] == dictionary[key], 'test_gm.grouping failed'
         for element in calculated[1]:
             i = 0
             try:
                 if element != parameters[i]['true_corr']:
                     i += 1
                 else:
-                    assert element == parameters[i]['true_corr'], 'test_gm.Grouping failed'
+                    assert element == parameters[i]['true_corr'], 'test_gm.grouping failed'
                     i += 1
             except:
-                raise AssertionError('test_gm.Grouping failed')
+                raise AssertionError('test_gm.grouping failed')
 
 
-def test_Degroup():
+def test_degroup():
     grouped, pos_corr = grouped_sample_population()
     calculated = []
     for element in grouped:
         calculated.append(gm.add_parameters(
-            gm.Degroup(element), settings['nthread']))
-    assert calculated == sample_population, 'test_gm.Degroup failed'
+            gm.degroup(element), settings['nthread']))
+    assert calculated == sample_population, 'test_gm.degroup failed'
 
 
-def test_Mutate():
+def test_mutate():
     grouped, pos_corr = grouped_sample_population()
     for i, element in enumerate(grouped):
         total_calc = []
         for j, group in enumerate(element):
-            calculated = gm.Mutate(group, settings['mut_chance'], random.random(), pos_corr[i][j])
-            assert len(calculated) == len(group), 'test_gm.Mutate failed'
+            calculated = gm.mutate(group, settings['mut_chance'], random.random(), pos_corr[i][j])
+            assert len(calculated) == len(group), 'test_gm.mutate failed'
             total_calc.append(calculated)
-        assert len(total_calc) == len(element), 'test_gm.Mutate failed'
+        assert len(total_calc) == len(element), 'test_gm.mutate failed'
+
+
+def test_set_num():
+    result = [2, 1, 2, 3]
+    calculated = []
+    for num in nums:
+        calculated.append(mnist_ga.set_num(num, simple_population))
+    assert result == calculated, 'test_set_num failed'
 
 
 def test_elitism():
@@ -192,9 +200,22 @@ def test_elitism():
     assert result == calculated, 'test_gm.elitism failed'
 
 
+def test_culling():
+    result = [1, 2, 1, 0]
+    for i, num in enumerate(nums):
+        settings.update({'culling':num})
+        calculated = mnist_ga.culling(sample_population, fitnesses, settings, parameters)
+        assert len(calculated) == len(sample_population), 'test_culling failed'
+        counter = 0
+        for member in calculated:
+            if member in sample_population:
+                counter += 1
+        assert counter == result[i], 'test_culling failed'
+
+
 def test_add_parameters():
     dictionary = {'test': 1}
-    nthread = 16
+    nthread = 8
     calculated = gm.add_parameters(dictionary, nthread)
     result = {
         'test': 1,
