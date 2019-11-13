@@ -38,7 +38,7 @@ def single_paramSet(parameters, iterations, grid_size):
 
 def perform_gridSearch(
     parameters,
-    grid_size
+    grid_size,
     nthread,
     calculateFitness
 ):
