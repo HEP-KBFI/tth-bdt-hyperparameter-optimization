@@ -62,44 +62,6 @@ def test_initialize_values2():
     assert result == expected_l
 
 
-def test_param_update():
-    nthread = 2
-    dict1 = {
-        'first': 1.,
-        'second': 5.,
-        'third': 8.,
-        'silent': 1,
-        'objective': 'multi:softprob',
-        'num_class': 10,
-        'nthread': nthread,
-        'seed': 1,
-    }
-    dict2 = {
-        'first': 2.,
-        'second': 6.,
-        'third': 9.,
-        'silent': 1,
-        'objective': 'multi:softprob',
-        'num_class': 10,
-        'nthread': nthread,
-        'seed': 1,
-    }
-    expected_dicts = [dict1, dict2]
-    in1 = {
-        'first': 1.,
-        'second': 5.,
-        'third': 8.
-    }
-    in2 = {
-        'first': 2.,
-        'second': 6.,
-        'third': 9.
-    }
-    in_d = [in1, in2]
-    result = xg.param_update(in_d, nthread)
-    assert result == expected_dicts
-
-
 def test_create_all_combinations():
     nr_parameters = 3
     grid_size = 3
