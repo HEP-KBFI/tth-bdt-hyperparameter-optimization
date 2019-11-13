@@ -1,6 +1,6 @@
+from __future__ import division
 from itertools import product
 import numpy as np
-from __future__ import division
 
 
 def create_all_combinations(nr_parameters, grid_size):
