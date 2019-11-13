@@ -362,6 +362,7 @@ def evolution(settings, data, parameters):
             'Invalid parameters for subpopulation creation'
 
         # Create subpopulations
+        print("::::::: Creating subpopulations ::::::::\n")
         subpopulations = create_subpopulations(settings, parameters)
 
         # Evolve subpopulations
@@ -383,6 +384,7 @@ def evolution(settings, data, parameters):
     else:
 
         # Create one population
+        print("::::::: Creating population ::::::::\n")
         population = xt.prepare_run_params(settings['nthread'], parameters, settings['pop_size'])
 
         # Evolve population
