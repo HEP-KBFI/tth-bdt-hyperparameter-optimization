@@ -203,7 +203,7 @@ def culling(population, fitnesses, settings, parameters):
         num -= 1
 
     # Replace destroyed members
-    population += global_functions.prepare_run_params(
+    population += xt.prepare_run_params(
         settings['nthread'], parameters, size)
 
     return population
