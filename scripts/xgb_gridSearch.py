@@ -20,7 +20,7 @@ import os
 
 GRID_SIZE = 2
 
-def main(outputDir):
+def main(param_file, nthread, sample_dir, outputDir):
     if not os.path.isdir(outputDir):
         os.makedirs(outputDir)
     parameters = universal.read_parameters(param_file)
@@ -28,8 +28,6 @@ def main(outputDir):
     result_dict = gsm.perform_gridSearch(
         param_file,
         nthread,
-        sample_dir,
-        outputDir,
         pm.ensemble_fitness
     )
     universal.save_results(result_dict, outputDir, roc=False)

@@ -39,8 +39,6 @@ def single_paramSet(parameters, iterations, grid_size):
 def perform_gridSearch(
     param_file,
     nthread,
-    sample_dir,
-    outputDir,
     calculateFitness
 ):
     parameter_dicts = initialize_values(parameters, GRID_SIZE)
