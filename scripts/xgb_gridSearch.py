@@ -12,6 +12,7 @@ Options:
 
 '''
 from tthAnalysis.bdtHyperparameterOptimization import universal
+from tthAnalysis.bdtHyperparameterOptimization import xgb_tools as xt
 from tthAnalysis.bdtHyperparameterOptimization import mnist_filereader as mf
 from tthAnalysis.bdtHyperparameterOptimization import pso_main as pm
 from tthAnalysis.bdtHyperparameterOptimization import gridSearch_main as gsm
@@ -29,7 +30,7 @@ def main(param_file, nthread, sample_dir, outputDir):
     result_dict = gsm.perform_gridSearch(
         param_file,
         nthread,
-        pm.ensemble_fitness
+        xt.ensemble_fitnesses
     )
     universal.save_results(result_dict, outputDir, roc=False)
 
