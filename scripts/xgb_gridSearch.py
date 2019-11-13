@@ -31,7 +31,8 @@ def main(param_file, nthread, sample_dir, outputDir):
         parameters,
         GRID_SIZE,
         nthread,
-        xt.ensemble_fitnesses
+        xt.ensemble_fitnesses,
+        data_dict
     )
     universal.save_results(result_dict, outputDir, roc=False)
 

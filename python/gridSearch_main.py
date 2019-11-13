@@ -40,9 +40,11 @@ def perform_gridSearch(
     parameters,
     grid_size,
     nthread,
-    calculateFitness
+    calculateFitness,
+    data_dict
 ):
     parameter_dicts = initialize_values(parameters, grid_size)
+    print(':::::: Calculating fitnesses ::::::')
     fitnesses, pred_trains, pred_tests = calculateFitness(
         parameter_dicts, data_dict
     )
