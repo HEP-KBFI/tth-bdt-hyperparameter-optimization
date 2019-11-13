@@ -46,7 +46,7 @@ def perform_gridSearch(
     parameter_dicts = initialize_values(parameters, grid_size)
     print(':::::: Calculating fitnesses ::::::')
     fitnesses, pred_trains, pred_tests = calculateFitness(
-        parameter_dicts, data_dict
+        parameter_dicts, data_dict, nthread
     )
     index =  np.argmax(fitnesses)
     result_dict = {
