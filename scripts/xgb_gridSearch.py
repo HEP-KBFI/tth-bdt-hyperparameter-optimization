@@ -28,7 +28,8 @@ def main(param_file, nthread, sample_dir, outputDir):
     parameters = universal.read_parameters(param_file)
     data_dict = mf.create_datasets(sample_dir, nthread)
     result_dict = gsm.perform_gridSearch(
-        param_file,
+        parameters,
+        GRID_SIZE
         nthread,
         xt.ensemble_fitnesses
     )
