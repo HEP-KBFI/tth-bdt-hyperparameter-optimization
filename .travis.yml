@@ -14,6 +14,6 @@ before_install:
   - docker pull claria/cvmfs-cms
 script:
   - docker run --privileged -e TEST_CMSSW_VERSION=${TEST_CMSSW_VERSION}
-                            -e SCRAM_ARCH=${SCRAM_ARCH}
-                            -v ${TRAVIS_BUILD_DIR}:/home/travis claria/cvmfs-cms /bin/bash 
-                            -c "cd /home/; py.test ./tests"
+  - docker run --privileged -e SCRAM_ARCH=${SCRAM_ARCH}
+  - docker run --privileged -v ${TRAVIS_BUILD_DIR}:/home/travis claria/cvmfs-cms /bin/bash 
+  - docker run --privileged -c "cd /home/; py.test ./tests"
