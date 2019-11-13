@@ -12,6 +12,7 @@ Options:
 
 '''
 from tthAnalysis.bdtHyperparameterOptimization import universal
+from tthAnalysis.bdtHyperparameterOptimization import mnist_filereader as mf
 from tthAnalysis.bdtHyperparameterOptimization import pso_main as pm
 from tthAnalysis.bdtHyperparameterOptimization import gridSearch_main as gsm
 import docopt
@@ -24,7 +25,7 @@ def main(param_file, nthread, sample_dir, outputDir):
     if not os.path.isdir(outputDir):
         os.makedirs(outputDir)
     parameters = universal.read_parameters(param_file)
-    data_dict = universal.create_datasets(sample_dir, nthread)
+    data_dict = mf.create_datasets(sample_dir, nthread)
     result_dict = gsm.perform_gridSearch(
         param_file,
         nthread,
