@@ -183,11 +183,11 @@ def elitism(population, fitnesses, elites):
 
 
 # Cull worst performing members and replace them with random new ones
-def culling(population, fitnesses, settings, parameters):
+def culling(population, fitnesses, settings, data, parameters):
 
-    # Create copies of data
-    population = population[:]
-    fitnesses = fitnesses[:]
+    # # Create copies of data
+    # population = population[:]
+    # fitnesses = fitnesses[:]
 
     # Set num as the number of members to destroy
     num = set_num(settings['culling'], population)
@@ -203,10 +203,13 @@ def culling(population, fitnesses, settings, parameters):
         num -= 1
 
     # Replace destroyed members
-    population += xt.prepare_run_params(
+    new_members = xt.prepare_run_params(
         settings['nthread'], parameters, size)
+    population += new_members
+    fitnesses += xt.ensemble_fitnesses(
+        new_members, data, settings['nthread'])[0]
 
-    return population
+    return population, fitnesses
 
 
 # Add missing parameters to an offspring
@@ -320,7 +323,7 @@ def evolve(population, settings, data, parameters, final = False):
         # Generate a new population
         if iteration != 0:
             print('::::: Iteration:     ', iteration, ' :::::')
-            population = culling(population, fitnesses, settings, parameters)
+            population, fitnesses = culling(population, fitnesses, settings, data, parameters)
             population = new_population(
                 population, fitnesses, settings, parameters)
 
