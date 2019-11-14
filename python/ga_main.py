@@ -6,44 +6,45 @@ import random
 import docopt
 from tthAnalysis.bdtHyperparameterOptimization import xgb_tools as xt
 from tthAnalysis.bdtHyperparameterOptimization import universal
+from tthAnalysis.bdtHyperparameterOptimization import ga_selection as select
 
 
-# Selection of two parents from a population 
-# based on the tournament method.
-def selection(pop, fitnesses, t_size = 3, t_prob = 0.75):
+# # Selection of two parents from a population 
+# # based on the tournament method.
+# def selection(pop, fitnesses, t_size=3, t_prob=0.75):
 
-    # Initialization
-    parents = []
-    while len(parents) < 2:
-        tournament = []
-        t_fitness = []
+#     # Initialization
+#     parents = []
+#     while len(parents) < 2:
+#         tournament = []
+#         t_fitness = []
 
-        # Randomly select tournament members
-        while len(tournament) < t_size:
-            select = random.randint(0, len(pop)-1)
-            tournament.append(pop[select])
-            t_fitness.append(fitnesses[select])
+#         # Randomly select tournament members
+#         while len(tournament) < t_size:
+#             select = random.randint(0, len(pop)-1)
+#             tournament.append(pop[select])
+#             t_fitness.append(fitnesses[select])
 
-        while len(tournament) >= 1:
+#         while len(tournament) >= 1:
 
-            # Member with highest fitness will be selected 
-            # with probability of t_prob
-            if random.random() < t_prob:
-                parents.append(tournament[np.argmax(t_fitness)])
-                break
+#             # Member with highest fitness will be selected 
+#             # with probability of t_prob
+#             if random.random() < t_prob:
+#                 parents.append(tournament[np.argmax(t_fitness)])
+#                 break
 
-            # Last remaining member of tournament will be selected
-            elif len(tournament) == 1:
-                parents.append(tournament[0])
-                break
+#             # Last remaining member of tournament will be selected
+#             elif len(tournament) == 1:
+#                 parents.append(tournament[0])
+#                 break
 
-            # If member with highest fitness was not selected, 
-            # then it is removed from tournament
-            else:
-                tournament.remove(tournament[np.argmax(t_fitness)])
-                t_fitness.remove(t_fitness[np.argmax(t_fitness)])
+#             # If member with highest fitness was not selected, 
+#             # then it is removed from tournament
+#             else:
+#                 tournament.remove(tournament[np.argmax(t_fitness)])
+#                 t_fitness.remove(t_fitness[np.argmax(t_fitness)])
 
-    return parents
+#     return parents
 
 
 # Crossover of parents based on grouping
@@ -233,7 +234,7 @@ def new_population(population, fitnesses, settings, parameters):
 
     # Generate offspring to fill the new generation
     while len(new_population) < len(population):
-        parents = selection(population, fitnesses)
+        parents = select.tournament(population, fitnesses)
         offspring = add_parameters(
             crossover(parents, settings['mut_chance'], parameters), 
             settings['nthread'])
