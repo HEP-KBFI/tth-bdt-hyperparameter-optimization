@@ -59,11 +59,11 @@ def prepare_params_calc(value_dicts):
         return reduct_value_dicts
 
 
-def parameter_evaluation(parameter_dict, data_dict, nthread):
+def parameter_evaluation(parameter_dict, data_dict, nthread, num_class):
     params = {
         'silent': 1,
         'objective': 'multi:softprob',
-        'num_class': 10,
+        'num_class': num_class,
         'nthread': nthread,
         'seed': 1,
     }
@@ -87,13 +87,13 @@ def parameter_evaluation(parameter_dict, data_dict, nthread):
 
 
 # parameter evaluation as argument for the function. Move to universal
-def ensemble_fitnesses(parameter_dicts, data_dict, nthread, *args):
+def ensemble_fitnesses(parameter_dicts, data_dict, nthread, num_class *args):
     fitnesses = []
     pred_trains = []
     pred_tests = []
     for parameter_dict in parameter_dicts:
         fitness, pred_train, pred_test = parameter_evaluation(
-            parameter_dict, data_dict, nthread)
+            parameter_dict, data_dict, nthread, num_class)
         fitnesses.append(fitness)
         pred_trains.append(pred_train)
         pred_tests.append(pred_test)
