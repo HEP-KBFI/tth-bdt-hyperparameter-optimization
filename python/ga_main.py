@@ -282,7 +282,7 @@ def sub_evolution(subpopulations, settings, data, parameters):
 
     # Evolution for each subpopulation
     for population in subpopulations:
-        print('\n::::: Subpopulation: ', sub_iteration, ' :::::')
+        print('\n::::: Subpopulation: ' + str(sub_iteration) + ' :::::')
         final_population, scores_dict = evolve(
             population, settings, data, parameters, setting['nthread'])
 
@@ -322,7 +322,7 @@ def evolve(population, settings, data, parameters, final = False):
         
         # Generate a new population
         if iteration != 0:
-            print('::::: Iteration:     ', iteration, ' :::::')
+            print('::::: Iteration:     ' + str(iteration) + ' :::::')
             population, fitnesses = culling(population, fitnesses, settings, data, parameters)
             population = new_population(
                 population, fitnesses, settings, parameters)
