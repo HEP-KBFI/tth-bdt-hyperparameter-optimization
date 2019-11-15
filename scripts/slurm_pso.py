@@ -26,6 +26,7 @@ from tthAnalysis.bdtHyperparameterOptimization import xgb_tools as xt
 
 np.random.seed(1)
 
+num_class = 10
 
 def main(param_file, nthread, sample_dir, outputDir, mainDir):
     if not os.path.isdir(outputDir):
@@ -50,7 +51,7 @@ def main(param_file, nthread, sample_dir, outputDir, mainDir):
         w_init, w_fin, c1, c2, iterations,
         data_dict, value_dicts, sm.run_iteration,
         number_parameters, parameter_dicts, outputDir,
-        mainDir
+        mainDir, num_class
     )
     universal.save_results(result_dict, outputDir)
 
