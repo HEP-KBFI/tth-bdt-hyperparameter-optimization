@@ -208,7 +208,7 @@ def culling(population, fitnesses, settings, data, parameters):
         settings['nthread'], parameters, size)
     population += new_members
     fitnesses += xt.ensemble_fitnesses(
-        new_members, data, settings['nthread'])[0]
+        new_members, data, settings['nthread'], , settings['num_class'])[0]
 
     return population, fitnesses
 
@@ -306,7 +306,8 @@ def sub_evolution(subpopulations, settings, data, parameters):
 
     return merged_population, scores_dict
 
-# Evolve a population until reaching the threshold or maximum number of iterations
+# Evolve a population until reaching the threshold 
+# or maximum number of iterations
 def evolve(population, settings, data, parameters, final = False):
 
     # Initialization
@@ -324,13 +325,15 @@ def evolve(population, settings, data, parameters, final = False):
         # Generate a new population
         if iteration != 0:
             print('::::: Iteration:     ' + str(iteration) + ' :::::')
-            population, fitnesses = culling(population, fitnesses, settings, data, parameters)
+            population, fitnesses = culling(
+                population, fitnesses, settings, data, parameters)
             population = new_population(
                 population, fitnesses, settings, parameters)
 
         # Calculate fitness of the population
         fitnesses, pred_trains, pred_tests = (
-            xt.ensemble_fitnesses(population, data, settings['nthread'])
+            xt.ensemble_fitnesses(
+                population, data, settings['nthread'], settings['num_class'])
         )
 
         # Save results
@@ -389,7 +392,8 @@ def evolution(settings, data, parameters):
 
         # Create one population
         print("::::::: Creating population ::::::::\n")
-        population = xt.prepare_run_params(settings['nthread'], parameters, settings['pop_size'])
+        population = xt.prepare_run_params(
+            settings['nthread'], parameters, settings['pop_size'])
 
         # Evolve population
         population, scores_dict, fitnesses, pred_trains, pred_tests = evolve(
