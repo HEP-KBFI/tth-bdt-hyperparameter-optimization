@@ -208,7 +208,7 @@ def culling(population, fitnesses, settings, data, parameters):
         settings['nthread'], parameters, size)
     population += new_members
     fitnesses += xt.ensemble_fitnesses(
-        new_members, data, settings['nthread'], , settings['num_class'])[0]
+        new_members, data, settings['nthread'], settings['num_class'])[0]
 
     return population, fitnesses
 
