@@ -130,11 +130,11 @@ def grouped_sample_population():
 
 
 # TESTS
-def test_selection():
-    calculated = gm.selection(simple_population, fitnesses)
-    assert len(calculated) == 2, 'test_selection failed'
-    for parent in calculated:
-        assert parent in simple_population, 'test_selection failed'
+# def test_selection():
+#     calculated = gm.selection(simple_population, fitnesses)
+#     assert len(calculated) == 2, 'test_selection failed'
+#     for parent in calculated:
+#         assert parent in simple_population, 'test_selection failed'
 
 
 def test_crossover():
