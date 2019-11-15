@@ -35,7 +35,7 @@ def prepare_newDay(
     )
     new_parameters = calculate_newValue(
         current_speeds, parameter_dicts, nthread, value_dicts)
-    return new_parameters
+    return new_parameters, current_speeds
 
 
 def checkNumeric(variables):
@@ -189,7 +189,7 @@ def run_pso(
     compactness_threshold = 0.1
     compactness = universal.calculate_improvement_wSTDEV(parameter_dicts)
     i = 1
-    print(":::::::: Initializing :::::::::")
+    print(':::::::: Initializing :::::::::')
     fitnesses, pred_trains, pred_tests = calculate_fitnesses(
         parameter_dicts, data_dict, nthread, num_class, outputDir, sample_dir,
         mainDir, sample_size)
@@ -206,8 +206,8 @@ def run_pso(
     best_fitnesses = fitnesses
     current_speeds = np.zeros((sample_size, number_parameters))
     while i <= iterations and compactness_threshold < compactness:
-        print("::::::: Iteration: ", i, " ::::::::")
-        print(" --- Compactness: ", compactness, " ---")
+        print('::::::: Iteration: '+ str(i) + ' ::::::::')
+        print(' --- Compactness: ' + str(compactness) + ' ---')
         parameter_dicts = new_parameters
         fitnesses, pred_trains, pred_tests = calculate_fitnesses(
             parameter_dicts, data_dict, nthread, num_class,  outputDir, sample_dir,
@@ -215,7 +215,7 @@ def run_pso(
         best_fitnesses = find_bestFitnesses(fitnesses, best_fitnesses)
         personal_bests = calculate_personal_bests(
             fitnesses, best_fitnesses, parameter_dicts, personal_bests)
-        new_parameters = prepare_newDay(
+        new_parameters, current_speeds = prepare_newDay(
             personal_bests, parameter_dicts,
             result_dict['best_parameters'],
             current_speeds, w, nthread, value_dicts,

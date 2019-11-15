@@ -87,7 +87,7 @@ def parameter_evaluation(parameter_dict, data_dict, nthread, num_class):
 
 
 # parameter evaluation as argument for the function. Move to universal
-def ensemble_fitnesses(parameter_dicts, data_dict, nthread, num_class *args):
+def ensemble_fitnesses(parameter_dicts, data_dict, nthread, num_class, *args):
     fitnesses = []
     pred_trains = []
     pred_tests = []

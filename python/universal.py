@@ -210,7 +210,7 @@ def roc(labels, pred_vectors):
                 else:
                     bg_score += 1
         y.append(float(sig_score)/len(labels))
-        x.append(float(bg_score)/(9*len(labels)))
+        x.append(float(bg_score)/(9*len(labels))) # for 2 categories cant be 9
     return x, y
 
 

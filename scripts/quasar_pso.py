@@ -33,7 +33,7 @@ def main(param_file, nthread, sample_dir, outputDir, mainDir):
     data_dict = create_datasets(sample_dir, nthread)
     print("::::::: Reading parameters :::::::")
     value_dicts = universal.read_parameters(param_file)
-    weight_dict = universal.read_weights(value_dicts, mainDir)
+    weight_dict = pm.read_weights(value_dicts, mainDir)
     w_init = np.array(weight_dict['w_init'])
     w_fin = np.array(weight_dict['w_fin'])
     iterations = weight_dict['iterations']
