@@ -76,6 +76,8 @@ def parameter_evaluation(parameter_dict, data_dict, nthread, num_class):
         num_boost_round=int(num_boost_round),
         verbose_eval=False
     )
+    print("Importances: ")
+    print(model.get_score(importance_type='gain'))
     pred_train = model.predict(data_dict['dtrain'])
     pred_test = model.predict(data_dict['dtest'])
     # score = calculate_fitness(pred_train, pred_test, data_dict)
