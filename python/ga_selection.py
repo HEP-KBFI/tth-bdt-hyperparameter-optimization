@@ -3,6 +3,7 @@ from __future__ import division
 import random
 import numpy as np
 
+
 # Tournament selection
 def tournament(population, fitnesses, t_size=2, t_prob=0.8):
 
@@ -83,6 +84,7 @@ def normalize(fitnesses):
     for fitness in fitnesses:
         normalized.append(fitness / total)
     return normalized
+
 
 # Generate roulette wheel according to probabilities and select parents
 def wheel(population, probabilities):

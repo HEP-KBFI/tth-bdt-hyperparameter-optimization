@@ -1,8 +1,8 @@
 """
 Genetic algorithm for optimizing the hyperparameters of XGBoost. (MNIST nbr)
-Call with 'python3'
+Call with 'python'
 
-Usage: mnist_ga.py --sample_dir=DIR --nthread=INT --output_dir=DIR --param_file=PTH --sett_file=PTH
+Usage: ga_quasar_mnist.py --sample_dir=DIR --nthread=INT --output_dir=DIR --param_file=PTH --sett_file=PTH
 
 Options:
     --sample_dir=DIR        The location of MNIST number sample

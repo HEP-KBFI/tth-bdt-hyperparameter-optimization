@@ -9,44 +9,6 @@ from tthAnalysis.bdtHyperparameterOptimization import universal
 from tthAnalysis.bdtHyperparameterOptimization import ga_selection as select
 
 
-# # Selection of two parents from a population 
-# # based on the tournament method.
-# def selection(pop, fitnesses, t_size=3, t_prob=0.75):
-
-#     # Initialization
-#     parents = []
-#     while len(parents) < 2:
-#         tournament = []
-#         t_fitness = []
-
-#         # Randomly select tournament members
-#         while len(tournament) < t_size:
-#             select = random.randint(0, len(pop)-1)
-#             tournament.append(pop[select])
-#             t_fitness.append(fitnesses[select])
-
-#         while len(tournament) >= 1:
-
-#             # Member with highest fitness will be selected 
-#             # with probability of t_prob
-#             if random.random() < t_prob:
-#                 parents.append(tournament[np.argmax(t_fitness)])
-#                 break
-
-#             # Last remaining member of tournament will be selected
-#             elif len(tournament) == 1:
-#                 parents.append(tournament[0])
-#                 break
-
-#             # If member with highest fitness was not selected, 
-#             # then it is removed from tournament
-#             else:
-#                 tournament.remove(tournament[np.argmax(t_fitness)])
-#                 t_fitness.remove(t_fitness[np.argmax(t_fitness)])
-
-#     return parents
-
-
 # Crossover of parents based on grouping
 def crossover(parents, mutation_chance, value_dicts):
     parent1, true_corr = grouping(parents[0], value_dicts)
@@ -186,10 +148,6 @@ def elitism(population, fitnesses, elites):
 # Cull worst performing members and replace them with random new ones
 def culling(population, fitnesses, settings, data, parameters):
 
-    # # Create copies of data
-    # population = population[:]
-    # fitnesses = fitnesses[:]
-
     # Set num as the number of members to destroy
     num = set_num(settings['culling'], population)
 
@@ -285,7 +243,7 @@ def sub_evolution(subpopulations, settings, data, parameters):
     for population in subpopulations:
         print('\n::::: Subpopulation: ' + str(sub_iteration) + ' :::::')
         final_population, scores_dict = evolve(
-            population, settings, data, parameters, setting['nthread'])
+            population, settings, data, parameters)
 
         # Saving results in dictionaries 
         # (key indicates the subpopulation)
@@ -369,7 +327,7 @@ def evolution(settings, data, parameters):
             'Invalid parameters for subpopulation creation'
 
         # Create subpopulations
-        print("::::::: Creating subpopulations ::::::::\n")
+        print("::::::: Creating subpopulations ::::::::")
         subpopulations = create_subpopulations(settings, parameters)
 
         # Evolve subpopulations
@@ -377,7 +335,7 @@ def evolution(settings, data, parameters):
             subpopulations, settings, data, parameters)
 
         # Evolve merged population
-        print(('\n::::: Merged population  :::::'))
+        print(('\n::::: Merged population:::::'))
         population, final_scores_dict, fitnesses, pred_trains, pred_tests = \
             evolve(merged_population, settings, data, parameters, True)
 

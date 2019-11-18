@@ -130,13 +130,6 @@ def grouped_sample_population():
 
 
 # TESTS
-# def test_selection():
-#     calculated = gm.selection(simple_population, fitnesses)
-#     assert len(calculated) == 2, 'test_selection failed'
-#     for parent in calculated:
-#         assert parent in simple_population, 'test_selection failed'
-
-
 def test_crossover():
     parents = sample_population[0:2]
     calculated = gm.add_parameters(
@@ -198,20 +191,6 @@ def test_elitism():
     for num in nums:
         calculated.append(gm.elitism(simple_population, fitnesses, num))
     assert result == calculated, 'test_elitism failed'
-
-
-# def test_culling():
-#     result = [1, 2, 1, 0]
-#     for i, num in enumerate(nums):
-#         settings.update({'culling':num})
-#         calculated = gm.culling(sample_population, fitnesses, settings, parameters)
-#         assert len(calculated[0]) == len(sample_population), 'test_culling failed'
-#         assert len(calculated[1]) == len(sample_population), 'test_culling failed'
-#         counter = 0
-#         for member in calculated[0]:
-#             if member in sample_population:
-#                 counter += 1
-#         assert counter == result[i], 'test_culling failed'
 
 
 def test_add_parameters():
