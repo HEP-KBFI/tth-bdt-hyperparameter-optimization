@@ -188,6 +188,7 @@ def calculate_dict_mean_coeff_of_variation(list_dict):
 
 def roc(labels, pred_vectors):
     thresholds = np.arange(0, 1, 0.01)
+    number_bg = len(pred_vectors[0]) - 1
     y = []
     x = []
     for threshold in thresholds:
@@ -210,7 +211,7 @@ def roc(labels, pred_vectors):
                 else:
                     bg_score += 1
         y.append(float(sig_score)/len(labels))
-        x.append(float(bg_score)/(9*len(labels))) # for 2 categories cant be 9
+        x.append(float(bg_score)/(number_bg*len(labels)))
     return x, y
 
 
