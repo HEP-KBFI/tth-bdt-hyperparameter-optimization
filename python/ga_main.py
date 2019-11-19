@@ -1,9 +1,6 @@
 from __future__ import division
-import numpy as np
-import xgboost as xgb
-import os
 import random
-import docopt
+import numpy as np
 from tthAnalysis.bdtHyperparameterOptimization import xgb_tools as xt
 from tthAnalysis.bdtHyperparameterOptimization import universal
 from tthAnalysis.bdtHyperparameterOptimization import ga_selection as select
@@ -74,7 +71,7 @@ def grouping(parent, value_dicts):
 def degroup(offspring):
     degrouped_offspring = {}
     for group in offspring:
-            degrouped_offspring.update(group)
+        degrouped_offspring.update(group)
     return degrouped_offspring
 
 
@@ -84,11 +81,11 @@ def mutate(group, mutation_chance, cointoss, pos_corr):
     if pos_corr == 'True':
         for i, key in enumerate(group):
             if random.random() < 0.5:
-                mutation[key] = (group[key] 
-                    + (mutation_chance - cointoss)*group[key])
+                mutation[key] = (group[key]
+                                 + (mutation_chance - cointoss)*group[key])
             else:
-                mutation[key] = (group[key] 
-                    - (mutation_chance - cointoss)*group[key])
+                mutation[key] = (group[key]
+                                 - (mutation_chance - cointoss)*group[key])
     else:
         for i, key in enumerate(group):
             if random.random() < 0.5:
@@ -124,8 +121,8 @@ def set_num(amount, population):
 
 # Preserve best performing members of the previous generation
 def elitism(population, fitnesses, elites):
-    
-    # Create copies of data 
+
+    # Create copies of data
     population = population[:]
     fitnesses = fitnesses[:]
 
@@ -188,20 +185,21 @@ def add_parameters(offspring, nthread):
 def new_population(population, fitnesses, settings, parameters):
 
     # Add best members of previous population into the new population
-    new_population = elitism(population, fitnesses, settings['elites'])
+    next_population = elitism(population, fitnesses, settings['elites'])
 
     # Generate offspring to fill the new generation
-    while len(new_population) < len(population):
+    while len(next_population) < len(population):
         parents = select.tournament(population, fitnesses)
         offspring = add_parameters(
-            crossover(parents, settings['mut_chance'], parameters), 
+            crossover(parents, settings['mut_chance'], parameters),
             settings['nthread'])
 
         # No duplicate members
         if offspring not in new_population:
-            new_population.append(offspring)
+            next_population.append(offspring)
 
-    return new_population
+    return next_population
+
 
 # Create num amount of subpopulations
 def create_subpopulations(settings, parameters):
@@ -218,7 +216,7 @@ def create_subpopulations(settings, parameters):
     # Divide population into num amount of subpopulations
     for i in range(num):
         if i == 0:
-            sub_size = size//num + size%num
+            sub_size = size//num + size % num
         else:
             sub_size = size//num
 
@@ -228,6 +226,7 @@ def create_subpopulations(settings, parameters):
         subpopulations.append(sub_population)
 
     return subpopulations
+
 
 # Evolve subpopulations separately and then merge them into one
 def sub_evolution(subpopulations, settings, data, parameters):
@@ -245,7 +244,7 @@ def sub_evolution(subpopulations, settings, data, parameters):
         final_population, scores_dict = evolve(
             population, settings, data, parameters)
 
-        # Saving results in dictionaries 
+        # Saving results in dictionaries
         # (key indicates the subpopulation)
         best_scores[sub_iteration] = scores_dict['best_scores']
         avg_scores[sub_iteration] = scores_dict['avg_scores']
@@ -257,16 +256,17 @@ def sub_evolution(subpopulations, settings, data, parameters):
 
     # Collect results
     scores_dict = {
-        'best_scores': best_scores, 
-        'avg_scores': avg_scores, 
+        'best_scores': best_scores,
+        'avg_scores': avg_scores,
         'worst_scores': worst_scores
     }
 
     return merged_population, scores_dict
 
-# Evolve a population until reaching the threshold 
+
+# Evolve a population until reaching the threshold
 # or maximum number of iterations
-def evolve(population, settings, data, parameters, final = False):
+def evolve(population, settings, data, parameters, final=False):
 
     # Initialization
     best_scores = []
@@ -277,9 +277,9 @@ def evolve(population, settings, data, parameters, final = False):
     iteration = 0
 
     # Evolution loop
-    while (improvement > settings['threshold'] 
-        and iteration <= settings['iterations']):
-        
+    while (improvement > settings['threshold']
+           and iteration <= settings['iterations']):
+
         # Generate a new population
         if iteration != 0:
             print('::::: Iteration:     ' + str(iteration) + ' :::::')
@@ -307,8 +307,8 @@ def evolve(population, settings, data, parameters, final = False):
 
     # Collect results
     scores_dict = {
-        'best_scores': best_scores, 
-        'avg_scores': avg_scores, 
+        'best_scores': best_scores,
+        'avg_scores': avg_scores,
         'worst_scores': worst_scores
     }
 

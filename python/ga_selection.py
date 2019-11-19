@@ -10,32 +10,32 @@ def tournament(population, fitnesses, t_size=2, t_prob=0.8):
     # Initialization
     parents = []
     while len(parents) < 2:
-        tournament = []
+        tour = []
         t_fitness = []
 
         # Randomly select tournament members
         while len(tournament) < t_size:
             select = random.randint(0, len(population) - 1)
-            tournament.append(population[select])
+            tour.append(population[select])
             t_fitness.append(fitnesses[select])
 
-        while len(tournament) >= 1:
+        while len(tour) >= 1:
 
-            # Member with highest fitness will be selected 
+            # Member with highest fitness will be selected
             # with probability of t_prob
             if random.random() < t_prob:
-                parents.append(tournament[np.argmax(t_fitness)])
+                parents.append(tour[np.argmax(t_fitness)])
                 break
 
             # Last remaining member of tournament will be selected
-            elif len(tournament) == 1:
-                parents.append(tournament[0])
+            elif len(tour) == 1:
+                parents.append(tour[0])
                 break
 
-            # If member with highest fitness was not selected, 
+            # If member with highest fitness was not selected,
             # then it is removed from tournament
             else:
-                tournament.remove(tournament[np.argmax(t_fitness)])
+                tour.remove(tour[np.argmax(t_fitness)])
                 t_fitness.remove(t_fitness[np.argmax(t_fitness)])
 
     return parents
@@ -43,9 +43,8 @@ def tournament(population, fitnesses, t_size=2, t_prob=0.8):
 
 # Roulette wheel selection
 def roulette(population, fitnesses):
-    parents = []
     norm_fitnesses = normalize(fitnesses)
-    return wheel(population, norm_fitnesses)
+    return wheel_parents(population, norm_fitnesses)
 
 
 # Rank selection
@@ -58,7 +57,7 @@ def rank(population, fitnesses):
     ranked_fitnesses = []
     ranks = []
     probabilities = []
-    rank = 1
+    curr_rank = 1
 
     # Sort population and fitness lists
     while len(ranked_population) < len(population):
@@ -67,14 +66,14 @@ def rank(population, fitnesses):
         del temp_fitnesses[index]
         ranked_population.append(temp_population[index])
         del temp_population[index]
-        ranks.append(rank)
-        rank += 1
+        ranks.append(curr_rank)
+        curr_rank += 1
 
     # Calculate probabilities
-    for rank in ranks:
-        probabilities.append(rank / (len(ranks) * (len(ranks) - 1)))
+    for curr_rank in ranks:
+        probabilities.append(curr_rank / (len(ranks) * (len(ranks) - 1)))
 
-    return wheel(ranked_population, probabilities)
+    return wheel_parents(ranked_population, probabilities)
 
 
 # Normalize fitness scores
@@ -87,7 +86,7 @@ def normalize(fitnesses):
 
 
 # Generate roulette wheel according to probabilities and select parents
-def wheel(population, probabilities):
+def wheel_parents(population, probabilities):
 
     # Initialization
     wheel = []
