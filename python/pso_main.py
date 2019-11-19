@@ -64,7 +64,7 @@ def calculate_personal_bests(
             new_dicts.append(personal_best)
     return new_dicts
 
-
+# XGB specific
 def calculate_newValue(
     current_speeds,
     parameter_dicts,
@@ -82,6 +82,8 @@ def calculate_newValue(
                 new_value[key] = parameter_dict[key] + speed
             if new_value[key] < value_dicts[i]['range_start']:
                 new_value[key] = value_dicts[i]['range_start']
+            elif new_value[key] > value_dicts[i]['range_end']:
+                new_value[key] = value_dicts[i]['range_end']
             i += 1
         new_values.append(new_value)
     return new_values
