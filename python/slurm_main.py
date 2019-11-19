@@ -39,7 +39,7 @@ def prepare_jobFile(
     template_file = os.path.join(templateDir, 'submit_template.sh')
     errorFile = os.path.join(outputDir, 'error')
     outputFile = os.path.join(outputDir, 'output')
-    runScript = os.path.join(mainDir, 'python', 'slurm_fitness.py')
+    runScript = os.path.join(mainDir, 'scripts', 'slurm_fitness.py')
     copyfile(template_file, jobFile)
     with open(jobFile, 'a') as fh:
         fh.writelines('''
@@ -149,3 +149,17 @@ def check_error(outputDir):
             number_errors = len(f.readlines())
         if number_errors > 0:
             raise SystemExit(0)
+
+
+def save_info(score, pred_train, pred_test, saveDir):
+    train_path = os.path.join(saveDir, "pred_train.lst")
+    test_path = os.path.join(saveDir, "pred_test.lst")
+    score_path = os.path.join(saveDir, "score.txt")
+    with open(train_path, "w") as f:
+        wr = csv.writer(f)
+        wr.writerows(pred_train)
+    with open(test_path, "w") as f:
+        wr = csv.writer(f)
+        wr.writerows(pred_test)
+    with open(score_path, "w") as f:
+        f.write(str(score))

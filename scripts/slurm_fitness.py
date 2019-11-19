@@ -14,25 +14,12 @@ import numpy as np
 from tthAnalysis.bdtHyperparameterOptimization import universal
 from tthAnalysis.bdtHyperparameterOptimization import mnist_filereader as mf
 from tthAnalysis.bdtHyperparameterOptimization import xgb_tools as xt
+from tthAnalysis.bdtHyperparameterOptimization import slurm_main as sm
 import docopt
 import json
 from pathlib import Path
 import os
 import csv
-
-
-def save_info(score, pred_train, pred_test, saveDir):
-    train_path = os.path.join(saveDir, "pred_train.lst")
-    test_path = os.path.join(saveDir, "pred_test.lst")
-    score_path = os.path.join(saveDir, "score.txt")
-    with open(train_path, "w") as f:
-        wr = csv.writer(f)
-        wr.writerows(pred_train)
-    with open(test_path, "w") as f:
-        wr = csv.writer(f)
-        wr.writerows(pred_test)
-    with open(score_path, "w") as f:
-        f.write(str(score))
 
 
 def main(parameterFile, sample_dir, nthread):
@@ -42,7 +29,7 @@ def main(parameterFile, sample_dir, nthread):
     saveDir = str(path.parent)
     score, pred_train, pred_test = xt.parameter_evaluation(
         parameter_dict, data_dict, nthread)
-    save_info(score, pred_train, pred_test, saveDir)
+    sm.save_info(score, pred_train, pred_test, saveDir)
 
 
 if __name__ == '__main__':

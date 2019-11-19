@@ -1,15 +1,15 @@
 from __future__ import division
-import numpy as np
+import warnings
+import itertools
 import json
 import os
-import xgboost as xgb
+import numpy as np
 import matplotlib
 matplotlib.use('agg')
-import matplotlib.pyplot as plt
-import itertools
-from sklearn.metrics import confusion_matrix
-import warnings
 warnings.filterwarnings('ignore', category=RuntimeWarning)
+import matplotlib.pyplot as plt
+from sklearn.metrics import confusion_matrix
+
 
 def read_parameters(param_file):
     value_dicts = []
@@ -22,14 +22,16 @@ def read_parameters(param_file):
 
 def best_to_file(best_values, outputDir, assesment):
     outputPath = os.path.join(outputDir, 'best_parameters.json')
-    with open(outputPath, 'w') as f:
-        json.dump(best_values, f)
-        f.write('\n')
-        json.dump(assesment, f)
+    with open(outputPath, 'w') as file:
+        json.dump(best_values, file)
+        file.write('\n')
+        json.dump(assesment, file)
 
 
 def calculate_fitness(
-    pred_train, pred_test, data_dict
+    pred_train,
+    pred_test,
+    data_dict
 ):
     train_value = []
     for vector in pred_train:
@@ -73,27 +75,26 @@ def calculate_f1_score(confusionMatrix):
     nr_labels = len(confusionMatrix)
     labels = np.arange(0, nr_labels)
     num_elem = confusionMatrix.sum()
-    gs = []
-    f1s = []
+    g_scores = []
+    f1_scores = []
     for label in labels:
-        fp = 0
-        fn = 0
+        false_positives = 0
+        false_negatives = 0
         new_labels = np.delete(labels, label)
-        tp = confusionMatrix[label, label]
+        true_positives = confusionMatrix[label, label]
         for nl in new_labels:
-            fn += confusionMatrix[label, nl]
-            fp += confusionMatrix[nl, label]
-        tn = num_elem - fp - fn - tp
-        precision = tp / (tp + fp)
-        recall = tp / (tp + fn)
+            false_negatives += confusionMatrix[label, nl]
+            false_positives += confusionMatrix[nl, label]
+        precision = true_positives / (true_positives + false_positives)
+        recall = true_positives / (true_positives + false_negatives)
         # F1 -> harmonic mean of prec & recall
-        f1 = 2 * (precision * recall) / (precision + recall)
+        f1_score = 2 * (precision * recall) / (precision + recall)
         # G -> geometric mean of prec & recall
-        g = np.sqrt(precision * recall)
-        f1s.append(f1)
-        gs.append(g)
-    mean_f1 = np.mean(f1s)
-    mean_g = np.mean(gs)
+        g_score = np.sqrt(precision * recall)
+        f1_scores.append(f1_score)
+        g_scores.append(g_score)
+    mean_f1 = np.mean(f1_scores)
+    mean_g = np.mean(g_scores)
     return mean_f1, mean_g
 
 
@@ -239,10 +240,10 @@ def plot_roc(
     plotOut = os.path.join(outputDir, 'roc.png')
     plt.xlabel('Proportion of false values')
     plt.ylabel('Proportion of true values')
-    ax = plt.gca()
-    ax.set_aspect('equal')
-    plt.xlim(0.0,0.1)
-    plt.ylim(0.9,1.0)
+    axis = plt.gca()
+    axis.set_aspect('equal')
+    plt.xlim(0.0, 1.0)
+    plt.ylim(0.0, 1.0)
     plt.plot(
         x_train, y_train, color='k', linestyle='--',
         label='optimized values, training data', zorder=100
@@ -264,27 +265,27 @@ def plot_costFunction(avg_scores, outputDir):
         os.makedirs(outputDir)
     try:
         n_gens = len(avg_scores)
-        x = np.arange(0, n_gens)
-        plt.plot(x, avg_scores, color='k')
+        gen_numbers = np.arange(0, n_gens)
+        plt.plot(gen_numbers, avg_scores, color='k')
         plt.xlim(0, n_gens - 1)
         plt.xticks(np.arange(n_gens - 1))
     except: #in case of a genetic algorithm with multiple subpopulations
         for i in avg_scores.keys():
             n_gens = len(avg_scores[i])
             if i != 'final':
-                x = np.arange(0, n_gens)
-                plt.plot(x, avg_scores[i], color='b')
+                gen_numbers = np.arange(0, n_gens)
+                plt.plot(gen_numbers, avg_scores[i], color='b')
             if i == 'final':
                 n_gens_final = n_gens + len(avg_scores[i]) - 1
-                x = np.arange(n_gens - 1, n_gens_final)
-                plt.plot(x, avg_scores[i], color='k')
+                gen_numbers = np.arange(n_gens - 1, n_gens_final)
+                plt.plot(gen_numbers, avg_scores[i], color='k')
         plt.xlim(0, n_gens_final - 1)
         plt.xticks(np.arange(n_gens_final - 1))
     finally:
         plt.xlabel('Generation')
         plt.ylabel('Fitness score')
-        ax = plt.gca()
-        ax.set_aspect('auto', adjustable='box')
+        axis = plt.gca()
+        axis.set_aspect('auto', adjustable='box')
         plt.grid(True)
         plt.tick_params(top=True, right=True, direction='in')
         plt.savefig(plotOut)
@@ -344,4 +345,3 @@ def choose_values(matrix, pair, true_labels):
 # def calculate_ROC(labels, normed_matrix):
 #     thresholds = np.arange(0, 1, 0.05)
 #     for threshold in thresholds:
-
