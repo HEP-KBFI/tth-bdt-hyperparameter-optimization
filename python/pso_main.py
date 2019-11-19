@@ -74,8 +74,8 @@ def calculate_newValue(
     new_values = []
     for current_speed, parameter_dict in zip(current_speeds, parameter_dicts):
         new_value = {}
-        i = 0
-        for speed, key in zip(current_speed, parameter_dict):
+        for i, speed in enumerate(current_speed):
+            key = value_dicts[i]['p_name']
             if key == 'num_boost_round' or key == 'max_depth':
                 new_value[key] = int(np.ceil(parameter_dict[key] + speed))
             else:
@@ -84,7 +84,6 @@ def calculate_newValue(
                 new_value[key] = value_dicts[i]['range_start']
             elif new_value[key] > value_dicts[i]['range_end']:
                 new_value[key] = value_dicts[i]['range_end']
-            i += 1
         new_values.append(new_value)
     return new_values
 
