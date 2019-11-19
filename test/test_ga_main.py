@@ -1,3 +1,11 @@
+"""
+Testing the main functions of the genetic algorithm.
+Missing tests for the following functions:
+    culling
+    sub_evolution
+    evolve
+    evolution
+"""
 from __future__ import division
 import random
 from tthAnalysis.bdtHyperparameterOptimization import ga_main as gm
@@ -121,8 +129,8 @@ FITNESSES = [0.4, 0.6, 0.8]
 NUMS = [0.5, 1, 2, 3]
 
 
-# helper function for testing
 def grouped_sample():
+    """Temporary function for grouping the sample population"""
     grouped = []
     pos_corr = []
     for element in SAMPLE:
@@ -131,8 +139,8 @@ def grouped_sample():
     return grouped, pos_corr
 
 
-# TESTS
 def test_crossover():
+    """Testing the crossover function"""
     parents = SAMPLE[0:2]
     calculated = gm.add_parameters(
         gm.crossover(
@@ -144,6 +152,7 @@ def test_crossover():
 
 
 def test_grouping():
+    """Testing the grouping function"""
     for dictionary in SAMPLE:
         calculated = gm.grouping(dictionary, PARAMETERS)
         for element in calculated:
@@ -165,6 +174,7 @@ def test_grouping():
 
 
 def test_degroup():
+    """Testing the degroup function"""
     grouped = grouped_sample()[0]
     calculated = []
     for element in grouped:
@@ -174,6 +184,7 @@ def test_degroup():
 
 
 def test_mutate():
+    """Testing the mutate function"""
     grouped, pos_corr = grouped_sample()
     for i, element in enumerate(grouped):
         total_calc = []
@@ -186,6 +197,7 @@ def test_mutate():
 
 
 def test_set_num():
+    """Testing the set_num function"""
     result = [2, 1, 2, 3]
     calculated = []
     for num in NUMS:
@@ -194,6 +206,7 @@ def test_set_num():
 
 
 def test_elitism():
+    """Testing the elitism function"""
     result = [[3, 2], [3], [3, 2], [3, 2, 1]]
     calculated = []
     for num in NUMS:
@@ -202,6 +215,7 @@ def test_elitism():
 
 
 def test_add_parameters():
+    """Testing the add_parameters function"""
     dictionary = {'test': 1}
     nthread = 8
     calculated = gm.add_parameters(dictionary, nthread)
@@ -217,6 +231,7 @@ def test_add_parameters():
 
 
 def test_new_population():
+    """Testing the new_population function"""
     SETTINGS.update({'pop_size': 3})
     calculated = gm.new_population(
         SAMPLE, FITNESSES, SETTINGS, PARAMETERS)
@@ -225,6 +240,7 @@ def test_new_population():
 
 
 def test_create_subpopulations():
+    """Testing the create_subpopulations function"""
     nums = NUMS[1:]
     sizes = [1, 2, 4, 7, 11]
     result = [

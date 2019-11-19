@@ -1,3 +1,4 @@
+"""Main functions for the genetic algorithm"""
 from __future__ import division
 import random
 import numpy as np
@@ -6,8 +7,8 @@ from tthAnalysis.bdtHyperparameterOptimization import universal
 from tthAnalysis.bdtHyperparameterOptimization import ga_selection as select
 
 
-# Crossover of parents based on grouping
 def crossover(parents, mutation_chance, value_dicts):
+    """Crossover of parents based on grouping"""
     parent1, true_corr = grouping(parents[0], value_dicts)
     parent2, true_corr = grouping(parents[1], value_dicts)
     offspring = []
@@ -47,8 +48,8 @@ def crossover(parents, mutation_chance, value_dicts):
     return offspring
 
 
-# Group elements in a parent for crossover
 def grouping(parent, value_dicts):
+    """Group elements in a parent for crossover"""
     grouped_parent = []
     group = []
     new_dict = {}
@@ -67,16 +68,16 @@ def grouping(parent, value_dicts):
     return grouped_parent, true_corr
 
 
-# Degroup elements in offspring after crossover
 def degroup(offspring):
+    """Degroup elements in offspring after crossover"""
     degrouped_offspring = {}
     for group in offspring:
         degrouped_offspring.update(group)
     return degrouped_offspring
 
 
-# Mutation of a single group
 def mutate(group, mutation_chance, cointoss, pos_corr):
+    """Mutation of a single group"""
     mutation = {}
     if pos_corr == 'True':
         for i, key in enumerate(group):
@@ -101,15 +102,15 @@ def mutate(group, mutation_chance, cointoss, pos_corr):
     return mutation
 
 
-# Set num as the amount indicated
 def set_num(amount, population):
+    """Set num as the amount indicated"""
 
     # Given is a number
     if amount >= 1:
         num = amount
 
     # Given is a fraction
-    elif amount < 1 and amount > 0:
+    elif 0 < amount < 1:
         num = int(round(len(population)*amount))
 
     # Given 0 or a negative number
@@ -119,8 +120,8 @@ def set_num(amount, population):
     return num
 
 
-# Preserve best performing members of the previous generation
 def elitism(population, fitnesses, elites):
+    """Preserve best performing members of the previous generation"""
 
     # Create copies of data
     population = population[:]
@@ -142,8 +143,8 @@ def elitism(population, fitnesses, elites):
     return elite
 
 
-# Cull worst performing members and replace them with random new ones
 def culling(population, fitnesses, settings, data, parameters):
+    """Cull worst performing members and replace them with random new ones"""
 
     # Set num as the number of members to destroy
     num = set_num(settings['culling'], population)
@@ -168,8 +169,8 @@ def culling(population, fitnesses, settings, data, parameters):
     return population, fitnesses
 
 
-# Add missing parameters to an offspring
 def add_parameters(offspring, nthread):
+    """Add missing parameters to an offspring"""
     params = {
         'silent': 1,
         'objective': 'multi:softprob',
@@ -181,8 +182,8 @@ def add_parameters(offspring, nthread):
     return offspring
 
 
-# Create the next generation population
 def new_population(population, fitnesses, settings, parameters):
+    """Create the next generation population"""
 
     # Add best members of previous population into the new population
     next_population = elitism(population, fitnesses, settings['elites'])
@@ -195,14 +196,14 @@ def new_population(population, fitnesses, settings, parameters):
             settings['nthread'])
 
         # No duplicate members
-        if offspring not in new_population:
+        if offspring not in next_population:
             next_population.append(offspring)
 
     return next_population
 
 
-# Create num amount of subpopulations
 def create_subpopulations(settings, parameters):
+    """Create num amount of subpopulations"""
 
     # Initialization
     subpopulations = []
@@ -228,8 +229,8 @@ def create_subpopulations(settings, parameters):
     return subpopulations
 
 
-# Evolve subpopulations separately and then merge them into one
 def sub_evolution(subpopulations, settings, data, parameters):
+    """Evolve subpopulations separately and then merge them into one"""
 
     # Initialization
     best_scores = {}
@@ -264,11 +265,12 @@ def sub_evolution(subpopulations, settings, data, parameters):
     return merged_population, scores_dict
 
 
-# Evolve a population until reaching the threshold
-# or maximum number of iterations
 def evolve(population, settings, data, parameters, final=False):
+    """Evolve a population until reaching the threshold
+    or maximum number of iterations"""
 
     # Initialization
+    fitnesses = []
     best_scores = []
     avg_scores = []
     worst_scores = []
@@ -319,6 +321,7 @@ def evolve(population, settings, data, parameters, final=False):
 
 
 def evolution(settings, data, parameters):
+    """Evolution of the parameter values"""
 
     if settings['sub_pops'] > 1:
 

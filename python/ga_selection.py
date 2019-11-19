@@ -1,11 +1,11 @@
-# Various selection methods that can be used by the genetic algorithm
+"""Various selection methods that can be used by the genetic algorithm"""
 from __future__ import division
 import random
 import numpy as np
 
 
-# Tournament selection
 def tournament(population, fitnesses, t_size=2, t_prob=0.8):
+    """Tournament selection"""
 
     # Initialization
     parents = []
@@ -41,14 +41,14 @@ def tournament(population, fitnesses, t_size=2, t_prob=0.8):
     return parents
 
 
-# Roulette wheel selection
 def roulette(population, fitnesses):
+    """Roulette wheel selection"""
     norm_fitnesses = normalize(fitnesses)
     return wheel_parents(population, norm_fitnesses)
 
 
-# Rank selection
 def rank(population, fitnesses):
+    """Rank selection"""
 
     # Initialization
     temp_population = population[:]
@@ -76,8 +76,8 @@ def rank(population, fitnesses):
     return wheel_parents(ranked_population, probabilities)
 
 
-# Normalize fitness scores
 def normalize(fitnesses):
+    """Normalize fitness scores"""
     normalized = []
     total = sum(fitnesses)
     for fitness in fitnesses:
@@ -85,8 +85,8 @@ def normalize(fitnesses):
     return normalized
 
 
-# Generate roulette wheel according to probabilities and select parents
 def wheel_parents(population, probabilities):
+    """Generate roulette wheel according to probabilities and select parents"""
 
     # Initialization
     wheel = []
