@@ -72,6 +72,20 @@ def calculate_conf_matrix(pred_train, pred_test, data_dict):
 
 
 def calculate_f1_score(confusionMatrix):
+    '''Calculates the F1-score and the G-score
+
+    Parameters
+    ----------
+    confusionMatrix : array, shape = [n_classes, n_classes]
+        Confusion matrix of true and predicted labels
+
+    Returns
+    -------
+    mean_f1 : float
+        Mean F1-score of all the different lables
+    mean_g : float
+        Mean G-score of all the different labels
+    '''
     nr_labels = len(confusionMatrix)
     labels = np.arange(0, nr_labels)
     num_elem = confusionMatrix.sum()
