@@ -7,7 +7,122 @@ from tthAnalysis.bdtHyperparameterOptimization import universal
 from tthAnalysis.bdtHyperparameterOptimization import ga_selection as select
 
 
-def crossover(parents, mutation_chance, value_dicts):
+def float_encoding(value, accuracy=1.0e5):
+    """Encode a float into a bit string"""
+    integer = int(round(value * accuracy))
+    return '{:032b}'.format(integer)
+
+
+def int_encoding(value):
+    """Encode an int into a bit string"""
+    return '{:032b}'.format(value)
+
+
+def encode_parent(parent, parameters):
+    """Encode the parent for crossover and mutation"""
+
+    # Initialization
+    group = {}
+    encoded_parent = {}
+
+    # Encoding values in parent
+    for parameter in parameters:
+        key = parameter['p_name']
+        true_int = parameter['true_int']
+        if true_int:
+            encoded_parent.append(int_encoding(parent[key]))
+        else:
+            encoded_parent.append(float_encoding(parent[key]))
+
+    return encoded_parent
+
+
+def kpoint_crossover(parents, parameters, mutation_chance=0, k=1):
+    """Crossover of parents via k-point crossover.
+    Default is single-point crossover."""
+
+    # Initialization
+    points = []
+    offspring = []
+    parent1 = prepare_parent(parents[0], parameters)
+    parent2 = prepare_parent(parents[1], parameters)
+
+    # Choose crossover points
+    for i in range(k):
+        point = round(random.random() * len(parent1))
+        points.append(point)
+
+    # k-point crossover of parents
+    for key in parent1.keys():
+        parent1_chromosome = parent1[key]
+        parent2_chromosome = parent2[key]
+        curr_chromosome = parent1_chromosome
+        offspring_chromosome = ''
+        for i in range(len(parent1_chromosome)):
+            offspring_chromosome.append(curr_chromosome[i])
+            if i in points:
+                if curr_chromosome == parent1_chromosome:
+                    curr_chromosome = parent2_chromosome
+                else:
+                    curr_chromosome = parent1_chromosome
+
+        # Mutation
+        if mutation_chance != 0:
+            offspring_chromosome = chromosome_mutate(
+                offspring_chromosome, mutation_chance)
+
+        offspring[key] = offspring_chromosome
+
+    return offspring
+
+
+def uniform_crossover(parents, parameters, mutation_chance=0):
+    """Crossover of parents via uniform crossover"""
+
+    # Initialization
+    offspring = []
+    parent1 = prepare_parent(parents[0], parameters)
+    parent2 = prepare_parent(parents[1], parameters)
+
+    # Uniform crossover of parents
+    for key in parent1.keys():
+        parent1_chromosome = parent1[key]
+        parent2_chromosome = parent2[key]
+        offspring_chromosome = ''
+        for i in range(len(parent1_chromosome)):
+            cointoss = random.random()
+            if cointoss < 0.5:
+                offspring_chromosome += parent1_chromosome[i]
+            else:
+                offspring_chromosome += parent2_chromosome[i]
+
+        # Mutation
+        if mutation_chance != 0:
+            offspring_chromosome = chromosome_mutate(
+                offspring_chromosome, mutation_chance)
+
+        offspring[key] = offspring_chromosome
+
+    return offspring
+
+
+def chromosome_mutate(chromosome, mutation_chance):
+    """Mutation of a single chromosome"""
+
+    # Initialization
+    mutated_chromosome = {}
+
+    # Random mutation based on mutation_chance
+    for gene in chromosome:
+        if random.random() < mutation_chance:
+            mutated_chromosome.append(abs(gene - 1))
+        else:
+            mutated_chromosome.append(gene)
+
+    return mutated_chromosome
+
+
+def group_crossover(parents, mutation_chance, value_dicts):
     """Crossover of parents based on grouping"""
     parent1, true_corr = grouping(parents[0], value_dicts)
     parent2, true_corr = grouping(parents[1], value_dicts)
@@ -16,7 +131,7 @@ def crossover(parents, mutation_chance, value_dicts):
         cointoss = random.random()
         if cointoss < 0.5:
             if cointoss < (mutation_chance/2):
-                mutated = mutate(
+                mutated = group_mutate(
                     parent1[group],
                     mutation_chance,
                     cointoss,
@@ -27,7 +142,7 @@ def crossover(parents, mutation_chance, value_dicts):
                 offspring.append(parent1[group])
         else:
             if cointoss > (1 - mutation_chance/2):
-                mutated = mutate(
+                mutated = group_mutate(
                     parent2[group],
                     mutation_chance,
                     (1 - cointoss),
@@ -76,7 +191,7 @@ def degroup(offspring):
     return degrouped_offspring
 
 
-def mutate(group, mutation_chance, cointoss, pos_corr):
+def group_mutate(group, mutation_chance, cointoss, pos_corr):
     """Mutation of a single group"""
     mutation = {}
     if pos_corr == 'True':
@@ -192,7 +307,7 @@ def new_population(population, fitnesses, settings, parameters):
     while len(next_population) < len(population):
         parents = select.tournament(population, fitnesses)
         offspring = add_parameters(
-            crossover(parents, settings['mut_chance'], parameters),
+            group_crossover(parents, settings['mut_chance'], parameters),
             settings['nthread'])
 
         # No duplicate members

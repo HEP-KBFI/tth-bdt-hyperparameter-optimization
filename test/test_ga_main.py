@@ -139,11 +139,11 @@ def grouped_sample():
     return grouped, pos_corr
 
 
-def test_crossover():
-    """Testing the crossover function"""
+def test_group_crossover():
+    """Testing the group_crossover function"""
     parents = SAMPLE[0:2]
     calculated = gm.add_parameters(
-        gm.crossover(
+        gm.group_crossover(
             parents,
             SETTINGS['mut_chance'],
             PARAMETERS),
@@ -183,13 +183,13 @@ def test_degroup():
     assert calculated == SAMPLE, 'test_degroup failed'
 
 
-def test_mutate():
-    """Testing the mutate function"""
+def test_group_mutate():
+    """Testing the group_mutate function"""
     grouped, pos_corr = grouped_sample()
     for i, element in enumerate(grouped):
         total_calc = []
         for j, group in enumerate(element):
-            calculated = gm.mutate(
+            calculated = gm.group_mutate(
                 group, SETTINGS['mut_chance'], random.random(), pos_corr[i][j])
             assert len(calculated) == len(group), 'test_mutate failed'
             total_calc.append(calculated)
