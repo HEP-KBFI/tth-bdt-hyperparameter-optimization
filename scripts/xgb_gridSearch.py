@@ -34,7 +34,7 @@ def main(param_file, nthread, sample_dir, outputDir):
         xt.ensemble_fitnesses,
         data_dict
     )
-    universal.save_results(result_dict, outputDir, plotROC=False)
+    universal.save_results(result_dict, outputDir, plot_roc=False)
 
 
 if __name__ == '__main__':
