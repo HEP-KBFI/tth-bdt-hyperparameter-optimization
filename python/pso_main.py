@@ -133,7 +133,7 @@ def read_weights(value_dicts):
         'c2': [],
         'iterations': pso_settings['iterations'],
         'sample_size': pso_settings['sample_size'],
-        'compactness_threshold': param_dic['compactness_threshold']
+        'compactness_threshold': pso_settings['compactness_threshold']
     }
     normed_weights_dict = weight_normalization(pso_settings)
     for xgbParameter in value_dicts:
