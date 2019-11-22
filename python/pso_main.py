@@ -197,8 +197,7 @@ def run_pso(
     i = 1
     print(':::::::: Initializing :::::::::')
     fitnesses, pred_trains, pred_tests = calculate_fitnesses(
-        parameter_dicts, data_dict, pso_settings['sample_size'],
-        global_settings)
+        parameter_dicts, data_dict, global_settings)
     index = np.argmax(fitnesses)
     pso_settings['iterations']
     pso_settings['compactness_threshold']
@@ -219,8 +218,7 @@ def run_pso(
         print(' --- Compactness: ' + str(compactness) + ' ---')
         parameter_dicts = new_parameters
         fitnesses, pred_trains, pred_tests = calculate_fitnesses(
-            parameter_dicts, data_dict, pso_settings['sample_size'],
-            global_settings)
+            parameter_dicts, data_dict, global_settings)
         best_fitnesses = find_bestFitnesses(fitnesses, best_fitnesses)
         personal_bests = calculate_personal_bests(
             fitnesses, best_fitnesses, parameter_dicts, personal_bests)
