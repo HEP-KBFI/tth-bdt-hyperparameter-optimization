@@ -1,7 +1,8 @@
 {"sample_dir": "/foo/bar"}
-{"nthread": 8}
-{"output_dir": "$HOME/foo/bar"}
+{"nthread": 28}
+{"output_dir": "$HOME/foobar"}
 {"sample_type": "tth"}
 {"num_classes": 2}
 {"bdtType": "evtLevelTT_TTH"}
 {"trainvar": "noHTT"}
+{"channel": "3l_1tau"}
