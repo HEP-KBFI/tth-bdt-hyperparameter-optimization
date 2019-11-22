@@ -96,7 +96,7 @@ def ensemble_fitnesses(parameter_dicts, data_dict, global_settings):
     for parameter_dict in parameter_dicts:
         fitness, pred_train, pred_test = parameter_evaluation(
             parameter_dict, data_dict,
-            global_settings['nthread'], global_settings['num_class'])
+            global_settings['nthread'], global_settings['num_classes'])
         fitnesses.append(fitness)
         pred_trains.append(pred_train)
         pred_tests.append(pred_test)
