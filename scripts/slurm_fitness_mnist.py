@@ -19,12 +19,14 @@ import json
 from pathlib import Path
 import os
 import csv
+import warnings
+warnings.filterwarnings('ignore', category=DeprecationWarning)
 
 
 def main(parameter_file):
-    parameter_dict = universal.read_parameters(parameterFile)[0]
+    parameter_dict = universal.read_parameters(parameter_file)[0]
     data_dict = mf.create_datasets(sample_dir, nthread)
-    path = Path(parameterFile)
+    path = Path(parameter_file)
     saveDir = str(path.parent)
     score, pred_train, pred_test = xt.parameter_evaluation(
         parameter_dict, data_dict, nthread)

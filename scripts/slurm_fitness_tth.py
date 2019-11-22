@@ -39,8 +39,8 @@ def main(parameter_file):
     )
     data_dict = ttHxt.createDataSet(
         data, trainVars, nthread)
-    parameter_dict = universal.read_parameters(parameterFile)[0]
-    path = Path(parameterFile)
+    parameter_dict = universal.read_parameters(parameter_file)[0]
+    path = Path(parameter_file)
     saveDir = str(path.parent)
     score, pred_train, pred_test = xt.parameter_evaluation(
         parameter_dict, data_dict, nthread)
