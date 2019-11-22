@@ -1,12 +1,11 @@
 '''
 Call with 'python3'
 
-Usage: slurm_fitness.py --parameterFile=PTH --sample_dir=DIR --nthread=INT
+Usage: slurm_fitness.py --parameterFile=PTH
 
 Options:
-    -p --parameterFile=PTH      Path to parameters to be run
-    -s --sample_dir=DIR         Directory of the sample
-    -n --nthread=INT            Number of threads to use
+    -p --parameter_file=PTH      Path to parameters to be run
+
 
 '''
 from __future__ import division
@@ -22,7 +21,7 @@ import os
 import csv
 
 
-def main(parameterFile, sample_dir, nthread):
+def main(parameter_file):
     parameter_dict = universal.read_parameters(parameterFile)[0]
     data_dict = mf.create_datasets(sample_dir, nthread)
     path = Path(parameterFile)
@@ -35,9 +34,7 @@ def main(parameterFile, sample_dir, nthread):
 if __name__ == '__main__':
     try:
         arguments = docopt.docopt(__doc__)
-        parameterFile = arguments['--parameterFile']
-        nthread = int(arguments['--nthread'])
-        sample_dir = arguments['--sample_dir']
-        main(parameterFile, sample_dir, nthread)
+        parameter_file = arguments['--parameter_file']
+        main(parameterFile)
     except docopt.DocoptExit as e:
         print(e)

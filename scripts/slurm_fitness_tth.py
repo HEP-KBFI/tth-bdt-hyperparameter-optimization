@@ -4,7 +4,7 @@ Call with 'python'
 Usage: slurm_fitness.py --parameterFile=PTH
 
 Options:
-    -p --parameterFile=PTH      Path to parameters to be run
+    -p --parameter_file=PTH      Path to parameters to be run
 
 '''
 from __future__ import division
@@ -22,7 +22,7 @@ import warnings
 warnings.filterwarnings('ignore', category=DeprecationWarning)
 
 
-def main(parameterFile):
+def main(parameter_file):
     global_settings = universal.read_settings('global')
     channel = global_settings['channel']
     bdtType = global_settings['bdtType']

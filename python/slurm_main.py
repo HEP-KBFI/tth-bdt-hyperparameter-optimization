@@ -55,7 +55,7 @@ def prepare_jobFile(
 #SBATCH --cpus-per-task=%s
 #SBATCH -e %s
 #SBATCH -o %s
-python %s --parameterFile %s
+python %s --parameter_file %s
         ''' % (global_settings['nthread'], errorFile, outputFile, runScript,
                parameterFile))
     return jobFile
