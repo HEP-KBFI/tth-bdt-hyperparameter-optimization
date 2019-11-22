@@ -161,7 +161,7 @@ def weight_normalization(param_dict):
 
 
 def get_weight_step(pso_settings):
-    w = np.array = pso_settings['w_init']
+    w = np.array(pso_settings['w_init'])
     w_fin = np.array(pso_settings['w_fin'])
     w_init = np.array(pso_settings['w_init'])
     w_step = (w_fin - w_init)/pso_settings['iterations']
