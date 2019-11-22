@@ -20,6 +20,8 @@ import os
 import csv
 import warnings
 warnings.filterwarnings('ignore', category=DeprecationWarning)
+warnings.filterwarnings('ignore', category=FutureWarning)
+
 
 
 def main(parameter_file):
