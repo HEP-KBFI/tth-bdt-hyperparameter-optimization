@@ -65,7 +65,7 @@ def run_iteration(
         data_dict,
         global_settings
 ):
-    output_dir = global_settings['output_dir']
+    output_dir = os.path.expandvars(global_settings['output_dir'])
     pso_settings = universal.read_settings('pso')
     parameters_to_file(output_dir, parameter_dicts)
     wild_card_path = os.path.join(output_dir, 'samples', '*', 'parameters.json')
