@@ -37,11 +37,11 @@ def single_paramSet(parameters, iterations, grid_size):
 
 
 def perform_gridSearch(
-    parameters,
-    grid_size,
-    nthread,
-    calculateFitness,
-    data_dict
+        parameters,
+        grid_size,
+        nthread,
+        calculateFitness,
+        data_dict
 ):
     parameter_dicts = initialize_values(parameters, grid_size)
     print(':::::: Calculating fitnesses ::::::')

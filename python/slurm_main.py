@@ -10,11 +10,14 @@ import csv
 import glob
 from pathlib import Path
 from shutil import copyfile
+from tthAnalysis.bdtHyperparameterOptimization import universal
 import time
+import warnings
+warnings.filterwarnings('ignore', category=DeprecationWarning)
 
 
-def parameters_to_file(outputDir, parameter_dicts):
-    samples = os.path.join(outputDir, 'samples')
+def parameters_to_file(output_dir, parameter_dicts):
+    samples = os.path.join(output_dir, 'samples')
     if not os.path.exists(samples):
         os.makedirs(samples)
     for nr, parameter_dict in enumerate(parameter_dicts):
@@ -27,63 +30,62 @@ def parameters_to_file(outputDir, parameter_dicts):
 
 
 def prepare_jobFile(
-    parameterFile,
-    sample_dir,
-    nthread,
-    sample_nr,
-    outputDir,
-    mainDir
+        parameterFile,
+        sample_nr,
+        global_settings
 ):
-    templateDir = os.path.join(mainDir, 'data')
-    jobFile = os.path.join(outputDir, 'parameter_' + str(sample_nr) + '.sh')
+    cmssw_base_path = os.path.expandvars('$CMSSW_BASE')
+    main_dir = os.path.join(
+        cmssw_base_path,
+        'src',
+        'tthAnalysis',
+        'bdtHyperparameterOptimization'
+    )
+    output_dir = os.path.expandvars(global_settings['output_dir'])
+    templateDir = os.path.join(main_dir, 'data')
+    jobFile = os.path.join(output_dir, 'parameter_' + str(sample_nr) + '.sh')
     template_file = os.path.join(templateDir, 'submit_template.sh')
-    errorFile = os.path.join(outputDir, 'error')
-    outputFile = os.path.join(outputDir, 'output')
-    runScript = os.path.join(mainDir, 'python', 'slurm_fitness.py')
+    errorFile = os.path.join(output_dir, 'error')
+    outputFile = os.path.join(output_dir, 'output')
+    batch_job_file = 'slurm_fitness_' + global_settings['sample_type'] + '.py'
+    runScript = os.path.join(main_dir, 'scripts', batch_job_file)
     copyfile(template_file, jobFile)
     with open(jobFile, 'a') as fh:
         fh.writelines('''
 #SBATCH --cpus-per-task=%s
 #SBATCH -e %s
 #SBATCH -o %s
-python %s --parameterFile %s --sample_dir %s --nthread %s
-        ''' % (nthread, errorFile, outputFile, runScript,
-            parameterFile, sample_dir, nthread))
+python %s --parameter_file %s
+        ''' % (global_settings['nthread'], errorFile, outputFile, runScript,
+               parameterFile))
     return jobFile
 
 
-def run_job(jobFile):
-    subprocess.call(['sbatch', jobFile])
-
-
 def run_iteration(
-    parameter_dicts,
-    data_dict,
-    nthread,
-    outputDir,
-    sample_dir,
-    mainDir,
-    sample_size
+        parameter_dicts,
+        data_dict,
+        global_settings
 ):
-    parameters_to_file(outputDir, parameter_dicts)
-    wild_card_path = os.path.join(outputDir, 'samples', '*', 'parameters.json')
+    output_dir = os.path.expandvars(global_settings['output_dir'])
+    pso_settings = universal.read_settings('pso')
+    parameters_to_file(output_dir, parameter_dicts)
+    wild_card_path = os.path.join(output_dir, 'samples', '*', 'parameters.json')
     for parameterFile in glob.glob(wild_card_path):
         sample_nr = get_sample_nr(parameterFile)
         jobFile = prepare_jobFile(
-            parameterFile, sample_dir, nthread,
-            sample_nr, outputDir, mainDir
+            parameterFile, sample_nr, global_settings
         )
-        run_job(jobFile)
-    wait_iteration(outputDir, sample_size)
-    pred_tests = create_result_lists(outputDir, 'pred_test')
-    pred_trains = create_result_lists(outputDir, 'pred_train')
-    fitnesses = read_fitness(outputDir)
-    delete_previous_files(outputDir)
+        subprocess.call(['sbatch', jobFile])
+    wait_iteration(output_dir, pso_settings['sample_size'])
+    pred_tests = create_result_lists(output_dir, 'pred_test')
+    pred_trains = create_result_lists(output_dir, 'pred_train')
+    fitnesses = read_fitness(output_dir)
+    delete_previous_files(output_dir)
     return fitnesses, pred_trains, pred_tests
 
 
-def create_result_lists(outputDir, pred_type):
-    samples = os.path.join(outputDir, 'samples')
+def create_result_lists(output_dir, pred_type):
+    samples = os.path.join(output_dir, 'samples')
     wild_card_path = os.path.join(samples, '*', pred_type + '.lst')
     ordering_list = []
     for path in glob.glob(wild_card_path):
@@ -95,8 +97,8 @@ def create_result_lists(outputDir, pred_type):
     return ordering_list
 
 
-def read_fitness(outputDir):
-    samples = os.path.join(outputDir, 'samples')
+def read_fitness(output_dir):
+    samples = os.path.join(output_dir, 'samples')
     wild_card_path = os.path.join(samples, '*', 'score.txt')
     fitnesses = []
     for path in glob.glob(wild_card_path):
@@ -116,10 +118,10 @@ def get_sample_nr(path):
     return sample_nr
 
 
-def wait_iteration(outputDir, sample_size):
-    wild_card_path = os.path.join(outputDir, 'samples', '*', '*.lst')
+def wait_iteration(output_dir, sample_size):
+    wild_card_path = os.path.join(output_dir, 'samples', '*', '*.lst')
     while len(glob.glob(wild_card_path)) != sample_size*2:
-        check_error(outputDir)
+        check_error(output_dir)
         time.sleep(5)
 
 
@@ -132,20 +134,34 @@ def lists_from_file(path):
     return row_res
 
 
-def delete_previous_files(outputDir):
-    wild_card_path1 = os.path.join(outputDir, 'samples', '*', '*.lst')
-    wild_card_path2 = os.path.join(outputDir, 'samples', '*', '*.txt')
-    wild_card_path = os.path.join(outputDir, '*.sh')
+def delete_previous_files(output_dir):
+    wild_card_path1 = os.path.join(output_dir, 'samples', '*', '*.lst')
+    wild_card_path2 = os.path.join(output_dir, 'samples', '*', '*.txt')
+    wild_card_path = os.path.join(output_dir, '*.sh')
     for path in glob.glob(wild_card_path1):
         os.remove(path)
     for path in glob.glob(wild_card_path2):
         os.remove(path)
 
 
-def check_error(outputDir):
-    errorFile = os.path.join(outputDir, 'error')
+def check_error(output_dir):
+    errorFile = os.path.join(output_dir, 'error')
     if os.path.exists(errorFile):
         with open(errorFile, 'r') as f:
             number_errors = len(f.readlines())
         if number_errors > 0:
             raise SystemExit(0)
+
+
+def save_info(score, pred_train, pred_test, save_dir):
+    train_path = os.path.join(save_dir, "pred_train.lst")
+    test_path = os.path.join(save_dir, "pred_test.lst")
+    score_path = os.path.join(save_dir, "score.txt")
+    with open(train_path, "w") as f:
+        wr = csv.writer(f)
+        wr.writerows(pred_train)
+    with open(test_path, "w") as f:
+        wr = csv.writer(f)
+        wr.writerows(pred_test)
+    with open(score_path, "w") as f:
+        f.write(str(score))

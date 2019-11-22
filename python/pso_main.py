@@ -1,10 +1,8 @@
 from __future__ import division
-import numpy as np
-import xgboost as xgb
-from tthAnalysis.bdtHyperparameterOptimization import universal
-import docopt
-import numbers
 import os
+import numbers
+import numpy as np
+from tthAnalysis.bdtHyperparameterOptimization import universal
 np.random.seed(1)
 
 
@@ -19,15 +17,15 @@ def find_bestFitnesses(fitnesses, best_fitnesses):
 
 
 def prepare_newDay(
-    personal_bests,
-    parameter_dicts,
-    best_parameters,
-    current_speeds,
-    w,
-    nthread,
-    value_dicts,
-    c1,
-    c2
+        personal_bests,
+        parameter_dicts,
+        best_parameters,
+        current_speeds,
+        w,
+        nthread,
+        value_dicts,
+        c1,
+        c2
 ):
     current_speeds = calculate_newSpeed(
         personal_bests, parameter_dicts, best_parameters,
@@ -35,7 +33,7 @@ def prepare_newDay(
     )
     new_parameters = calculate_newValue(
         current_speeds, parameter_dicts, nthread, value_dicts)
-    return new_parameters
+    return new_parameters, current_speeds
 
 
 def checkNumeric(variables):
@@ -46,14 +44,14 @@ def checkNumeric(variables):
 
 
 def calculate_personal_bests(
-    fitnesses,
-    best_fitnesses,
-    parameter_dicts,
-    personal_bests
+        fitnesses,
+        best_fitnesses,
+        parameter_dicts,
+        personal_bests
 ):
     new_dicts = []
     for fitness, best_fitness, parameters, personal_best in zip(
-        fitnesses, best_fitnesses, parameter_dicts, personal_bests):
+            fitnesses, best_fitnesses, parameter_dicts, personal_bests):
         nonNumeric = checkNumeric(
             [fitness, best_fitness])
         if nonNumeric:
@@ -64,37 +62,38 @@ def calculate_personal_bests(
             new_dicts.append(personal_best)
     return new_dicts
 
-
+# XGB specific
 def calculate_newValue(
-    current_speeds,
-    parameter_dicts,
-    nthread,
-    value_dicts
+        current_speeds,
+        parameter_dicts,
+        nthread,
+        value_dicts
 ):
     new_values = []
     for current_speed, parameter_dict in zip(current_speeds, parameter_dicts):
         new_value = {}
-        i = 0
-        for speed, key in zip(current_speed, parameter_dict):
+        for i, speed in enumerate(current_speed):
+            key = value_dicts[i]['p_name']
             if key == 'num_boost_round' or key == 'max_depth':
                 new_value[key] = int(np.ceil(parameter_dict[key] + speed))
             else:
                 new_value[key] = parameter_dict[key] + speed
             if new_value[key] < value_dicts[i]['range_start']:
                 new_value[key] = value_dicts[i]['range_start']
-            i += 1
+            elif new_value[key] > value_dicts[i]['range_end']:
+                new_value[key] = value_dicts[i]['range_end']
         new_values.append(new_value)
     return new_values
 
 
 def calculate_newSpeed(
-    personal_bests,
-    parameter_dicts,
-    best_parameters,
-    w,
-    current_speeds,
-    c1,
-    c2
+        personal_bests,
+        parameter_dicts,
+        best_parameters,
+        w,
+        current_speeds,
+        c1,
+        c2
 ):
     new_speeds = []
     i = 0
@@ -125,18 +124,18 @@ def calculate_newSpeed(
     return new_speeds
 
 
-def read_weights(value_dicts, mainDir):
-    path = os.path.join(mainDir, 'weights_runParameters.json')
-    param_dict = universal.read_parameters(path)[0]
+def read_weights(value_dicts):
+    pso_settings = universal.read_settings('pso')
     weight_dict = {
         'w_init': [],
         'w_fin': [],
         'c1': [],
         'c2': [],
-        'iterations': param_dict['iterations'],
-        'sample_size': param_dict['sample_size']
+        'iterations': pso_settings['iterations'],
+        'sample_size': pso_settings['sample_size'],
+        'compactness_threshold': pso_settings['compactness_threshold']
     }
-    normed_weights_dict = weight_normalization(param_dict)
+    normed_weights_dict = weight_normalization(pso_settings)
     for xgbParameter in value_dicts:
         if xgbParameter['range_end'] <= 1:
             weight_dict['w_init'].append(normed_weights_dict['w_init'])
@@ -144,56 +143,66 @@ def read_weights(value_dicts, mainDir):
             weight_dict['c1'].append(normed_weights_dict['c1'])
             weight_dict['c2'].append(normed_weights_dict['c2'])
         else:
-            weight_dict['w_init'].append(param_dict['w_init'])
-            weight_dict['w_fin'].append(param_dict['w_fin'])
-            weight_dict['c1'].append(param_dict['c1'])
-            weight_dict['c2'].append(param_dict['c2'])
+            weight_dict['w_init'].append(pso_settings['w_init'])
+            weight_dict['w_fin'].append(pso_settings['w_fin'])
+            weight_dict['c1'].append(pso_settings['c1'])
+            weight_dict['c2'].append(pso_settings['c2'])
     return weight_dict
 
 
-def weight_normalization(param_dict):
-    total_sum = param_dict['w_init'] + param_dict['c1'] + param_dict['c2']
+def weight_normalization(pso_settings):
+    total_sum = pso_settings['w_init'] + pso_settings['c1'] + pso_settings['c2']
     normed_weights_dict = {
-        'w_init': param_dict['w_init']/total_sum,
-        'w_fin': param_dict['w_fin']/total_sum,
-        'c1': param_dict['c1']/total_sum,
-        'c2': param_dict['c2']/total_sum
+        'w_init': pso_settings['w_init']/total_sum,
+        'w_fin': pso_settings['w_fin']/total_sum,
+        'c1': pso_settings['c1']/total_sum,
+        'c2': pso_settings['c2']/total_sum
     }
     return normed_weights_dict
 
 
+def get_weight_step(pso_settings):
+    w = np.array(pso_settings['w_init'])
+    w_fin = np.array(pso_settings['w_fin'])
+    w_init = np.array(pso_settings['w_init'])
+    w_step = (w_fin - w_init)/pso_settings['iterations']
+    return w, w_step
+
+
+def get_number_parameters():
+    cmssw_base_path = os.path.expandvars('$CMSSW_BASE')
+    parameters_path = os.path.join(
+        cmssw_base_path,
+        'src',
+        'tthAnalysis',
+        'bdtHyperparameterOptimization',
+        'data',
+        'xgb_parameters.json')
+    with open(parameters_path, 'rt') as parameters_file:
+        number_parameters = len(parameters_file.readlines())
+    return number_parameters
+
+
 def run_pso(
-    sample_dir,
-    nthread,
-    sample_size,
-    w_init,
-    w_fin,
-    c1,
-    c2,
-    iterations,
-    data_dict,
-    value_dicts,
-    calculate_fitnesses,
-    number_parameters,
-    parameter_dicts,
-    outputDir,
-    mainDir,
-    num_class
+        global_settings,
+        pso_settings,
+        data_dict,
+        value_dicts,
+        calculate_fitnesses,
+        parameter_dicts,
 ):
-    w = w_init
-    w_step = (w_fin - w_init)/iterations
+    w, w_step = get_weight_step(pso_settings)
     new_parameters = parameter_dicts
     personal_bests = {}
-    # improvements = []
-    # improvement = 1
-    compactness_threshold = 0.1
     compactness = universal.calculate_improvement_wSTDEV(parameter_dicts)
     i = 1
-    print(":::::::: Initializing :::::::::")
+    print(':::::::: Initializing :::::::::')
     fitnesses, pred_trains, pred_tests = calculate_fitnesses(
-        parameter_dicts, data_dict, nthread, num_class, outputDir, sample_dir,
-        mainDir, sample_size)
+        parameter_dicts, data_dict, global_settings)
     index = np.argmax(fitnesses)
+    iterations = pso_settings['iterations']
+    compactness_threshold = pso_settings['compactness_threshold']
+    number_parameters = get_number_parameters()
     result_dict = {
         'data_dict': data_dict,
         'best_parameters': parameter_dicts[index],
@@ -204,22 +213,21 @@ def run_pso(
     }
     personal_bests = parameter_dicts
     best_fitnesses = fitnesses
-    current_speeds = np.zeros((sample_size, number_parameters))
+    current_speeds = np.zeros((pso_settings['sample_size'], number_parameters))
     while i <= iterations and compactness_threshold < compactness:
-        print("::::::: Iteration: ", i, " ::::::::")
-        print(" --- Compactness: ", compactness, " ---")
+        print('::::::: Iteration: '+ str(i) + ' ::::::::')
+        print(' --- Compactness: ' + str(compactness) + ' ---')
         parameter_dicts = new_parameters
         fitnesses, pred_trains, pred_tests = calculate_fitnesses(
-            parameter_dicts, data_dict, nthread, num_class,  outputDir, sample_dir,
-            mainDir, sample_size)
+            parameter_dicts, data_dict, global_settings)
         best_fitnesses = find_bestFitnesses(fitnesses, best_fitnesses)
         personal_bests = calculate_personal_bests(
             fitnesses, best_fitnesses, parameter_dicts, personal_bests)
-        new_parameters = prepare_newDay(
+        new_parameters, current_speeds = prepare_newDay(
             personal_bests, parameter_dicts,
             result_dict['best_parameters'],
-            current_speeds, w, nthread, value_dicts,
-            c1, c2
+            current_speeds, w, global_settings['nthread'], value_dicts,
+            pso_settings['c1'], pso_settings['c2']
         )
         index = np.argmax(fitnesses)
         if result_dict['best_fitness'] < max(fitnesses):
@@ -230,11 +238,6 @@ def run_pso(
         avg_scores = np.mean(fitnesses)
         result_dict['avg_scores'].append(avg_scores)
         compactness = universal.calculate_improvement_wSTDEV(parameter_dicts)
-        # improvements, improvement = gf.calculate_improvement_wAVG(
-        #     result_dict['avg_scores'],
-        #     improvements,
-        #     threshold
-        # )
         w += w_step
         i += 1
     return result_dict
