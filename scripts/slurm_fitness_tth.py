@@ -24,6 +24,7 @@ warnings.filterwarnings('ignore', category=DeprecationWarning)
 
 def main(parameter_file):
     global_settings = universal.read_settings('global')
+    num_classes = global_settings['num_classes']
     channel = global_settings['channel']
     bdtType = global_settings['bdtType']
     trainvar = global_settings['trainvar']
@@ -43,7 +44,7 @@ def main(parameter_file):
     path = Path(parameter_file)
     saveDir = str(path.parent)
     score, pred_train, pred_test = xt.parameter_evaluation(
-        parameter_dict, data_dict, nthread)
+        parameter_dict, data_dict, nthread, num_classes)
     sm.save_info(score, pred_train, pred_test, saveDir)
 
 

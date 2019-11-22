@@ -24,12 +24,14 @@ warnings.filterwarnings('ignore', category=DeprecationWarning)
 
 
 def main(parameter_file):
+    global_settings = universal.read_settings('global')
+    num_classes = global_settings['num_classes']
     parameter_dict = universal.read_parameters(parameter_file)[0]
     data_dict = mf.create_datasets(sample_dir, nthread)
     path = Path(parameter_file)
     saveDir = str(path.parent)
     score, pred_train, pred_test = xt.parameter_evaluation(
-        parameter_dict, data_dict, nthread)
+        parameter_dict, data_dict, nthread, num_classes)
     sm.save_info(score, pred_train, pred_test, saveDir)
 
 
