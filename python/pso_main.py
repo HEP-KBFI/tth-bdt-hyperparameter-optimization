@@ -125,16 +125,17 @@ def calculate_newSpeed(
 
 
 def read_weights(value_dicts):
-    param_dict = universal.read_settings('pso')
+    pso_settings = universal.read_settings('pso')
     weight_dict = {
         'w_init': [],
         'w_fin': [],
         'c1': [],
         'c2': [],
-        'iterations': param_dict['iterations'],
-        'sample_size': param_dict['sample_size']
+        'iterations': pso_settings['iterations'],
+        'sample_size': pso_settings['sample_size'],
+        'compactness_threshold': param_dic['compactness_threshold']
     }
-    normed_weights_dict = weight_normalization(param_dict)
+    normed_weights_dict = weight_normalization(pso_settings)
     for xgbParameter in value_dicts:
         if xgbParameter['range_end'] <= 1:
             weight_dict['w_init'].append(normed_weights_dict['w_init'])
@@ -142,20 +143,20 @@ def read_weights(value_dicts):
             weight_dict['c1'].append(normed_weights_dict['c1'])
             weight_dict['c2'].append(normed_weights_dict['c2'])
         else:
-            weight_dict['w_init'].append(param_dict['w_init'])
-            weight_dict['w_fin'].append(param_dict['w_fin'])
-            weight_dict['c1'].append(param_dict['c1'])
-            weight_dict['c2'].append(param_dict['c2'])
+            weight_dict['w_init'].append(pso_settings['w_init'])
+            weight_dict['w_fin'].append(pso_settings['w_fin'])
+            weight_dict['c1'].append(pso_settings['c1'])
+            weight_dict['c2'].append(pso_settings['c2'])
     return weight_dict
 
 
-def weight_normalization(param_dict):
-    total_sum = param_dict['w_init'] + param_dict['c1'] + param_dict['c2']
+def weight_normalization(pso_settings):
+    total_sum = pso_settings['w_init'] + pso_settings['c1'] + pso_settings['c2']
     normed_weights_dict = {
-        'w_init': param_dict['w_init']/total_sum,
-        'w_fin': param_dict['w_fin']/total_sum,
-        'c1': param_dict['c1']/total_sum,
-        'c2': param_dict['c2']/total_sum
+        'w_init': pso_settings['w_init']/total_sum,
+        'w_fin': pso_settings['w_fin']/total_sum,
+        'c1': pso_settings['c1']/total_sum,
+        'c2': pso_settings['c2']/total_sum
     }
     return normed_weights_dict
 
