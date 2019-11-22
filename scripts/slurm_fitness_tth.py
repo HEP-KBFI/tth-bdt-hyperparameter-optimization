@@ -21,7 +21,6 @@ import csv
 
 
 def main(parameterFile):
-    global_settings = universal.read_global_settings('global')
     global_settings = universal.read_settings('global')
     channel = global_settings['channel']
     bdtType = global_settings['bdtType']
