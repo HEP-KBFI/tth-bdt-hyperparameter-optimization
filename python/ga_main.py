@@ -27,6 +27,26 @@ def float_encoding(value, accuracy=5):
     return encoded
 
 
+def float_decoding(encoded, accuracy=5):
+    '''Decode an encoded float back into a float.
+
+    Parameters
+    ----------
+    encoded : string
+        Encoded value
+    accuracy : int
+        Number of decimals preserved in the float
+
+    Returns
+    -------
+    value : float
+        Decoded value of the float
+    '''
+    decoded = int(encoded, 2)
+    value = decoded / accuracy
+    return value
+
+
 def int_encoding(value):
     '''Encode an int into a bit string.
 
@@ -44,20 +64,37 @@ def int_encoding(value):
     return encoded
 
 
+def int_decoding(encoded):
+    '''Decode an encoded int back into a n int.
+
+    Parameters
+    ----------
+    encoded : string
+        Encoded value
+
+    Returns
+    -------
+    decoded : int
+        Decoded value of the int
+    '''
+    decoded = int(encoded, 2)
+    return decoded
+
+
 def encode_parent(parent, parameters):
-    '''Encode the parent for crossover and mutation.
+    '''Encode an individual for crossover and mutation.
 
     Parameters
     ----------
     parent : dict
-        Parent to be encoded
+        Individual to be encoded
     parameters : dict
         xgboost settings used in the genetic algorithm
 
     Returns
     -------
     encoded_parent : dict
-        Parent with encoded values
+        Individual with encoded values
     '''
 
     # Initialization
@@ -67,12 +104,43 @@ def encode_parent(parent, parameters):
     for parameter in parameters:
         key = parameter['p_name']
         true_int = parameter['true_int']
-        if true_int:
+        if true_int == 'True':
             encoded_parent[key] = int_encoding(parent[key])
         else:
             encoded_parent[key] = float_encoding(parent[key])
 
     return encoded_parent
+
+
+def decode_offspring(offspring, parameters):
+    '''Decode an individual.
+
+    Parameters
+    ----------
+    offspring : dict
+        Individual to be decoded
+    parameters : dict
+        xgboost settings used in the genetic algorithm
+
+    Returns
+    -------
+    decoded_offspring : dict
+        Individual with decoded values
+    '''
+
+    # Initialization
+    decoded_offspring = {}
+
+    # Decoding values in offspring
+    for parameter in parameters:
+        key = parameter['p_name']
+        true_int = parameter['true_int']
+        if true_int == 'True':
+            decoded_offspring[key] = int_decoding(offspring[key])
+        else:
+            decoded_offspring[key] = float_decoding(offspring[key])
+
+    return decoded_offspring
 
 
 def kpoint_crossover(parents, parameters, mutation_chance=0, k=1):
@@ -128,6 +196,10 @@ def kpoint_crossover(parents, parameters, mutation_chance=0, k=1):
 
         offspring[key] = offspring_chromosome
 
+    # Finalize offspring
+    offspring = decode_offspring(offspring, parameters)
+    offspring = mutation_fix(offspring, parameters)
+
     return offspring
 
 
@@ -172,6 +244,10 @@ def uniform_crossover(parents, parameters, mutation_chance=0):
                 offspring_chromosome, mutation_chance)
 
         offspring[key] = offspring_chromosome
+
+    # Finalize offspring
+    offspring = decode_offspring(offspring, parameters)
+    offspring = mutation_fix(offspring, parameters)
 
     return offspring
 
@@ -256,14 +332,41 @@ def group_crossover(parents, parameters, mutation_chance):
 
     # Finalize offspring
     offspring = degroup(offspring)
-    for i, pm in enumerate(parameters):
-        key = pm['p_name']
-        if pm['true_int'] == 'True':
-            offspring[key] = int(offspring[key])
-        if offspring[key] < pm['range_start']:
-            offspring[key] = pm['range_start']
-        elif offspring[key] > pm['range_end']:
-            offspring[key] = pm['range_end']
+    offspring = mutation_fix(offspring, parameters)
+
+    return offspring
+
+def mutation_fix(offspring, parameters):
+    '''
+    Fixes mutated offspring in case of parameter violation.
+
+    Parameters
+    ---------
+    offspring : dict
+        Mutated offspring
+    parameters : dict
+        xgboost settings used in the genetic algorithm
+
+    Returns
+    -------
+    offspring : dict
+        Offspring with fixed parameter values
+    '''
+    for parameter in parameters:
+        # Current parameter
+        key = parameter['p_name']
+
+        # Forces int parameters to have integer values
+        if parameter['true_int'] == 'True':
+            offspring[key] = int(round(offspring[key]))
+
+        # Forces parameter values not to be lower than range start value
+        if offspring[key] < parameter['range_start']:
+            offspring[key] = parameter['range_start']
+
+        # Forces parameter values not to exceed range end value
+        elif offspring[key] > parameter['range_end']:
+            offspring[key] = parameter['range_end']
 
     return offspring
 
@@ -288,22 +391,20 @@ def grouping(parent, parameters):
 
     # Initialization
     grouped_parent = []
-    group = []
-    new_dict = {}
+    group = {}
     true_corr = []
 
     # Grouping
     for i, param in enumerate(parameters):
         key = param['p_name']
-        new_dict[key] = parent[key]
+        group[key] = parent[key]
         if i + 1 > (len(parameters) - 1):
-            grouped_parent.append(new_dict)
+            grouped_parent.append(group)
             true_corr.append(param['true_corr'])
         elif parameters[i]['group_nr'] != parameters[i + 1]['group_nr']:
-            grouped_parent.append(new_dict)
+            grouped_parent.append(group)
             true_corr.append(param['true_corr'])
-            group = []
-            new_dict = {}
+            group = {}
 
     return grouped_parent, true_corr
 
@@ -328,7 +429,7 @@ def degroup(offspring):
 
 def group_mutate(group, mutation_chance, cointoss, pos_corr):
     '''Mutation of a single group.
-    
+
     Parameters
     ----------
     group : dict
@@ -397,7 +498,7 @@ def set_num(amount, population):
     '''
 
     # Given is a number
-    if amount >= 1 and type(amount) == int:
+    if amount >= 1 and isinstance(amount, int):
         num = amount
 
     # Given is a fraction
