@@ -1,5 +1,5 @@
 {"sample_dir": "/foo/bar"}
 {"nthread": 8}
 {"output_dir": "$HOME/foo/bar"}
-{"sample_type": "ttH"}
+{"sample_type": "tth"}
 {"num_classes": 2}
