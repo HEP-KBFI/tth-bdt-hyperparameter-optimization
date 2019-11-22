@@ -74,7 +74,7 @@ def run_iteration(
         jobFile = prepare_jobFile(
             parameterFile, sample_nr, global_settings
         )
-    subprocess.call(['sbatch', jobFile])
+        subprocess.call(['sbatch', jobFile])
     wait_iteration(output_dir, pso_settings['sample_size'])
     pred_tests = create_result_lists(output_dir, 'pred_test')
     pred_trains = create_result_lists(output_dir, 'pred_train')
