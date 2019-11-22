@@ -3,7 +3,7 @@ Particle swarm optimization for the hyperparameters optimization of XGBoost.
 (MNIST numbers). Version for quasar.
 Call with 'python3'
 
-Usage: quasar_pso.py --sample_dir=DIR --nthread=INT --param_file=PTH --outputDir=DIR --mainDir=DIR
+Usage: quasar_pso_mnist.py --sample_dir=DIR --nthread=INT --param_file=PTH --outputDir=DIR --mainDir=DIR
 
 Options:
     --sample_dir=DIR        Directory of the sample
@@ -24,7 +24,6 @@ from tthAnalysis.bdtHyperparameterOptimization import pso_main as pm
 from tthAnalysis.bdtHyperparameterOptimization import xgb_tools as xt
 np.random.seed(1)
 
-num_class = 10
 
 def main(param_file, nthread, sample_dir, outputDir, mainDir):
     if not os.path.isdir(outputDir):
@@ -33,22 +32,15 @@ def main(param_file, nthread, sample_dir, outputDir, mainDir):
     data_dict = create_datasets(sample_dir, nthread)
     print("::::::: Reading parameters :::::::")
     value_dicts = universal.read_parameters(param_file)
-    weight_dict = pm.read_weights(value_dicts, mainDir)
-    w_init = np.array(weight_dict['w_init'])
-    w_fin = np.array(weight_dict['w_fin'])
-    iterations = weight_dict['iterations']
-    sample_size = weight_dict['sample_size']
-    c1 = weight_dict['c1']
-    c2 = weight_dict['c2']
-    number_parameters = 7 # Read from file
+    pso_settings = pm.read_weights(value_dicts)
+    global_settings = universal.read_settings('global')
+    iterations = pso_settings['iterations']
+    sample_size = pso_settings['sample_size']
     parameter_dicts = xt.prepare_run_params(
         nthread, value_dicts, sample_size)
     result_dict = pm.run_pso(
-        sample_dir, nthread, sample_size,
-        w_init, w_fin, c1, c2, iterations,
-        data_dict, value_dicts, xt.ensemble_fitnesses,
-        number_parameters, parameter_dicts,
-        outputDir, mainDir, num_class
+        global_settings, pso_settings, data_dict,
+        value_dicts, xt.ensemble_fitnesses, parameter_dicts
     )
     universal.save_results(result_dict, outputDir)
 

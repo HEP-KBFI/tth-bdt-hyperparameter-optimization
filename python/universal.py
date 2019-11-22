@@ -1,3 +1,5 @@
+'''Universal functions to be used in evolutionary algorithms
+'''
 from __future__ import division
 import warnings
 import itertools
@@ -572,6 +574,45 @@ def plot_costfunction(avg_scores, output_dir):
         plt.tick_params(top=True, right=True, direction='in')
         plt.savefig(plot_out)
         plt.close('all')
+
+
+def to_one_dict(list_of_dicts):
+    main_dict = {}
+    for elem in list_of_dicts:
+        key = list(elem.keys())[0]
+        main_dict[key] = elem[key]
+    return main_dict
+
+
+def getParameters(parameters_path):
+    paramerList = read_parameters(parameters_path)
+    parameter_dict = to_one_dict(paramerList)
+    return parameter_dict
+
+
+def read_settings(group):
+    '''Function to read the global settings of the optimization
+
+    Parameters:
+    -----------
+    group : str
+        Group of settings wanted. Either: 'global', 'ga' or 'pso'
+
+    Returns:
+    --------
+    settings_dict : dict
+        Dictionary containing the settings for the optimization
+    '''
+    cmssw_base_path = os.path.expandvars('$CMSSW_BASE')
+    settings_path = os.path.join(
+        cmssw_base_path,
+        'tthAnalysis',
+        'bdtHyperparameterOptimization',
+        'data',
+        group + '_settings.json')
+    parameter_list = read_parameters(settings_path)
+    settings_dict = to_one_dict(parameter_list)
+    return settings_dict
 
 
 # One-vs-All ROC
