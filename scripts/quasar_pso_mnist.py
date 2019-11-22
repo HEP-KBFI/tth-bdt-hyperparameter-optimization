@@ -33,7 +33,7 @@ def main():
         'tthAnalysis',
         'bdtHyperparameterOptimization',
         'data',
-        'xgb_parameters'
+        'xgb_parameters.json'
     )
     value_dicts = universal.read_parameters(param_file)
     pso_settings = pm.read_weights(value_dicts)
