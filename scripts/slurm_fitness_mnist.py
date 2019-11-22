@@ -28,6 +28,8 @@ warnings.filterwarnings('ignore', category=FutureWarning)
 def main(parameter_file):
     global_settings = universal.read_settings('global')
     num_classes = global_settings['num_classes']
+    sample_dir = global_settings['sample_dir']
+    nthread = global_settings['nthread']
     parameter_dict = universal.read_parameters(parameter_file)[0]
     data_dict = mf.create_datasets(sample_dir, nthread)
     path = Path(parameter_file)
