@@ -8,7 +8,7 @@ from tthAnalysis.bdtHyperparameterOptimization import ga_selection as select
 
 
 def float_encoding(value, accuracy=5):
-    '''Encode a float into a bit string
+    '''Encode a float into a bit string.
 
     Parameters
     ----------
@@ -28,7 +28,7 @@ def float_encoding(value, accuracy=5):
 
 
 def int_encoding(value):
-    '''Encode an int into a bit string
+    '''Encode an int into a bit string.
 
     Parameters
     ----------
@@ -45,7 +45,7 @@ def int_encoding(value):
 
 
 def encode_parent(parent, parameters):
-    '''Encode the parent for crossover and mutation
+    '''Encode the parent for crossover and mutation.
 
     Parameters
     ----------
@@ -132,7 +132,7 @@ def kpoint_crossover(parents, parameters, mutation_chance=0, k=1):
 
 
 def uniform_crossover(parents, parameters, mutation_chance=0):
-    '''Crossover of parents via uniform crossover
+    '''Crossover of parents via uniform crossover.
 
     Parameters
     ----------
@@ -177,7 +177,7 @@ def uniform_crossover(parents, parameters, mutation_chance=0):
 
 
 def chromosome_mutate(chromosome, mutation_chance):
-    '''Mutation of a single chromosome
+    '''Mutation of a single chromosome.
 
     Parameters
     ----------
@@ -205,11 +205,30 @@ def chromosome_mutate(chromosome, mutation_chance):
     return mutated_chromosome
 
 
-def group_crossover(parents, mutation_chance, value_dicts):
-    '''Crossover of parents based on grouping'''
-    parent1, true_corr = grouping(parents[0], value_dicts)
-    parent2, true_corr = grouping(parents[1], value_dicts)
+def group_crossover(parents, parameters, mutation_chance):
+    '''Crossover of parents based on grouping.
+
+    Parameters
+    ----------
+    parents : list
+        Two parents to be used in the crossover
+    parameters : dict
+        xgboost settings used in the genetic algorithm
+    mutation_chance : float
+        probability of mutation for each bit
+
+    Returns
+    -------
+    offspring : dict
+        New individual
+    '''
+
+    # Initialization
+    parent1, true_corr = grouping(parents[0], parameters)
+    parent2, true_corr = grouping(parents[1], parameters)
     offspring = []
+
+    # Crossover and mutation
     for group in range(len(parent1)):
         cointoss = random.random()
         if cointoss < 0.5:
@@ -234,8 +253,10 @@ def group_crossover(parents, mutation_chance, value_dicts):
                 offspring.append(mutated)
             else:
                 offspring.append(parent2[group])
+
+    # Finalize offspring
     offspring = degroup(offspring)
-    for i, pm in enumerate(value_dicts):
+    for i, pm in enumerate(parameters):
         key = pm['p_name']
         if pm['true_int'] == 'True':
             offspring[key] = int(offspring[key])
@@ -243,31 +264,62 @@ def group_crossover(parents, mutation_chance, value_dicts):
             offspring[key] = pm['range_start']
         elif offspring[key] > pm['range_end']:
             offspring[key] = pm['range_end']
+
     return offspring
 
 
-def grouping(parent, value_dicts):
-    '''Group elements in a parent for crossover'''
+def grouping(parent, parameters):
+    '''Group elements in a parent for crossover
+
+    Parameters
+    ----------
+    parent : dict
+        Parent to be grouped
+    parameters : dict
+        xgboost settings used in the genetic algorithm
+
+    Returns
+    -------
+    grouped_parent : list
+        Parent with grouped parameter values
+    true_corr : list
+        Correlation for each group
+    '''
+
+    # Initialization
     grouped_parent = []
     group = []
     new_dict = {}
     true_corr = []
-    for i, param in enumerate(value_dicts):
+
+    # Grouping
+    for i, param in enumerate(parameters):
         key = param['p_name']
         new_dict[key] = parent[key]
-        if i + 1 > (len(value_dicts) - 1):
+        if i + 1 > (len(parameters) - 1):
             grouped_parent.append(new_dict)
             true_corr.append(param['true_corr'])
-        elif value_dicts[i]['group_nr'] != value_dicts[i + 1]['group_nr']:
+        elif parameters[i]['group_nr'] != parameters[i + 1]['group_nr']:
             grouped_parent.append(new_dict)
             true_corr.append(param['true_corr'])
             group = []
             new_dict = {}
+
     return grouped_parent, true_corr
 
 
 def degroup(offspring):
-    '''Degroup elements in offspring after crossover'''
+    '''Degroup elements in offspring after crossover
+
+    Parameters
+    ----------
+    offspring : list
+        Grouped individual to be degrouped
+
+    Returns
+    degrouped_offspring : dict
+        Degrouped individual
+    '''
     degrouped_offspring = {}
     for group in offspring:
         degrouped_offspring.update(group)
@@ -275,9 +327,31 @@ def degroup(offspring):
 
 
 def group_mutate(group, mutation_chance, cointoss, pos_corr):
-    '''Mutation of a single group'''
+    '''Mutation of a single group.
+    
+    Parameters
+    ----------
+    group : dict
+        Group of parameter values to be mutated together
+    mutation_chance : float
+        Probability of mutation occuring
+    cointoss : float
+        Random number indicating current probability value
+    pos_corr : bool
+        Group is correlated either positively (True) or negatively (False)
+
+    Returns
+    -------
+    mutation : dict
+        Group of mutated parameter values
+    '''
+
+    # Initialization
     mutation = {}
+
     if pos_corr == 'True':
+
+        # Positively correlated mutation
         for i, key in enumerate(group):
             if random.random() < 0.5:
                 mutation[key] = (group[key]
@@ -286,6 +360,8 @@ def group_mutate(group, mutation_chance, cointoss, pos_corr):
                 mutation[key] = (group[key]
                                  - (mutation_chance - cointoss)*group[key])
     else:
+
+        # Negatively correlated mutation
         for i, key in enumerate(group):
             if random.random() < 0.5:
                 mutation[key] = (
@@ -297,14 +373,31 @@ def group_mutate(group, mutation_chance, cointoss, pos_corr):
                     group[key]
                     - ((-1)**i)*(mutation_chance - cointoss)*group[key]
                 )
+
     return mutation
 
 
 def set_num(amount, population):
-    '''Set num as the amount indicated'''
+    '''Set num as the amount indicated for the given population.
+    If given a float between 0 and 1, num is set as a given fraction of the population.
+    If given a int larger than 1, num is set as that int.
+    If given any other number, num is set as 0.
+
+    Parameters
+    ----------
+    amount : float or int
+        Given number
+    population : list
+        Current population
+
+    Returns
+    -------
+    num : int
+        Number of members of the population indicated by the amount given.
+    '''
 
     # Given is a number
-    if amount >= 1:
+    if amount >= 1 and type(amount) == int:
         num = amount
 
     # Given is a fraction
@@ -404,7 +497,20 @@ def culling(population, fitnesses, settings, data, parameters):
 
 
 def add_parameters(offspring, nthread):
-    '''Add missing parameters to an offspring'''
+    '''Add missing parameters to an offspring.
+
+    Parameters
+    ----------
+    offspring : dict
+        An individual with missing parameters
+    nthread : int
+        Number of threads
+
+    Returns
+    -------
+    offspring : dict
+        An individual with a complete set of parameters
+    '''
     params = {
         'silent': 1,
         'objective': 'multi:softprob',
@@ -417,7 +523,24 @@ def add_parameters(offspring, nthread):
 
 
 def new_population(population, fitnesses, settings, parameters):
-    '''Create the next generation population'''
+    '''Create the next generation population.
+
+    Parameters
+    ----------
+    population : list
+        Current set of individuals
+    fitnesses : list
+        Fitness scores corresponding to the given population
+    settings : dict
+        Settings of the genetic algorithm
+    parameters: dict
+        Descriptions of the xgboost parameters
+
+    Returns
+    -------
+    next_population : list
+        Newly generated set of individuals
+    '''
 
     # Add best members of previous population into the new population
     next_population = elitism(population, fitnesses, settings['elites'])
@@ -437,7 +560,20 @@ def new_population(population, fitnesses, settings, parameters):
 
 
 def create_subpopulations(settings, parameters):
-    '''Create num amount of subpopulations'''
+    '''Create num amount of subpopulations
+
+    Parameters
+    ----------
+    settings : dict
+        Settings of the genetic algorithm
+    parameters: dict
+        Descriptions of the xgboost parameters
+
+    Returns
+    -------
+    subpopulations : list
+        Randomly generated subpopulations
+    '''
 
     # Initialization
     subpopulations = []
@@ -464,7 +600,26 @@ def create_subpopulations(settings, parameters):
 
 
 def sub_evolution(subpopulations, settings, data, parameters):
-    '''Evolve subpopulations separately and then merge them into one'''
+    '''Evolve subpopulations separately and then merge them into one
+
+    Parameters
+    ----------
+    subpopulations : list
+        Initial subpopulations
+    settings : dict
+        Settings of the genetic algorithm
+    data: dict
+        Data sets for testing and training
+    parameters: dict
+        Descriptions of the xgboost parameters
+
+    Returns
+    -------
+    merged_population : list
+        Final subpopulations merged into one
+    scores_dict : dict
+        History of score improvements
+    '''
 
     # Initialization
     best_scores = {}
@@ -501,7 +656,32 @@ def sub_evolution(subpopulations, settings, data, parameters):
 
 def evolve(population, settings, data, parameters, final=False):
     '''Evolve a population until reaching the threshold
-    or maximum number of iterations'''
+    or maximum number of iterations
+
+    Parameters
+    ----------
+    population : list
+        Initial population
+    settings : dict
+        Settings of the genetic algorithm
+    data: dict
+        Data sets for testing and training
+    parameters: dict
+        Descriptions of the xgboost parameters
+    final : bool
+        Whether the evolution is the last one
+
+    Returns
+    -------
+    population : list
+        Final population
+    scores_dict : dict
+        History of score improvements
+    fitnesses : list
+        Fitness scores corresponding to the final population
+    pred_trains : list
+    pred_tests : list
+    '''
 
     # Initialization
     fitnesses = []
@@ -555,7 +735,22 @@ def evolve(population, settings, data, parameters, final=False):
 
 
 def evolution(settings, data, parameters):
-    '''Evolution of the parameter values'''
+    '''Evolution of the parameter values
+
+    Parameters
+    ----------
+    settings : dict
+        Settings of the genetic algorithm
+    data: dict
+        Data sets for testing and training
+    parameters: dict
+        Descriptions of the xgboost parameters
+
+    Returns
+    -------
+    result : dict
+        Result of the run of the genetic algorithm
+    '''
 
     if settings['sub_pops'] > 1:
 
