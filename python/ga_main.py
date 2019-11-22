@@ -231,10 +231,10 @@ def uniform_crossover(parents, parameters, mutation_chance=0):
         parent1_chromosome = parent1[key]
         parent2_chromosome = parent2[key]
         offspring_chromosome = ''
-        for i in range(len(parent1_chromosome)):
+        for i, chromosome in enumerate(parent1_chromosome):
             cointoss = random.random()
             if cointoss < 0.5:
-                offspring_chromosome += parent1_chromosome[i]
+                offspring_chromosome += chromosome
             else:
                 offspring_chromosome += parent2_chromosome[i]
 
@@ -305,30 +305,30 @@ def group_crossover(parents, parameters, mutation_chance):
     offspring = []
 
     # Crossover and mutation
-    for group in range(len(parent1)):
+    for i, group in enumerate(parent1):
         cointoss = random.random()
         if cointoss < 0.5:
             if cointoss < (mutation_chance/2):
                 mutated = group_mutate(
-                    parent1[group],
+                    group,
                     mutation_chance,
                     cointoss,
                     true_corr[group]
                 )
                 offspring.append(mutated)
             else:
-                offspring.append(parent1[group])
+                offspring.append(group)
         else:
             if cointoss > (1 - mutation_chance/2):
                 mutated = group_mutate(
-                    parent2[group],
+                    parent2[i],
                     mutation_chance,
                     (1 - cointoss),
                     true_corr[group]
                 )
                 offspring.append(mutated)
             else:
-                offspring.append(parent2[group])
+                offspring.append(parent2[i])
 
     # Finalize offspring
     offspring = degroup(offspring)
@@ -360,7 +360,8 @@ def mutation_fix(offspring, parameters):
         if parameter['true_int'] == 'True':
             offspring[key] = int(round(offspring[key]))
 
-        # Forces parameter values not to be lower than range start value
+        # Forces parameter values not to be lower
+        # than range start value
         if offspring[key] < parameter['range_start']:
             offspring[key] = parameter['range_start']
 
@@ -439,7 +440,8 @@ def group_mutate(group, mutation_chance, cointoss, pos_corr):
     cointoss : float
         Random number indicating current probability value
     pos_corr : bool
-        Group is correlated either positively (True) or negatively (False)
+        Group is correlated either positively (True)
+        or negatively (False)
 
     Returns
     -------
@@ -480,7 +482,8 @@ def group_mutate(group, mutation_chance, cointoss, pos_corr):
 
 def set_num(amount, population):
     '''Set num as the amount indicated for the given population.
-    If given a float between 0 and 1, num is set as a given fraction of the population.
+    If given a float between 0 and 1, num is set
+    as a given fraction of the population.
     If given a int larger than 1, num is set as that int.
     If given any other number, num is set as 0.
 
@@ -494,7 +497,8 @@ def set_num(amount, population):
     Returns
     -------
     num : int
-        Number of members of the population indicated by the amount given.
+        Number of members of the population indicated
+        by the amount given.
     '''
 
     # Given is a number
@@ -551,7 +555,8 @@ def elitism(population, fitnesses, elites):
 
 
 def culling(population, fitnesses, settings, data, parameters):
-    '''Cull worst performing members and replace them with random new ones
+    '''Cull worst performing members
+    and replace them with random new ones
 
     Parameters
     ----------
@@ -650,7 +655,7 @@ def new_population(population, fitnesses, settings, parameters):
     while len(next_population) < len(population):
         parents = select.tournament(population, fitnesses)
         offspring = add_parameters(
-            group_crossover(parents, settings['mut_chance'], parameters),
+            group_crossover(parents, parameters, settings['mut_chance'], ),
             settings['nthread'])
 
         # No duplicate members
