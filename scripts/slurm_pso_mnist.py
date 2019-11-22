@@ -1,7 +1,7 @@
 '''
 Particle swarm optimization for the hyperparameters optimization of XGBoost.
 (MNIST numbers). Version for slurm.
-Call with 'python3'
+Call with 'python'
 
 Usage: slurm_pso_mnist.py --sample_dir=DIR --nthread=INT --paramDir=DIR --outputDir=DIR --mainDir=DIR
 

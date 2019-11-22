@@ -214,7 +214,7 @@ def run_pso(
     personal_bests = parameter_dicts
     best_fitnesses = fitnesses
     current_speeds = np.zeros((pso_settings['sample_size'], number_parameters))
-    while i <= iteratons and compactness_threshold < compactness:
+    while i <= iterations and compactness_threshold < compactness:
         print('::::::: Iteration: '+ str(i) + ' ::::::::')
         print(' --- Compactness: ' + str(compactness) + ' ---')
         parameter_dicts = new_parameters

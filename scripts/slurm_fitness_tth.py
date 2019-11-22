@@ -30,7 +30,7 @@ def main(parameterFile):
         cf
     )
     data_dict = ttHxt.createDataSet(
-        data, trainVars, global_settings['nthread'])
+        data, trainVars, nthread)
     parameter_dict = universal.read_parameters(parameterFile)[0]
     data_dict = mf.create_datasets(sample_dir, nthread)
     path = Path(parameterFile)
