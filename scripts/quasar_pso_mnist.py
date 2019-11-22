@@ -29,6 +29,7 @@ def main():
     cmssw_base_path = os.path.expandvars('$CMSSW_BASE')
     param_file = os.path.join(
         cmssw_base_path,
+        'src',
         'tthAnalysis',
         'bdtHyperparameterOptimization',
         'data',
