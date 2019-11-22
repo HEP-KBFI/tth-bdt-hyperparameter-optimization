@@ -1,7 +1,7 @@
 '''
-Call with 'python3'
+Call with 'python'
 
-Usage: slurm_fitness.py --parameterFile=PTH --sample_dir=DIR --nthread=INT
+Usage: slurm_fitness.py --parameterFile=PTH
 
 Options:
     -p --parameterFile=PTH      Path to parameters to be run
@@ -10,9 +10,9 @@ Options:
 from __future__ import division
 import numpy as np
 from tthAnalysis.bdtHyperparameterOptimization import universal
-from tthAnalysis.bdtHyperparameterOptimization import mnist_filereader as mf
 from tthAnalysis.bdtHyperparameterOptimization import xgb_tools as xt
 from tthAnalysis.bdtHyperparameterOptimization import slurm_main as sm
+from tthAnalysis.bdtTraining import xgb_tth as ttHxt
 import docopt
 import json
 from pathlib import Path
@@ -24,6 +24,13 @@ def main(parameterFile):
     global_settings = universal.read_global_settings('global')
     nthread = global_settings['nthread']
     sample_dir = global_settings['sample_dir']
+    data, trainVars = ttHxt.tth_analysis_main(
+        channel, bdtType, nthread,
+        outputDir, dataCard_dir, trainvar,
+        cf
+    )
+    data_dict = ttHxt.createDataSet(
+        data, trainVars, global_settings['nthread'])
     parameter_dict = universal.read_parameters(parameterFile)[0]
     data_dict = mf.create_datasets(sample_dir, nthread)
     path = Path(parameterFile)

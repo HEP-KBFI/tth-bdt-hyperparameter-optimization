@@ -200,8 +200,8 @@ def run_pso(
     fitnesses, pred_trains, pred_tests = calculate_fitnesses(
         parameter_dicts, data_dict, global_settings)
     index = np.argmax(fitnesses)
-    pso_settings['iterations']
-    pso_settings['compactness_threshold']
+    iterations = pso_settings['iterations']
+    compactness_threshold = pso_settings['compactness_threshold']
     number_parameters = get_number_parameters()
     result_dict = {
         'data_dict': data_dict,
