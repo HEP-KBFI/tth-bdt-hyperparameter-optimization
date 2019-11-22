@@ -3,3 +3,5 @@
 {"output_dir": "$HOME/foo/bar"}
 {"sample_type": "tth"}
 {"num_classes": 2}
+{"bdtType": "evtLevelTT_TTH"}
+{"trainvar": "noHTT"}

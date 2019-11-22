@@ -22,6 +22,13 @@ import csv
 
 def main(parameterFile):
     global_settings = universal.read_global_settings('global')
+    global_settings = universal.read_settings('global')
+    channel = global_settings['channel']
+    bdtType = global_settings['bdtType']
+    trainvar = global_settings['trainvar']
+    fnFile = '_'.join(['fn', channel])
+    importString = "".join(['tthAnalysis.bdtTraining.', fnFile])
+    cf = __import__(importString, fromlist=[''])
     nthread = global_settings['nthread']
     sample_dir = global_settings['sample_dir']
     data, trainVars = ttHxt.tth_analysis_main(
@@ -32,7 +39,6 @@ def main(parameterFile):
     data_dict = ttHxt.createDataSet(
         data, trainVars, nthread)
     parameter_dict = universal.read_parameters(parameterFile)[0]
-    data_dict = mf.create_datasets(sample_dir, nthread)
     path = Path(parameterFile)
     saveDir = str(path.parent)
     score, pred_train, pred_test = xt.parameter_evaluation(
