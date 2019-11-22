@@ -22,7 +22,7 @@ def main():
     if not os.path.isdir(output_dir):
         os.makedirs(output_dir)
     print("::::::: Loading data ::::::::")
-    data_dict = create_datasets(
+    data_dict = mf.create_datasets(
         global_settings['sample_dir'],
         global_settings['nthread'])
     print("::::::: Reading parameters :::::::")
