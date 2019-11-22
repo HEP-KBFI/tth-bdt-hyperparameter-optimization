@@ -12,6 +12,8 @@ from pathlib import Path
 from shutil import copyfile
 from tthAnalysis.bdtHyperparameterOptimization import universal
 import time
+import warnings
+warnings.filterwarnings('ignore', category=DeprecationWarning)
 
 
 def parameters_to_file(output_dir, parameter_dicts):
