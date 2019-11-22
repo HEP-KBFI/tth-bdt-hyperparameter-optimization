@@ -26,6 +26,7 @@ def main(parameterFile):
     channel = global_settings['channel']
     bdtType = global_settings['bdtType']
     trainvar = global_settings['trainvar']
+    output_dir = os.path.expandvars(global_settings['output_dir'])
     fnFile = '_'.join(['fn', channel])
     importString = "".join(['tthAnalysis.bdtTraining.', fnFile])
     cf = __import__(importString, fromlist=[''])
@@ -33,8 +34,7 @@ def main(parameterFile):
     sample_dir = global_settings['sample_dir']
     data, trainVars = ttHxt.tth_analysis_main(
         channel, bdtType, nthread,
-        outputDir, dataCard_dir, trainvar,
-        cf
+        output_dir, trainvar, cf
     )
     data_dict = ttHxt.createDataSet(
         data, trainVars, nthread)
