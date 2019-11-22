@@ -606,6 +606,7 @@ def read_settings(group):
     cmssw_base_path = os.path.expandvars('$CMSSW_BASE')
     settings_path = os.path.join(
         cmssw_base_path,
+        'src'
         'tthAnalysis',
         'bdtHyperparameterOptimization',
         'data',
