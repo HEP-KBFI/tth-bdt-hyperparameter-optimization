@@ -1,7 +1,7 @@
 '''
 Call with 'python'
 
-Usage: slurm_fitness.py --parameterFile=PTH
+Usage: slurm_fitness_tth.py --parameter_file=PTH
 
 Options:
     -p --parameter_file=PTH      Path to parameters to be run
