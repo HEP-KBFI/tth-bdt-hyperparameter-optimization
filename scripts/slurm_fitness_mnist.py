@@ -35,6 +35,6 @@ if __name__ == '__main__':
     try:
         arguments = docopt.docopt(__doc__)
         parameter_file = arguments['--parameter_file']
-        main(parameterFile)
+        main(parameter_file)
     except docopt.DocoptExit as e:
         print(e)
