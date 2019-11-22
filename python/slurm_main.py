@@ -39,7 +39,7 @@ def prepare_jobFile(
         'tthAnalysis',
         'bdtHyperparameterOptimization'
     )
-    output_dir = global_settings['output_dir']
+    output_dir = os.path.expandvars(global_settings['output_dir'])
     templateDir = os.path.join(main_dir, 'data')
     jobFile = os.path.join(output_dir, 'parameter_' + str(sample_nr) + '.sh')
     template_file = os.path.join(templateDir, 'submit_template.sh')
