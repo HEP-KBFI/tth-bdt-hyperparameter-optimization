@@ -113,7 +113,7 @@ def uniform_crossover(parents, parameters, mutation_chance=0):
     return offspring
 
 
-def group_crossover(parents, parameters, mutation_chance):
+def group_crossover(parents, parameters, mutation_chance=0):
     '''Crossover of parents based on grouping.
 
     Parameters
@@ -187,7 +187,7 @@ def chromosome_mutate(chromosome, mutation_chance):
     '''
 
     # Initialization
-    mutated_chromosome = {}
+    mutated_chromosome = ''
 
     # Random mutation based on mutation_chance
     for gene in chromosome:

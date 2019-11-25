@@ -1,6 +1,5 @@
 '''Main functions for the genetic algorithm'''
 from __future__ import division
-import random
 import numpy as np
 from tthAnalysis.bdtHyperparameterOptimization import xgb_tools as xt
 from tthAnalysis.bdtHyperparameterOptimization import universal
@@ -183,7 +182,7 @@ def new_population(population, fitnesses, settings, parameters):
     while len(next_population) < len(population):
         parents = select.tournament(population, fitnesses)
         offspring = add_parameters(
-            gc.group_crossover(parents, parameters, settings['mut_chance'], ),
+            gc.kpoint_crossover(parents, parameters, settings['mut_chance']),
             settings['nthread'])
 
         # No duplicate members
@@ -333,6 +332,7 @@ def evolve(population, settings, data, parameters, final=False):
         # Generate a new population
         if iteration != 0:
             print('::::: Iteration:     ' + str(iteration) + ' :::::')
+            print("Population: " + str(population))
             population, fitnesses = culling(
                 population, fitnesses, settings, data, parameters)
             population = new_population(
@@ -402,15 +402,15 @@ def evolution(settings, data, parameters):
 
         # Evolve merged population
         print(('\n::::: Merged population:::::'))
-        population, final_scores_dict, fitnesses, pred_trains, pred_tests = \
-            evolve(merged_population, settings, data, parameters, True)
+        output = evolve(merged_population, settings, data, parameters, True)
 
         scores_dict['best_scores'].update(
-            {'final': final_scores_dict['best_scores']})
+            {'final': output[1]['best_scores']})
         scores_dict['avg_scores'].update(
-            {'final': final_scores_dict['avg_scores']})
+            {'final': output[1]['avg_scores']})
         scores_dict['worst_scores'].update(
-            {'final': final_scores_dict['worst_scores']})
+            {'final': output[1]['worst_scores']})
+        output[1] = scores_dict
 
     else:
 
@@ -418,23 +418,20 @@ def evolution(settings, data, parameters):
         print('::::::: Creating population ::::::::\n')
         population = xt.prepare_run_params(
             settings['nthread'], parameters, settings['pop_size'])
+        print("Initial population: " + str(population))
 
         # Evolve population
-        population, scores_dict, fitnesses, pred_trains, pred_tests = evolve(
-            population, settings, data, parameters, True)
+        output = evolve(population, settings, data, parameters, True)
 
     # Finalize results
-    index = np.argmax(fitnesses)
-    best_parameters = population[index]
-    pred_train = pred_trains[index]
-    pred_test = pred_tests[index]
+    index = np.argmax(output[2])
     result = {
-        'best_parameters': best_parameters,
-        'best_scores': scores_dict['best_scores'],
-        'avg_scores': scores_dict['avg_scores'],
-        'worst_scores': scores_dict['worst_scores'],
-        'pred_test': pred_test,
-        'pred_train': pred_train,
+        'best_parameters': output[0][index],
+        'best_scores': output[1]['best_scores'],
+        'avg_scores': output[1]['avg_scores'],
+        'worst_scores': output[1]['worst_scores'],
+        'pred_train': output[3][index],
+        'pred_test': output[4][index],
         'data_dict': data
     }
     return result
