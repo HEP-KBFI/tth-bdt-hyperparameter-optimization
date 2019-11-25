@@ -9,6 +9,22 @@ np.random.seed(1)
 
 
 def find_best_fitness(fitnesses, best_fitnesses):
+    '''Compares the current best fitnesses with the current ones and
+    substitutes one if it finds better
+
+    Parameters:
+    ----------
+    fitnesses : list
+        List of current iteration fitnesses
+    best_fitnesses : list
+        List of the best found fitnesses
+
+    Returns:
+    -------
+    new_best_fitnesses : list
+        List of best fitnesses taken into account the ones found current
+        iteration
+    '''
     new_best_fitnesses = []
     for fitness, best_fitness in zip(fitnesses, best_fitnesses):
         if fitness > best_fitness:
@@ -24,11 +40,15 @@ def prepare_new_day(
         best_parameters,
         current_speeds,
         w,
-        nthread,
         value_dicts,
         c1,
         c2
 ):
+    '''Finds the new new parameters to find the fitness of
+
+    Parameters:
+    ----------
+    '''
     current_speeds = calculate_new_speed(
         personal_bests, parameter_dicts, best_parameters,
         w, current_speeds, c1, c2
@@ -39,10 +59,23 @@ def prepare_new_day(
 
 
 def checkNumeric(variables):
+    '''Checks whether the variable is numberic
+
+    Parameters:
+    ----------
+    variables : list
+
+    Returns:
+    -------
+    decision : bool
+        Decision whether the list of variables contains non-numeric values
+    '''
     for variable in variables:
         if not isinstance(variable, numbers.Number):
-            return True
-    return False
+            decision = True
+        else:
+            decision = False
+    return decision
 
 
 def calculate_personal_bests(
@@ -51,6 +84,19 @@ def calculate_personal_bests(
         parameter_dicts,
         personal_bests
 ):
+    '''Find best parameter-set for each particle
+
+    Paraneters:
+    ----------
+    fitnesses : list
+        List of current iteration fitnesses for each particle
+    best_fitnesses : list
+        List of best fitnesses for each particle
+    parameter_dicts : list of dicts
+        Current parameters of the last iteration for each particle
+    personal_bests : list of dicts
+        Best parameters (with highest fitness) for each particle so far
+    '''
     new_dicts = []
     for fitness, best_fitness, parameters, personal_best in zip(
             fitnesses, best_fitnesses, parameter_dicts, personal_bests):
@@ -75,7 +121,7 @@ def calculate_new_position(
         new_value = {}
         for i, speed in enumerate(current_speed):
             key = value_dicts[i]['p_name']
-            if key == 'num_boost_round' or key == 'max_depth':
+            if bool(value_dicts[i]['true_int']):
                 new_value[key] = int(np.ceil(parameter_dict[key] + speed))
             else:
                 new_value[key] = parameter_dict[key] + speed
@@ -99,8 +145,8 @@ def calculate_new_speed(
     new_speeds = []
     i = 0
     for pb, current in zip(personal_bests, parameter_dicts):
-        r1 = np.random.uniform()
-        r2 = np.random.uniform()
+        rand1 = np.random.uniform()
+        rand2 = np.random.uniform()
         inertia = np.array(current_speeds[i])
         cognitive_array = []
         social_array = []
@@ -117,8 +163,8 @@ def calculate_new_speed(
         social_array = np.array(social_array)
         new_speed = (
             w * inertia
-            + c1 * (r1 * cognitive_array)
-            + c2 * (r2 * social_array)
+            + c1 * (rand1 * cognitive_array)
+            + c2 * (rand2 * social_array)
         )
         new_speeds.append(new_speed)
         i = i + 1
@@ -228,7 +274,7 @@ def run_pso(
         new_parameters, current_speeds = prepare_new_day(
             personal_bests, parameter_dicts,
             result_dict['best_parameters'],
-            current_speeds, w, global_settings['nthread'], value_dicts,
+            current_speeds, w, value_dicts,
             pso_settings['c1'], pso_settings['c2']
         )
         index = np.argmax(fitnesses)
