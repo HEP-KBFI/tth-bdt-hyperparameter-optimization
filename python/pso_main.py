@@ -192,19 +192,18 @@ def run_pso(
         calculate_fitnesses,
         parameter_dicts,
 ):
-    w, w_step = get_weight_step(pso_settings)
-    new_parameters = parameter_dicts
-    personal_bests = {}
-    compactness = universal.calculate_compactness(parameter_dicts)
-    print(' --- Compactness: ' + str(compactness) + ' ---')
-    i = 1
     print(':::::::: Initializing :::::::::')
-    fitnesses, pred_trains, pred_tests = calculate_fitnesses(
-        parameter_dicts, data_dict, global_settings)
-    index = np.argmax(fitnesses)
+    w, w_step = get_weight_step(pso_settings)
     iterations = pso_settings['iterations']
     compactness_threshold = pso_settings['compactness_threshold']
     number_parameters = get_number_parameters()
+    i = 1
+    new_parameters = parameter_dicts
+    personal_bests = {}
+    compactness = universal.calculate_compactness(parameter_dicts)
+    fitnesses, pred_trains, pred_tests = calculate_fitnesses(
+        parameter_dicts, data_dict, global_settings)
+    index = np.argmax(fitnesses)
     result_dict = {
         'data_dict': data_dict,
         'best_parameters': parameter_dicts[index],
@@ -219,6 +218,8 @@ def run_pso(
     while i <= iterations and compactness_threshold < compactness:
         print('::::::: Iteration: '+ str(i) + ' ::::::::')
         parameter_dicts = new_parameters
+        compactness = universal.calculate_compactness(parameter_dicts)
+        print(' --- Compactness: ' + str(compactness) + ' ---')
         fitnesses, pred_trains, pred_tests = calculate_fitnesses(
             parameter_dicts, data_dict, global_settings)
         best_fitnesses = find_best_fitness(fitnesses, best_fitnesses)
@@ -238,8 +239,6 @@ def run_pso(
             result_dict['best_fitness'] = max(fitnesses)
         avg_scores = np.mean(fitnesses)
         result_dict['avg_scores'].append(avg_scores)
-        compactness = universal.calculate_compactness(parameter_dicts)
-        print(' --- Compactness: ' + str(compactness) + ' ---')
         w += w_step
         i += 1
     return result_dict
