@@ -313,7 +313,7 @@ def group_crossover(parents, parameters, mutation_chance):
                     group,
                     mutation_chance,
                     cointoss,
-                    true_corr[group]
+                    true_corr[i]
                 )
                 offspring.append(mutated)
             else:
@@ -324,7 +324,7 @@ def group_crossover(parents, parameters, mutation_chance):
                     parent2[i],
                     mutation_chance,
                     (1 - cointoss),
-                    true_corr[group]
+                    true_corr[i]
                 )
                 offspring.append(mutated)
             else:
@@ -597,7 +597,7 @@ def culling(population, fitnesses, settings, data, parameters):
         settings['nthread'], parameters, size)
     population += new_members
     fitnesses += xt.ensemble_fitnesses(
-        new_members, data, settings['nthread'], settings['num_class'])[0]
+        new_members, data, settings)[0]
 
     return population, fitnesses
 
@@ -620,7 +620,7 @@ def add_parameters(offspring, nthread):
     params = {
         'silent': 1,
         'objective': 'multi:softprob',
-        'num_class': 10,
+        'num_classes': 10,
         'nthread': nthread,
         'seed': 1,
     }
@@ -813,7 +813,7 @@ def evolve(population, settings, data, parameters, final=False):
         # Calculate fitness of the population
         fitnesses, pred_trains, pred_tests = (
             xt.ensemble_fitnesses(
-                population, data, settings['nthread'], settings['num_class'])
+                population, data, settings)
         )
 
         # Save results
