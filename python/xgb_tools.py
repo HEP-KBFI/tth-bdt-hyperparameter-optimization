@@ -76,6 +76,8 @@ def parameter_evaluation(parameter_dict, data_dict, nthread, num_class):
         num_boost_round=int(num_boost_round),
         verbose_eval=False
     )
+    # print("Importances: ")
+    # print(model.get_score(importance_type='gain'))
     pred_train = model.predict(data_dict['dtrain'])
     pred_test = model.predict(data_dict['dtest'])
     # score = calculate_fitness(pred_train, pred_test, data_dict)
@@ -87,13 +89,14 @@ def parameter_evaluation(parameter_dict, data_dict, nthread, num_class):
 
 
 # parameter evaluation as argument for the function. Move to universal
-def ensemble_fitnesses(parameter_dicts, data_dict, nthread, num_class *args):
+def ensemble_fitnesses(parameter_dicts, data_dict, global_settings):
     fitnesses = []
     pred_trains = []
     pred_tests = []
     for parameter_dict in parameter_dicts:
         fitness, pred_train, pred_test = parameter_evaluation(
-            parameter_dict, data_dict, nthread, num_class)
+            parameter_dict, data_dict,
+            global_settings['nthread'], global_settings['num_classes'])
         fitnesses.append(fitness)
         pred_trains.append(pred_train)
         pred_tests.append(pred_test)
