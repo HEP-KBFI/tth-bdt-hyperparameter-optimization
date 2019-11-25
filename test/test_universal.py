@@ -61,11 +61,11 @@ def test_choose_values():
     assert (result[1] == elemsOut).all()
 
 
-def test_plot_costFunction():
+def test_plot_costfunction():
     avg_scores = [0.9, 0.95, 0.99, 1]
     error = False
     try:
-        universal.plot_costFunction(avg_scores, resourcesDir)
+        universal.plot_costfunction(avg_scores, resourcesDir)
     except:
         error = True
     assert error == False

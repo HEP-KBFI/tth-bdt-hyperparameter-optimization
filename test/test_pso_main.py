@@ -220,7 +220,7 @@ def test_calculate_newValue():
     nthread = 28
     values = {
         'num_boost_round': 1,
-        'learning_rate': 1,
+        'learning_rate': 0.3,
         'max_depth': 1,
         'gamma': 1,
         'min_child_weight': 1,
@@ -272,7 +272,6 @@ def test_weight_normalization():
 
 
 def test_read_weights():
-    weightPaht = os.path.join(hyper_path, 'data')
-    result = pm.read_weights(value_dicts, weightPaht)
-    assert len(result) == 6
+    result = pm.read_weights(value_dicts)
+    assert len(result) == 7
     assert len(result['c1']) == len(value_dicts)

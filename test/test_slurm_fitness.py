@@ -1,7 +1,7 @@
-from __future__ import division
-from tthAnalysis.bdtHyperparameterOptimization import slurm_fitness  as sm
+afrom __future__ import division
+from subprocess import call
 import numpy as np
-import os 
+import os
 import shutil
 import glob
 import gzip
@@ -35,7 +35,15 @@ def test_main():
         with gzip.open(fileLoc + '.gz', 'rb') as f_in:
             with open(fileLoc, 'wb') as f_out:
                 shutil.copyfileobj(f_in, f_out)
-    sm.main(parameterFile_newLoc, sampleDir, nthread)
+    cmssw_base = os.path.expandvars('$CMSSW_BASE')
+    script = os.path.join(
+        cmssw_base,
+        'src',
+        'tthAnalysis',
+        'bdtHyperparameterOptimization',
+        'scripts',
+        'slurm_pso_mnist.py')
+    call("python " + str(script), shell=True)
 
 
 def test_dummy_delete_files():

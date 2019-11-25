@@ -91,6 +91,11 @@ def test_check_error():
 
 
 def test_prepare_jobFile():
+    global_settings = {
+        'output_dir': tmp_folder,
+        'sample_type': 'mnist',
+        'nthread': 2
+    }
     nthread = 2
     parameterFile = os.path.join(resourcesDir, 'xgbParameters.json')
     sample_dir = os.path.join(resourcesDir, 'samples')
@@ -98,7 +103,7 @@ def test_prepare_jobFile():
     outputDir = os.path.join(resourcesDir, 'tmp')
     templateDir = resourcesDir
     sm.prepare_jobFile(
-        parameterFile, sample_dir, nthread, job_nr, outputDir, templateDir)
+        parameterFile, job_nr, global_settings)
     jobFile = os.path.join(resourcesDir, 'tmp', 'parameter_1.sh')
     with open(jobFile, 'r') as f:
         number_lines = len(f.readlines())
