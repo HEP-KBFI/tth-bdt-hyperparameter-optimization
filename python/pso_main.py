@@ -1,3 +1,5 @@
+'''Functions that are necessary for PSO algorithm
+'''
 from __future__ import division
 import os
 import numbers
@@ -6,7 +8,7 @@ from tthAnalysis.bdtHyperparameterOptimization import universal
 np.random.seed(1)
 
 
-def find_bestFitnesses(fitnesses, best_fitnesses):
+def find_best_fitness(fitnesses, best_fitnesses):
     new_best_fitnesses = []
     for fitness, best_fitness in zip(fitnesses, best_fitnesses):
         if fitness > best_fitness:
@@ -16,7 +18,7 @@ def find_bestFitnesses(fitnesses, best_fitnesses):
     return new_best_fitnesses
 
 
-def prepare_newDay(
+def prepare_new_day(
         personal_bests,
         parameter_dicts,
         best_parameters,
@@ -27,12 +29,12 @@ def prepare_newDay(
         c1,
         c2
 ):
-    current_speeds = calculate_newSpeed(
+    current_speeds = calculate_new_speed(
         personal_bests, parameter_dicts, best_parameters,
         w, current_speeds, c1, c2
     )
-    new_parameters = calculate_newValue(
-        current_speeds, parameter_dicts, nthread, value_dicts)
+    new_parameters = calculate_new_position(
+        current_speeds, parameter_dicts, value_dicts)
     return new_parameters, current_speeds
 
 
@@ -63,10 +65,9 @@ def calculate_personal_bests(
     return new_dicts
 
 # XGB specific
-def calculate_newValue(
+def calculate_new_position(
         current_speeds,
         parameter_dicts,
-        nthread,
         value_dicts
 ):
     new_values = []
@@ -86,7 +87,7 @@ def calculate_newValue(
     return new_values
 
 
-def calculate_newSpeed(
+def calculate_new_speed(
         personal_bests,
         parameter_dicts,
         best_parameters,
@@ -136,8 +137,8 @@ def read_weights(value_dicts):
         'compactness_threshold': pso_settings['compactness_threshold']
     }
     normed_weights_dict = weight_normalization(pso_settings)
-    for xgbParameter in value_dicts:
-        if xgbParameter['range_end'] <= 1:
+    for parameter in value_dicts:
+        if parameter['range_end'] <= 1:
             weight_dict['w_init'].append(normed_weights_dict['w_init'])
             weight_dict['w_fin'].append(normed_weights_dict['w_fin'])
             weight_dict['c1'].append(normed_weights_dict['c1'])
@@ -194,7 +195,8 @@ def run_pso(
     w, w_step = get_weight_step(pso_settings)
     new_parameters = parameter_dicts
     personal_bests = {}
-    compactness = universal.calculate_improvement_wSTDEV(parameter_dicts)
+    compactness = universal.calculate_compactness(parameter_dicts)
+    print(' --- Compactness: ' + str(compactness) + ' ---')
     i = 1
     print(':::::::: Initializing :::::::::')
     fitnesses, pred_trains, pred_tests = calculate_fitnesses(
@@ -216,14 +218,13 @@ def run_pso(
     current_speeds = np.zeros((pso_settings['sample_size'], number_parameters))
     while i <= iterations and compactness_threshold < compactness:
         print('::::::: Iteration: '+ str(i) + ' ::::::::')
-        print(' --- Compactness: ' + str(compactness) + ' ---')
         parameter_dicts = new_parameters
         fitnesses, pred_trains, pred_tests = calculate_fitnesses(
             parameter_dicts, data_dict, global_settings)
-        best_fitnesses = find_bestFitnesses(fitnesses, best_fitnesses)
+        best_fitnesses = find_best_fitness(fitnesses, best_fitnesses)
         personal_bests = calculate_personal_bests(
             fitnesses, best_fitnesses, parameter_dicts, personal_bests)
-        new_parameters, current_speeds = prepare_newDay(
+        new_parameters, current_speeds = prepare_new_day(
             personal_bests, parameter_dicts,
             result_dict['best_parameters'],
             current_speeds, w, global_settings['nthread'], value_dicts,
@@ -237,7 +238,8 @@ def run_pso(
             result_dict['best_fitness'] = max(fitnesses)
         avg_scores = np.mean(fitnesses)
         result_dict['avg_scores'].append(avg_scores)
-        compactness = universal.calculate_improvement_wSTDEV(parameter_dicts)
+        compactness = universal.calculate_compactness(parameter_dicts)
+        print(' --- Compactness: ' + str(compactness) + ' ---')
         w += w_step
         i += 1
     return result_dict

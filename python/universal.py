@@ -334,7 +334,7 @@ def calculate_improvement_wAVG(avg_scores, improvements, threshold):
     return improvements, improvement
 
 
-def calculate_improvement_wSTDEV(parameter_dicts):
+def calculate_compactness(parameter_dicts):
     '''Calculates the improvement based on how similar are different sets of
     parameters
 

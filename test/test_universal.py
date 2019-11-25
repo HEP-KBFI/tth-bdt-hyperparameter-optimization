@@ -88,7 +88,7 @@ def test_calculate_f1_score():
     assert result[1] == 1
 
 
-def test_calculate_improvement_wSTDEV():
+def test_calculate_compactness():
     parameter_dict1 = {
         'a': 1,
         'b': 10,
@@ -109,7 +109,7 @@ def test_calculate_improvement_wSTDEV():
         parameter_dict2,
         parameter_dict3
     ]
-    result = universal.calculate_improvement_wSTDEV(parameter_dicts)
+    result = universal.calculate_compactness(parameter_dicts)
     expected = np.sqrt(2/3)/2
     np.testing.assert_almost_equal(
         result,
