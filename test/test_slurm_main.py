@@ -90,7 +90,7 @@ def test_check_error():
     assert error == True
 
 
-def test_prepare_jobFile():
+def test_prepare_job_file():
     global_settings = {
         'output_dir': tmp_folder,
         'sample_type': 'mnist',
@@ -102,7 +102,7 @@ def test_prepare_jobFile():
     job_nr = 1
     outputDir = os.path.join(resourcesDir, 'tmp')
     templateDir = resourcesDir
-    sm.prepare_jobFile(
+    sm.prepare_job_file(
         parameterFile, job_nr, global_settings)
     jobFile = os.path.join(resourcesDir, 'tmp', 'parameter_1.sh')
     with open(jobFile, 'r') as f:
