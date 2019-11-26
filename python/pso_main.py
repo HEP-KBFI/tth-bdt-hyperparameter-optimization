@@ -125,28 +125,6 @@ def calculate_personal_bests(
             new_dicts.append(personal_best)
     return new_dicts
 
-# # XGB specific
-# def calculate_new_position(
-#         current_speeds,
-#         parameter_dicts,
-#         value_dicts
-# ):
-#     new_values = []
-#     for current_speed, parameter_dict in zip(current_speeds, parameter_dicts):
-#         new_value = {}
-#         for i, speed in enumerate(current_speed):
-#             key = value_dicts[i]['p_name']
-#             if bool(value_dicts[i]['true_int']):
-#                 new_value[key] = int(np.ceil(parameter_dict[key] + speed))
-#             else:
-#                 new_value[key] = parameter_dict[key] + speed
-#             if new_value[key] < value_dicts[i]['range_start']:
-#                 new_value[key] = value_dicts[i]['range_start']
-#             elif new_value[key] > value_dicts[i]['range_end']:
-#                 new_value[key] = value_dicts[i]['range_end']
-#         new_values.append(new_value)
-#     return new_values
-
 
 def calculate_new_position(
         current_speeds,
@@ -164,43 +142,7 @@ def calculate_new_position(
             else:
                 new_value[key] = parameter_dict[key] + current_speed[key]
         new_values.append(new_value)
-
-# def calculate_new_speed(
-#         personal_bests,
-#         parameter_dicts,
-#         best_parameters,
-#         w,
-#         current_speeds,
-#         c1,
-#         c2
-# ):
-#     new_speeds = []
-#     i = 0
-#     for pb, current in zip(personal_bests, parameter_dicts):
-#         rand1 = np.random.uniform()
-#         rand2 = np.random.uniform()
-#         inertia = np.array(current_speeds[i])
-#         cognitive_array = []
-#         social_array = []
-#         for key in current:
-#             cognitive_component = (
-#                 pb[key] - current[key]
-#             )
-#             social_component = (
-#                 best_parameters[key] - current[key]
-#             )
-#             cognitive_array.append(cognitive_component)
-#             social_array.append(social_component)
-#         cognitive_array = np.array(cognitive_array)
-#         social_array = np.array(social_array)
-#         new_speed = (
-#             w * inertia
-#             + c1 * (rand1 * cognitive_array)
-#             + c2 * (rand2 * social_array)
-#         )
-#         new_speeds.append(new_speed)
-#         i = i + 1
-#     return new_speeds
+    return new_values
 
 
 def calculate_new_speed(
