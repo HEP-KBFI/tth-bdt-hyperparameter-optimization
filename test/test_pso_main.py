@@ -15,7 +15,7 @@ value_dicts = [
         'range_end': 500,
         'true_int': 1,
         'group_nr': 1,
-        'true_corr': 'False'
+        'true_corr': 0
     },
     {
         'p_name': 'learning_rate',
@@ -23,7 +23,7 @@ value_dicts = [
         'range_end': 0.3,
         'true_int': 0,
         'group_nr': 1,
-        'true_corr': 'False'
+        'true_corr': 0
     },
     {
         'p_name': 'max_depth',
@@ -31,7 +31,7 @@ value_dicts = [
         'range_end': 10,
         'true_int': 1,
         'group_nr': 2,
-        'true_corr': 'False'
+        'true_corr': 0
     },
     {
         'p_name': 'gamma',
@@ -39,7 +39,7 @@ value_dicts = [
         'range_end': 5,
         'true_int': 0,
         'group_nr': 2,
-        'true_corr': 'False'
+        'true_corr': 0
     },
     {
         'p_name': 'min_child_weight',
@@ -47,7 +47,7 @@ value_dicts = [
         'range_end': 500,
         'true_int': 0,
         'group_nr': 3,
-        'true_corr': 'True'
+        'true_corr': 0
     },
     {
         'p_name': 'subsample',
@@ -55,7 +55,7 @@ value_dicts = [
         'range_end': 1,
         'true_int': 0,
         'group_nr': 4,
-        'true_corr': 'True'
+        'true_corr': 0
     },
     {
         'p_name': 'colsample_bytree',
@@ -63,7 +63,7 @@ value_dicts = [
         'range_end': 1,
         'true_int': 0,
         'group_nr': 5,
-        'true_corr': 'True'
+        'true_corr': 0
     }
 ]
 
@@ -240,13 +240,13 @@ def test_calculate_new_position():
         'colsample_bytree': 1,
     }
     current_speed = {
-        'num_boost_round': 0.5,
-        'learning_rate': 0.5,
-        'max_depth': 0.5,
-        'gamma': 0.5,
-        'min_child_weight': 0.5,
-        'subsample': 0.5,
-        'colsample_bytree': 0.5,
+        'num_boost_round': 1,
+        'learning_rate': 1,
+        'max_depth': 1,
+        'gamma': 1,
+        'min_child_weight': 1,
+        'subsample': 1,
+        'colsample_bytree': 1,
     }
     current_speeds = [
         current_speed,
