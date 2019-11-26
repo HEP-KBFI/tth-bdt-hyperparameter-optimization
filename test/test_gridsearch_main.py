@@ -1,6 +1,8 @@
 from __future__ import division
 import numpy as np
-from tthAnalysis.bdtHyperparameterOptimization import xgb_gridSearch as xg
+from tthAnalysis.bdtHyperparameterOptimization import gridSearch_main as gm
+from tthAnalysis.bdtHyperparameterOptimization import xgb_tools as xt
+
 
 def test_single_paramSet():
     grid_size = 3
@@ -15,7 +17,7 @@ def test_single_paramSet():
         'second': 6,
         'third': 8
     }
-    result = xg.single_paramSet(parameters, iterations, grid_size)
+    result = gm.single_paramSet(parameters, iterations, grid_size)
     assert result == expected
 
 
@@ -31,7 +33,7 @@ def test_initialize_values1():
         'second': 6.,
         'third': 9.
     }]
-    result = xg.initialize_values(parameters, grid_size)
+    result = gm.initialize_values(parameters, grid_size)
     assert result == expected1
 
 
@@ -58,12 +60,12 @@ def test_initialize_values2():
         'second': 6.,
     }
     expected_l = [expected1, expected2, expected3, expected4]
-    result = xg.initialize_values(parameters, grid_size)
+    result = gm.initialize_values(parameters, grid_size)
     assert result == expected_l
 
 
 def test_create_all_combinations():
     nr_parameters = 3
     grid_size = 3
-    result = xg.create_all_combinations(nr_parameters, grid_size)
+    result = gm.create_all_combinations(nr_parameters, grid_size)
     assert len(result) == 27

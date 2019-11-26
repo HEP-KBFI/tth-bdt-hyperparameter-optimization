@@ -17,25 +17,23 @@ pip install -r requirements.txt --user
 [update pytest to pytest==5.2.0](https://stackoverflow.com/questions/58189683/typeerror-attrib-got-an-unexpected-keyword-argument-convert)
 
 
-## Particle Swarm Optimization (PSO)
+### Wiki
 
-<img src="README/pso_overview1.png" alt="Sensitivity" width="400"/>
-<img src="README/pso_overview2.png" alt="Sensitivity" width="400"/>
-
-
-Calculating the speed for next iteration:
-<img src="http://bit.ly/2VvaTvW" align="center" border="0" alt="V_{t+1} = w*V_t + c_1*r_1*(P_t - X_t) + c_2*r_2*(G_t - X_t)" width="449" height="18" />
-
-c1 = c2 for balancing exploration and exploitation
-
-
-Calculating the position for the next iteration:
-<img src="http://bit.ly/2BatXXn" align="center" border="0" alt="X_{t+1} = X_t + V_{t}" width="118" height="18" />
+For more detailed information visit the [wiki](https://github.com/HEP-KBFI/tth-bdt-hyperparameter-optimization/wiki)
 
 
 ### MNIST numbers dataset
 
 Available here:
 [Mnist numbers dataset](http://yann.lecun.com/exdb/mnist/)
+
+
+### Tests
+
+After installation please run the unittests (in $CMSSW_BASE/src/tthAnalysis/bdtHyperparameterOptimization) with:
+
+````console
+pytest test/
+````
 
 

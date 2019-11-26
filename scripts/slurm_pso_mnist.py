@@ -39,12 +39,11 @@ def main():
         'xgb_parameters.json'
     )
     value_dicts = universal.read_parameters(param_file)
-    pso_settings = pm.read_weights(value_dicts)
+    pso_settings = pm.read_weights()
     parameter_dicts = xt.prepare_run_params(
-        global_settings['nthread'], value_dicts, pso_settings['sample_size'])
+        value_dicts, pso_settings['sample_size'])
     result_dict = pm.run_pso(
-        global_settings, pso_settings, data_dict,
-        value_dicts, sm.run_iteration, parameter_dicts
+        data_dict, value_dicts, sm.run_iteration, parameter_dicts
     )
     universal.save_results(result_dict, output_dir)
 

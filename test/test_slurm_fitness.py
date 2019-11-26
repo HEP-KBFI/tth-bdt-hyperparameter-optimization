@@ -1,19 +1,20 @@
 from __future__ import division
-from tthAnalysis.bdtHyperparameterOptimization import slurm_fitness  as sm
+from subprocess import call
 import numpy as np
-import os 
+import os
 import shutil
 import glob
 import gzip
 import shutil
 import urllib
+import pytest
 dir_path = os.path.dirname(os.path.realpath(__file__))
 resourcesDir = os.path.join(dir_path, 'resources')
 tmp_folder = os.path.join(resourcesDir, 'tmp')
 if not os.path.exists(tmp_folder):
     os.makedirs(tmp_folder)
 
-
+@pytest.mark.skip(reason="Runs too long")
 def test_main():
     main_url = 'http://yann.lecun.com/exdb/mnist/'
     train_images = 'train-images-idx3-ubyte'
@@ -35,7 +36,15 @@ def test_main():
         with gzip.open(fileLoc + '.gz', 'rb') as f_in:
             with open(fileLoc, 'wb') as f_out:
                 shutil.copyfileobj(f_in, f_out)
-    sm.main(parameterFile_newLoc, sampleDir, nthread)
+    cmssw_base = os.path.expandvars('$CMSSW_BASE')
+    script = os.path.join(
+        cmssw_base,
+        'src',
+        'tthAnalysis',
+        'bdtHyperparameterOptimization',
+        'scripts',
+        'slurm_pso_mnist.py')
+    call("python " + str(script), shell=True)
 
 
 def test_dummy_delete_files():
