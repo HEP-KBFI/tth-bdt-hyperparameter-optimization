@@ -228,27 +228,16 @@ def initialize_speeds(parameter_dicts):
 
 def read_weights(value_dicts):
     pso_settings = universal.read_settings('pso')
+    normed_weights_dict = weight_normalization(pso_settings)
     weight_dict = {
-        'w_init': [],
-        'w_fin': [],
-        'c1': [],
-        'c2': [],
+        'w_init': normed_weights_dict['w_init'],
+        'w_fin': normed_weights_dict['w_fin']
+        'c1': normed_weights_dict['c1'],
+        'c2': normed_weights_dict['c2'],
         'iterations': pso_settings['iterations'],
         'sample_size': pso_settings['sample_size'],
         'compactness_threshold': pso_settings['compactness_threshold']
     }
-    normed_weights_dict = weight_normalization(pso_settings)
-    for parameter in value_dicts:
-        if parameter['range_end'] <= 1:
-            weight_dict['w_init'].append(normed_weights_dict['w_init'])
-            weight_dict['w_fin'].append(normed_weights_dict['w_fin'])
-            weight_dict['c1'].append(normed_weights_dict['c1'])
-            weight_dict['c2'].append(normed_weights_dict['c2'])
-        else:
-            weight_dict['w_init'].append(pso_settings['w_init'])
-            weight_dict['w_fin'].append(pso_settings['w_fin'])
-            weight_dict['c1'].append(pso_settings['c1'])
-            weight_dict['c2'].append(pso_settings['c2'])
     return weight_dict
 
 
