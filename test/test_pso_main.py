@@ -72,7 +72,7 @@ def test_find_best_fitness():
     fitnesses = [0.5, 0.7, 0.1, 0.2]
     best_fitnesses = [0.4, 0.8, 0.7, 0.3]
     expected = [0.5, 0.8, 0.7, 0.3]
-    result = pm.find_best_fitness(fitnsesses, best_fitnesses)
+    result = pm.find_best_fitness(fitnesses, best_fitnesses)
     assert result == expected
 
 
@@ -138,7 +138,12 @@ def test_calculate_new_speed():
     w = 2
     c1 = 2
     c2 = 2
-    current_speeds = [1, 1, 1]
+    current_speed = {'a': 1, 'b': 1, 'c': 1}
+    current_speeds = [
+        current_speed,
+        current_speed,
+        current_speed
+    ]
     parameter_dicts = [
         {'a': 1, 'b': 1, 'c': 1},
         {'a': 2, 'b': 2, 'c': 2},
