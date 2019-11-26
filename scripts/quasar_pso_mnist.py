@@ -38,7 +38,7 @@ def main():
     value_dicts = universal.read_parameters(param_file)
     pso_settings = pm.read_weights()
     parameter_dicts = xt.prepare_run_params(
-        global_settings['nthread'], value_dicts, pso_settings['sample_size'])
+        value_dicts, pso_settings['sample_size'])
     result_dict = pm.run_pso(
         data_dict, value_dicts, xt.ensemble_fitnesses, parameter_dicts
     )
