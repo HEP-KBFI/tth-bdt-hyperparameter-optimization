@@ -217,7 +217,6 @@ def test_calculate_new_position():
         parameter_dict,
         parameter_dict
     ]
-    nthread = 28
     values = {
         'num_boost_round': 1,
         'learning_rate': 0.3,
@@ -239,7 +238,7 @@ def test_calculate_new_position():
         values
     ]
     result = pm.calculate_new_position(
-        current_speeds, parameter_dicts, nthread, value_dicts)
+        current_speeds, parameter_dicts, value_dicts)
     assert result == expected
 
 
