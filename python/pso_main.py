@@ -139,7 +139,7 @@ def calculate_new_position(
         value_dicts
 ):
     new_values = []
-    for current_speed, parameter_dict in zip(current_speeds, parameter_dicts)
+    for current_speed, parameter_dict in zip(current_speeds, parameter_dicts):
         for parameter in value_dicts:
             key = parameter['p_name']
             if bool(parameter['true_int']):
