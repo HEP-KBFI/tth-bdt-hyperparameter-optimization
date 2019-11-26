@@ -142,7 +142,7 @@ def calculate_new_position(
     new_values = []
     for current_speed, parameter_dict in zip(current_speeds, parameter_dicts):
         for parameter in value_dicts:
-           key = parameter['p_name']
+            key = parameter['p_name']
             new_value = {}
             if bool(parameter['true_int']):
                 new_value[key] = int(np.ceil(
