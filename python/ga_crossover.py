@@ -313,7 +313,7 @@ def float_encoding(value, accuracy=5):
     value : float
         Float to be encoded
     accuracy : int
-        Number of decimals to be preserved
+        Number of decimals to be preserved; default is 5
 
     Returns
     -------
@@ -350,7 +350,7 @@ def float_decoding(encoded, accuracy=5):
     encoded : string
         Encoded value
     accuracy : int
-        Number of decimals preserved in the float
+        Number of decimals preserved in the float; default is 5
 
     Returns
     -------
@@ -358,7 +358,7 @@ def float_decoding(encoded, accuracy=5):
         Decoded value of the float
     '''
     decoded = int(encoded, 2)
-    value = decoded / accuracy
+    value = decoded / (10 ** accuracy)
     return value
 
 

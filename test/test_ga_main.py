@@ -1,11 +1,11 @@
-"""
+'''
 Testing the main functions of the genetic algorithm.
 Missing tests for the following functions:
     culling
     sub_evolution
     evolve
     evolution
-"""
+'''
 from __future__ import division
 import random
 from tthAnalysis.bdtHyperparameterOptimization import ga_main as gm
@@ -129,75 +129,75 @@ FITNESSES = [0.4, 0.6, 0.8]
 NUMS = [0.5, 1, 2, 3]
 
 
-def grouped_sample():
-    """Temporary function for grouping the sample population"""
-    grouped = []
-    pos_corr = []
-    for element in SAMPLE:
-        grouped.append(gm.grouping(element, PARAMETERS)[0])
-        pos_corr.append(gm.grouping(element, PARAMETERS)[1])
-    return grouped, pos_corr
+# def grouped_sample():
+#     '''Temporary function for grouping the sample population'''
+#     grouped = []
+#     pos_corr = []
+#     for element in SAMPLE:
+#         grouped.append(gm.grouping(element, PARAMETERS)[0])
+#         pos_corr.append(gm.grouping(element, PARAMETERS)[1])
+#     return grouped, pos_corr
 
 
-def test_group_crossover():
-    """Testing the group_crossover function"""
-    parents = SAMPLE[0:2]
-    calculated = gm.add_parameters(
-        gm.group_crossover(
-            parents,
-            SETTINGS['mut_chance'],
-            PARAMETERS),
-        SETTINGS['nthread'])
-    assert len(calculated) == len(parents[0]), 'test_crossover failed'
+# def test_group_crossover():
+#     '''Testing the group_crossover function'''
+#     parents = SAMPLE[0:2]
+#     calculated = gm.add_parameters(
+#         gm.group_crossover(
+#             parents,
+#             SETTINGS['mut_chance'],
+#             PARAMETERS),
+#         SETTINGS['nthread'])
+#     assert len(calculated) == len(parents[0]), 'test_crossover failed'
 
 
-def test_grouping():
-    """Testing the grouping function"""
-    for dictionary in SAMPLE:
-        calculated = gm.grouping(dictionary, PARAMETERS)
-        for element in calculated:
-            assert len(element) == 5, 'test_grouping failed'
-        for element in calculated[0]:
-            for key in element.keys():
-                assert element[key] == dictionary[key], 'test_grouping failed'
-        for element in calculated[1]:
-            i = 0
-            try:
-                if element != PARAMETERS[i]['true_corr']:
-                    i += 1
-                else:
-                    assert element == PARAMETERS[i]['true_corr'], \
-                        'test_grouping failed'
-                    i += 1
-            except:
-                raise AssertionError('test_grouping failed')
+# def test_grouping():
+#     '''Testing the grouping function'''
+#     for dictionary in SAMPLE:
+#         calculated = gm.grouping(dictionary, PARAMETERS)
+#         for element in calculated:
+#             assert len(element) == 5, 'test_grouping failed'
+#         for element in calculated[0]:
+#             for key in element.keys():
+#                 assert element[key] == dictionary[key], 'test_grouping failed'
+#         for element in calculated[1]:
+#             i = 0
+#             try:
+#                 if element != PARAMETERS[i]['true_corr']:
+#                     i += 1
+#                 else:
+#                     assert element == PARAMETERS[i]['true_corr'], \
+#                         'test_grouping failed'
+#                     i += 1
+#             except:
+#                 raise AssertionError('test_grouping failed')
 
 
-def test_degroup():
-    """Testing the degroup function"""
-    grouped = grouped_sample()[0]
-    calculated = []
-    for element in grouped:
-        calculated.append(gm.add_parameters(
-            gm.degroup(element), SETTINGS['nthread']))
-    assert calculated == SAMPLE, 'test_degroup failed'
+# def test_degroup():
+#     '''Testing the degroup function'''
+#     grouped = grouped_sample()[0]
+#     calculated = []
+#     for element in grouped:
+#         calculated.append(gm.add_parameters(
+#             gm.degroup(element), SETTINGS['nthread']))
+#     assert calculated == SAMPLE, 'test_degroup failed'
 
 
-def test_group_mutate():
-    """Testing the group_mutate function"""
-    grouped, pos_corr = grouped_sample()
-    for i, element in enumerate(grouped):
-        total_calc = []
-        for j, group in enumerate(element):
-            calculated = gm.group_mutate(
-                group, SETTINGS['mut_chance'], random.random(), pos_corr[i][j])
-            assert len(calculated) == len(group), 'test_mutate failed'
-            total_calc.append(calculated)
-        assert len(total_calc) == len(element), 'test_mutate failed'
+# def test_group_mutate():
+#     '''Testing the group_mutate function'''
+#     grouped, pos_corr = grouped_sample()
+#     for i, element in enumerate(grouped):
+#         total_calc = []
+#         for j, group in enumerate(element):
+#             calculated = gm.group_mutate(
+#                 group, SETTINGS['mut_chance'], random.random(), pos_corr[i][j])
+#             assert len(calculated) == len(group), 'test_mutate failed'
+#             total_calc.append(calculated)
+#         assert len(total_calc) == len(element), 'test_mutate failed'
 
 
 def test_set_num():
-    """Testing the set_num function"""
+    '''Testing the set_num function'''
     result = [2, 1, 2, 3]
     calculated = []
     for num in NUMS:
@@ -206,7 +206,7 @@ def test_set_num():
 
 
 def test_elitism():
-    """Testing the elitism function"""
+    '''Testing the elitism function'''
     result = [[3, 2], [3], [3, 2], [3, 2, 1]]
     calculated = []
     for num in NUMS:
@@ -215,7 +215,7 @@ def test_elitism():
 
 
 def test_add_parameters():
-    """Testing the add_parameters function"""
+    '''Testing the add_parameters function'''
     dictionary = {'test': 1}
     nthread = 8
     calculated = gm.add_parameters(dictionary, nthread)
@@ -231,7 +231,7 @@ def test_add_parameters():
 
 
 def test_new_population():
-    """Testing the new_population function"""
+    '''Testing the new_population function'''
     SETTINGS.update({'pop_size': 3})
     calculated = gm.new_population(
         SAMPLE, FITNESSES, SETTINGS, PARAMETERS)
@@ -240,7 +240,7 @@ def test_new_population():
 
 
 def test_create_subpopulations():
-    """Testing the create_subpopulations function"""
+    '''Testing the create_subpopulations function'''
     nums = NUMS[1:]
     sizes = [1, 2, 4, 7, 11]
     result = [
