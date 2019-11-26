@@ -126,7 +126,7 @@ def test_calculate_personal_bests2():
     assert error == True
 
 
-def test_calculate_newSpeed():
+def test_calculate_new_speed():
     w = 2
     c1 = 2
     c2 = 2
@@ -142,7 +142,7 @@ def test_calculate_newSpeed():
         {'a': 7, 'b': 7, 'c': 7}
     ]
     best_parameters = {'a': 2, 'b': 2, 'c': 2}
-    result = pm.calculate_newSpeed(
+    result = pm.calculate_new_speed(
         personal_bests,
         parameter_dicts,
         best_parameters,
@@ -156,7 +156,7 @@ def test_calculate_newSpeed():
     assert result[2][0] >= 0 and result[2][0] <= 10
 
 
-def test_calculate_newSpeed2():
+def test_calculate_new_speed2():
     w = 2
     c1 = 2
     c2 = 2
@@ -188,7 +188,7 @@ def test_calculate_newSpeed2():
     best_params = values
     error = False
     try:
-        result = pm.calculate_newSpeed(
+        result = pm.calculate_new_speed(
             w,
             current_values,
             current_speeds,
@@ -202,7 +202,7 @@ def test_calculate_newSpeed2():
     assert error == True
 
 
-def test_calculate_newValue():
+def test_calculate_new_position():
     parameter_dict = {
         'num_boost_round': 0,
         'learning_rate': 0,
@@ -238,7 +238,7 @@ def test_calculate_newValue():
         values,
         values
     ]
-    result = pm.calculate_newValue(
+    result = pm.calculate_new_position(
         current_speeds, parameter_dicts, nthread, value_dicts)
     assert result == expected
 
@@ -274,4 +274,3 @@ def test_weight_normalization():
 def test_read_weights():
     result = pm.read_weights(value_dicts)
     assert len(result) == 7
-    assert len(result['c1']) == len(value_dicts)

@@ -67,7 +67,7 @@ def prepare_new_day(
     return new_parameters, current_speeds
 
 
-def checkNumeric(variables):
+def check_numeric(variables):
     '''Checks whether the variable is numberic
 
     Parameters:
@@ -80,10 +80,11 @@ def checkNumeric(variables):
         Decision whether the list of variables contains non-numeric values
     '''
     for variable in variables:
-        if not isinstance(variable, numbers.Number):
-            decision = True
-        else:
-            decision = False
+        for element in variable:
+            if not isinstance(element, numbers.Number):
+                decision = True
+            else:
+                decision = False
     return decision
 
 
@@ -109,7 +110,7 @@ def calculate_personal_bests(
     new_dicts = []
     for fitness, best_fitness, parameters, personal_best in zip(
             fitnesses, best_fitnesses, parameter_dicts, personal_bests):
-        nonNumeric = checkNumeric(
+        nonNumeric = check_numeric(
             [fitness, best_fitness])
         if nonNumeric:
             raise TypeError
