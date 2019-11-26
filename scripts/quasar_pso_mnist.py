@@ -18,7 +18,7 @@ np.random.seed(1)
 
 def main():
     global_settings = universal.read_settings('global')
-    output_dir = global_settings['output_dir']
+    output_dir = os.path.expandvars(global_settings['output_dir'])
     if not os.path.isdir(output_dir):
         os.makedirs(output_dir)
     print("::::::: Loading data ::::::::")
