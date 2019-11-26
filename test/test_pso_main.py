@@ -239,7 +239,15 @@ def test_calculate_new_position():
         'subsample': 1,
         'colsample_bytree': 1,
     }
-    current_speed = [1, 1, 1, 1, 1, 1, 1]
+    current_speed = {
+        'num_boost_round': 0.5,
+        'learning_rate': 0.5,
+        'max_depth': 0.5,
+        'gamma': 0.5,
+        'min_child_weight': 0.5,
+        'subsample': 0.5,
+        'colsample_bytree': 0.5,
+    }
     current_speeds = [
         current_speed,
         current_speed,
