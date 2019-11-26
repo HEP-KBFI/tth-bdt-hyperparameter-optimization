@@ -40,8 +40,7 @@ def main():
     parameter_dicts = xt.prepare_run_params(
         global_settings['nthread'], value_dicts, pso_settings['sample_size'])
     result_dict = pm.run_pso(
-        global_settings, pso_settings, data_dict,
-        value_dicts, xt.ensemble_fitnesses, parameter_dicts
+        data_dict, value_dicts, xt.ensemble_fitnesses, parameter_dicts
     )
     universal.save_results(result_dict, output_dir)
 

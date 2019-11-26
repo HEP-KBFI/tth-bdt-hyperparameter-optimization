@@ -13,7 +13,7 @@ tmp_folder = os.path.join(resourcesDir, 'tmp')
 if not os.path.exists(tmp_folder):
     os.makedirs(tmp_folder)
 
-
+@pytest.mark.skip(reason="Runs too long")
 def test_main():
     main_url = 'http://yann.lecun.com/exdb/mnist/'
     train_images = 'train-images-idx3-ubyte'

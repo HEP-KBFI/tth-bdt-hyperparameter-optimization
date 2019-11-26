@@ -1,7 +1,6 @@
 '''Functions that are necessary for PSO algorithm
 '''
 from __future__ import division
-import os
 import numbers
 import numpy as np
 from tthAnalysis.bdtHyperparameterOptimization import universal
@@ -52,10 +51,11 @@ def prepare_new_day(
         Current iteration parameters for each particle
     current_speeds : list of dicts
         Speed in every parameter direction for each particle
-    w : float
-        Inertial weight
     value_dicts : list of dicts
         Info about every variable that is to be optimized
+    weight_dict : dict
+        dictionary containing the normalized weights [w: inertial weight,
+        c1: cognitive weight, c2: social weight]
 
     Returns:
     -------
@@ -64,7 +64,6 @@ def prepare_new_day(
     current_speeds : list of dicts
         New speed of each particle
     '''
-    weight_dict
     current_speeds = calculate_new_speed(
         personal_bests, parameter_dicts, best_parameters,
         current_speeds, weight_dict
@@ -75,7 +74,7 @@ def prepare_new_day(
 
 
 def check_numeric(variables):
-    '''Checks whether the variable is numberic
+    '''Checks whether the variable is numeric
 
     Parameters:
     ----------
@@ -139,6 +138,22 @@ def calculate_new_position(
         parameter_dicts,
         value_dicts
 ):
+    '''Calculates the new parameters for the next iteration
+
+    Parameters:
+    ----------
+    current_speeds : list of dicts
+        Current speed in each parameter direction for each particle
+    parameter_dicts : list of dicts
+        Current parameter-sets of all particles
+    value_dicts : list of dicts
+        Info about every variable that is to be optimized
+
+    Returns:
+    -------
+    new_values : list of dicts
+        New parameters to be used in the next iteration
+    '''
     new_values = []
     for current_speed, parameter_dict in zip(current_speeds, parameter_dicts):
         new_value = {}
@@ -160,14 +175,33 @@ def calculate_new_speed(
         current_speeds,
         weight_dict
 ):
+    '''Calculates the new speed in each parameter direction for all particles
+
+    Parameters:
+    ----------
+    personal_bests : list of dicts
+        Best parameters for each individual particle
+    parameter_dicts : list of dicts
+        Current iteration parameters for each particle
+    current_speeds : list of dicts
+        Speed in every parameter direction for each particle
+    weight_dict : dict
+        dictionary containing the normalized weights [w: inertial weight,
+        c1: cognitive weight, c2: social weight]
+
+    Returns:
+    -------
+    new_speeds : list of dicts
+        The new speed of the particle in each parameter direction
+    '''
     new_speeds = []
     for personal, current, inertia in zip(
             personal_bests, parameter_dicts, current_speeds
     ):
         new_speed = {}
-        rand1 = np.random.uniform()
-        rand2 = np.random.uniform()
         for key in current:
+            rand1 = np.random.uniform()
+            rand2 = np.random.uniform()
             cognitive_component = weight_dict['c1'] * rand1 * (
                 personal[key] - current[key])
             social_component = weight_dict['c2'] * rand2 * (
@@ -183,6 +217,18 @@ def calculate_new_speed(
 
 
 def initialize_speeds(parameter_dicts):
+    '''Initializes the speeds in the beginning to be 0
+
+    Parameters:
+    ----------
+    parameter_dicts : list of dicts
+        The parameter-sets of all particles.
+
+    Returns:
+    -------
+    speeds : list of dicts
+        Speeds of all particles in all parameter directions. All are 0
+    '''
     speeds = []
     for parameter_dict in parameter_dicts:
         speed = {}
@@ -193,6 +239,17 @@ def initialize_speeds(parameter_dicts):
 
 
 def read_weights():
+    ''' Reads the weights for different components and normalizes them
+
+    Parameters:
+    ----------
+    None
+
+    Returns:
+    -------
+    weight_dict : dict
+        Contains all the weights for PSO
+    '''
     pso_settings = universal.read_settings('pso')
     normed_weights_dict = weight_normalization(pso_settings)
     weight_dict = {
@@ -208,6 +265,18 @@ def read_weights():
 
 
 def weight_normalization(pso_settings):
+    '''Normalizes the weights of the PSO
+
+    Parameters:
+    ----------
+    pso_settings : dict
+        Settings for the PSO
+
+    Returns:
+    -------
+    normed_weights_dict : dict
+        Normalized settings
+    '''
     total_sum = pso_settings['w_init'] + pso_settings['c1'] + pso_settings['c2']
     normed_weights_dict = {
         'w_init': pso_settings['w_init']/total_sum,
@@ -219,40 +288,63 @@ def weight_normalization(pso_settings):
 
 
 def get_weight_step(pso_settings):
-    w = np.array(pso_settings['w_init'])
-    w_fin = np.array(pso_settings['w_fin'])
-    w_init = np.array(pso_settings['w_init'])
-    w_step = (w_fin - w_init)/pso_settings['iterations']
-    return w, w_step
+    '''Calculates the step size of the inertial weight
 
+    Parameters:
+    ----------
+    pso_settings : dict
+        PSO settings
 
-def get_number_parameters():
-    cmssw_base_path = os.path.expandvars('$CMSSW_BASE')
-    parameters_path = os.path.join(
-        cmssw_base_path,
-        'src',
-        'tthAnalysis',
-        'bdtHyperparameterOptimization',
-        'data',
-        'xgb_parameters.json')
-    with open(parameters_path, 'rt') as parameters_file:
-        number_parameters = len(parameters_file.readlines())
-    return number_parameters
+    Returns:
+    -------
+    inertial_weight : float
+        inertial weight
+    inertial_weight_step : float
+        Step size of the inertial weight
+    '''
+    inertial_weight = np.array(pso_settings['w_init'])
+    inertial_weight_fin = np.array(pso_settings['w_fin'])
+    inertial_weight_init = np.array(pso_settings['w_init'])
+    inertial_weight_step = (
+        inertial_weight_fin - inertial_weight_init)/pso_settings['iterations']
+    return inertial_weight, inertial_weight_step
 
 
 def run_pso(
-        global_settings,
-        pso_settings,
         data_dict,
         value_dicts,
         calculate_fitnesses,
         parameter_dicts,
 ):
+    '''Performs the whole particle swarm optimization
+
+    Parameters:
+    ----------
+    global_settings : dict
+        Global settings for the run.
+    pso_settings : dict
+        Particle swarm settings for the run
+    data_dict : dict
+        Contains the data and labels
+    value_dicts : list of dicts
+        Info about every variable that is to be optimized
+    calculate_fitnesses : method
+        Function for fitness calculation
+    parameter_dicts : list of dicts
+        The parameter-sets of all particles.
+
+    Returns:
+    -------
+    result_dict : dict
+        Dictionary that contains the results like best_parameters,
+        best_fitnesses, avg_scores, pred_train, pred_test, data_dict
+    '''
     print(':::::::: Initializing :::::::::')
-    w, w_step = get_weight_step(pso_settings)
+    global_settings = universal.read_settings('global')
+    pso_settings = read_weights()
+    inertial_weight, inertial_weight_step = get_weight_step(pso_settings)
     iterations = pso_settings['iterations']
     compactness_threshold = pso_settings['compactness_threshold']
-    # number_parameters = get_number_parameters()
     i = 1
     new_parameters = parameter_dicts
     personal_bests = {}
@@ -271,7 +363,6 @@ def run_pso(
     personal_bests = parameter_dicts
     best_fitnesses = fitnesses
     current_speeds = initialize_speeds(parameter_dicts)
-    # current_speeds = np.zeros((pso_settings['sample_size'], number_parameters))
     while i <= iterations and compactness_threshold < compactness:
         print('::::::: Iteration: '+ str(i) + ' ::::::::')
         parameter_dicts = new_parameters
@@ -285,7 +376,7 @@ def run_pso(
         weight_dict = {
             'c1': pso_settings['c1'],
             'c2': pso_settings['c2'],
-            'w': w}
+            'w': inertial_weight}
         new_parameters, current_speeds = prepare_new_day(
             personal_bests, parameter_dicts,
             result_dict['best_parameters'],
@@ -300,6 +391,6 @@ def run_pso(
             result_dict['best_fitness'] = max(fitnesses)
         avg_scores = np.mean(fitnesses)
         result_dict['avg_scores'].append(avg_scores)
-        w += w_step
+        inertial_weight += inertial_weight_step
         i += 1
     return result_dict
