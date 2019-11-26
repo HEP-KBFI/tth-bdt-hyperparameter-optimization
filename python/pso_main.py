@@ -231,7 +231,7 @@ def read_weights(value_dicts):
     normed_weights_dict = weight_normalization(pso_settings)
     weight_dict = {
         'w_init': normed_weights_dict['w_init'],
-        'w_fin': normed_weights_dict['w_fin']
+        'w_fin': normed_weights_dict['w_fin'],
         'c1': normed_weights_dict['c1'],
         'c2': normed_weights_dict['c2'],
         'iterations': pso_settings['iterations'],
