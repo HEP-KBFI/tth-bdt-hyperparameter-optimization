@@ -6,8 +6,7 @@ Missing tests for the following functions:
     evolve
     evolution
 '''
-from __future__ import division
-import random
+# from __future__ import division
 from tthAnalysis.bdtHyperparameterOptimization import ga_main as gm
 
 
@@ -223,7 +222,7 @@ def test_add_parameters():
         'test': 1,
         'silent': 1,
         'objective': 'multi:softprob',
-        'num_class': 10,
+        'num_classes': 10,
         'nthread': nthread,
         'seed': 1,
     }

@@ -129,6 +129,7 @@ def culling(population, fitnesses, settings, data, parameters):
     return population, fitnesses
 
 
+# NOT IN USE ANYMORE
 def add_parameters(offspring, nthread):
     '''Add missing parameters to an offspring.
 
@@ -181,9 +182,8 @@ def new_population(population, fitnesses, settings, parameters):
     # Generate offspring to fill the new generation
     while len(next_population) < len(population):
         parents = select.tournament(population, fitnesses)
-        offspring = add_parameters(
-            gc.kpoint_crossover(parents, parameters, settings['mut_chance']),
-            settings['nthread'])
+        offspring = gc.kpoint_crossover(
+            parents, parameters, settings['mut_chance'])
 
         # No duplicate members
         if offspring not in next_population:
@@ -332,11 +332,11 @@ def evolve(population, settings, data, parameters, final=False):
         # Generate a new population
         if iteration != 0:
             print('::::: Iteration:     ' + str(iteration) + ' :::::')
-            print("Population: " + str(population))
             population, fitnesses = culling(
                 population, fitnesses, settings, data, parameters)
             population = new_population(
                 population, fitnesses, settings, parameters)
+            print("Population: " + str(population))
 
         # Calculate fitness of the population
         fitnesses, pred_trains, pred_tests = (

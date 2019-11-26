@@ -1,4 +1,5 @@
-'''Functions used by the genetic algorithm for crossover and mutation'''
+'''Functions used by the genetic algorithm for crossover 
+and mutation'''
 from __future__ import division
 import random
 

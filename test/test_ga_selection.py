@@ -1,4 +1,4 @@
-"""Testing the selection functions for the genetic algorithm"""
+'''Testing the selection functions for the genetic algorithm'''
 from tthAnalysis.bdtHyperparameterOptimization import ga_selection as gs
 
 POPULATION = [1, 2, 3]
@@ -7,7 +7,7 @@ PROBABILITIES = [0.2, 0.3, 0.5]
 
 
 def test_tournament():
-    """Testing the tournament selection"""
+    '''Testing tournament selection'''
     result = gs.tournament(POPULATION, FITNESSES)
     assert len(result) == 2, 'test_tournament failed'
     for member in result:
@@ -15,7 +15,7 @@ def test_tournament():
 
 
 def test_roulette():
-    """Testing the roulette wheel selection"""
+    '''Testing roulette wheel selection'''
     result = gs.roulette(POPULATION, FITNESSES)
     assert len(result) == 2, 'test_roulette failed'
     for member in result:
@@ -23,7 +23,7 @@ def test_roulette():
 
 
 def test_rank():
-    """Testing the rank selection"""
+    '''Testing rank selection'''
     result = gs.rank(POPULATION, FITNESSES)
     assert len(result) == 2, 'test_rank failed'
     for member in result:
@@ -31,14 +31,14 @@ def test_rank():
 
 
 def test_normalize():
-    """Testing the function normalizing the fitness scores"""
+    '''Testing the function normalizing the fitness scores'''
     result = gs.normalize(FITNESSES)
     assert sum(result) == 1, 'test_normalize failed'
 
 
-def test_wheel():
-    """Testing selection of parents via a generated wheel"""
-    result = gs.wheel(POPULATION, PROBABILITIES)
+def test_wheel_parents():
+    '''Testing selection of parents via a generated wheel'''
+    result = gs.wheel_parents(POPULATION, PROBABILITIES)
     assert len(result) == 2, 'test_wheel failed'
     for member in result:
         assert member in POPULATION, 'test_wheel failed'
