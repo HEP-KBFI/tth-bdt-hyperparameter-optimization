@@ -174,7 +174,7 @@ def calculate_new_speed(
                 + inertial_component
             )
         new_speeds.append(new_speed)
-    return 
+    return new_speeds
 
 
 def initialize_speeds(parameter_dicts):
