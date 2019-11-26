@@ -82,9 +82,10 @@ def check_numeric(variables):
     for variable in variables:
         if not isinstance(variable, numbers.Number):
             decision = True
+            return decision
         else:
             decision = False
-    return decision
+            return decision
 
 
 def calculate_personal_bests(
@@ -95,7 +96,7 @@ def calculate_personal_bests(
 ):
     '''Find best parameter-set for each particle
 
-    Paraneters:
+    Parameters:
     ----------
     fitnesses : list
         List of current iteration fitnesses for each particle
@@ -105,13 +106,18 @@ def calculate_personal_bests(
         Current parameters of the last iteration for each particle
     personal_bests : list of dicts
         Best parameters (with highest fitness) for each particle so far
+
+    Returns:
+    -------
+    new_dicts : list of dicts
+        Personal best parameter-sets for each particle
     '''
     new_dicts = []
     for fitness, best_fitness, parameters, personal_best in zip(
             fitnesses, best_fitnesses, parameter_dicts, personal_bests):
-        nonNumeric = check_numeric(
+        non_numeric = check_numeric(
             [fitness, best_fitness])
-        if nonNumeric:
+        if non_numeric:
             raise TypeError
         if fitness > best_fitness:
             new_dicts.append(parameters)
