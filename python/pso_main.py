@@ -80,11 +80,10 @@ def check_numeric(variables):
         Decision whether the list of variables contains non-numeric values
     '''
     for variable in variables:
-        for element in variable:
-            if not isinstance(element, numbers.Number):
-                decision = True
-            else:
-                decision = False
+        if not isinstance(variable, numbers.Number):
+            decision = True
+        else:
+            decision = False
     return decision
 
 
