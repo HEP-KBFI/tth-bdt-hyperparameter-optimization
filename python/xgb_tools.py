@@ -7,7 +7,7 @@ from tthAnalysis.bdtHyperparameterOptimization import universal
 def initialize_values(value_dicts):
     sample = {}
     for xgb_params in value_dicts:
-        if xgb_params['true_int'] == 'True':
+        if bool(xgb_params['true_int']):
             sample[xgb_params['p_name']] = np.random.randint(
                 low=xgb_params['range_start'],
                 high=xgb_params['range_end']

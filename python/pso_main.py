@@ -139,7 +139,15 @@ def calculate_new_position(
         value_dicts
 ):
     new_values = []
-    for parameter in value_dicts:
+    for current_speed, parameter_dict in zip(current_speeds, parameter_dicts)
+        for parameter in value_dicts:
+            key = parameter['p_name']
+            if bool(parameter['true_int']):
+                new_value[key] = int(np.ceil(
+                    parameter_dict[key] + current_speed[key]))
+            else:
+                new_value[key] = parameter_dict[key] + current_speed[key]
+        new_values.append(new_value)
 
 # def calculate_new_speed(
 #         personal_bests,
