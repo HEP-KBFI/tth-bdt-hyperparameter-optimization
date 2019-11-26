@@ -292,5 +292,5 @@ def test_weight_normalization():
 
 
 def test_read_weights():
-    result = pm.read_weights(value_dicts)
+    result = pm.read_weights()
     assert len(result) == 7

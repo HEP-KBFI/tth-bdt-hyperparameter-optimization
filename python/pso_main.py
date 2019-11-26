@@ -86,13 +86,14 @@ def check_numeric(variables):
     decision : bool
         Decision whether the list of variables contains non-numeric values
     '''
+    nr_nonnumeric = 0
+    decision = False
     for variable in variables:
         if not isinstance(variable, numbers.Number):
-            decision = True
-            return decision
-        else:
-            decision = False
-            return decision
+            nr_nonnumeric += 1
+    if nr_nonnumeric > 0:
+        decision = True
+    return decision
 
 
 def calculate_personal_bests(
@@ -139,10 +140,10 @@ def calculate_new_position(
         value_dicts
 ):
     new_values = []
-    for parameter in value_dicts:
-        key = parameter['p_name']
-        new_value = {}
-        for current_speed, parameter_dict in zip(current_speeds, parameter_dicts):
+    for current_speed, parameter_dict in zip(current_speeds, parameter_dicts):
+        for parameter in value_dicts:
+           key = parameter['p_name']
+            new_value = {}
             if bool(parameter['true_int']):
                 new_value[key] = int(np.ceil(
                     parameter_dict[key] + current_speed[key]))
