@@ -155,6 +155,7 @@ def calculate_new_position(
 ):
     new_values = []
     for current_speed, parameter_dict in zip(current_speeds, parameter_dicts):
+        new_value = {}
         for parameter in value_dicts:
             key = parameter['p_name']
             if bool(parameter['true_int']):
