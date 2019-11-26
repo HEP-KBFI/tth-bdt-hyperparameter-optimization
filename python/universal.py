@@ -371,6 +371,7 @@ def values_to_list_dict(keys, parameter_dicts):
     '''
     list_dict = {}
     for key in keys:
+        key = str(key)
         list_dict[key] = []
         for parameter_dict in parameter_dicts:
             list_dict[key].append(parameter_dict[key])

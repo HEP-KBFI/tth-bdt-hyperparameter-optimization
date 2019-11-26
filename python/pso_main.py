@@ -39,10 +39,8 @@ def prepare_new_day(
         parameter_dicts,
         best_parameters,
         current_speeds,
-        w,
         value_dicts,
-        c1,
-        c2
+        weight_dict
 ):
     '''Finds the new new parameters to find the fitness of
 
@@ -56,11 +54,20 @@ def prepare_new_day(
         Speed in every parameter direction for each particle
     w : float
         Inertial weight
-    value_dicts : 
+    value_dicts : list of dicts
+        Info about every variable that is to be optimized
+
+    Returns:
+    -------
+    new_parameters : list of dicts
+        Parameter-sets that are used in the next iteration
+    current_speeds : list of dicts
+        New speed of each particle
     '''
+    weight_dict
     current_speeds = calculate_new_speed(
         personal_bests, parameter_dicts, best_parameters,
-        w, current_speeds, c1, c2
+        current_speeds, weight_dict
     )
     new_parameters = calculate_new_position(
         current_speeds, parameter_dicts, value_dicts)
@@ -149,25 +156,22 @@ def calculate_new_speed(
         personal_bests,
         parameter_dicts,
         best_parameters,
-        w,
         current_speeds,
-        c1,
-        c2
+        weight_dict
 ):
     new_speeds = []
-    i = 0
     for personal, current, inertia in zip(
-        personal_bests, parameter_dicts, current_speeds
+            personal_bests, parameter_dicts, current_speeds
     ):
         new_speed = {}
         rand1 = np.random.uniform()
         rand2 = np.random.uniform()
         for key in current:
-            cognitive_component = c1 * rand1 * (
+            cognitive_component = weight_dict['c1'] * rand1 * (
                 personal[key] - current[key])
-            social_component = c2 * rand2 * (
+            social_component = weight_dict['c2'] * rand2 * (
                 best_parameters[key] - current[key])
-            inertial_component = w * inertia[key]
+            inertial_component = weight_dict['w'] * inertia[key]
             new_speed[key] = (
                 cognitive_component
                 + social_component
@@ -187,7 +191,7 @@ def initialize_speeds(parameter_dicts):
     return speeds
 
 
-def read_weights(value_dicts):
+def read_weights():
     pso_settings = universal.read_settings('pso')
     normed_weights_dict = weight_normalization(pso_settings)
     weight_dict = {
@@ -277,11 +281,15 @@ def run_pso(
         best_fitnesses = find_best_fitness(fitnesses, best_fitnesses)
         personal_bests = calculate_personal_bests(
             fitnesses, best_fitnesses, parameter_dicts, personal_bests)
+        weight_dict = {
+            'c1': pso_settings['c1'],
+            'c2': pso_settings['c2'],
+            'w': w}
         new_parameters, current_speeds = prepare_new_day(
             personal_bests, parameter_dicts,
             result_dict['best_parameters'],
-            current_speeds, w, value_dicts,
-            pso_settings['c1'], pso_settings['c2']
+            current_speeds, value_dicts,
+            weight_dict
         )
         index = np.argmax(fitnesses)
         if result_dict['best_fitness'] < max(fitnesses):

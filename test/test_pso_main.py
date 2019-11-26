@@ -135,9 +135,11 @@ def test_calculate_personal_bests2():
 
 
 def test_calculate_new_speed():
-    w = 2
-    c1 = 2
-    c2 = 2
+    weight_dict = {
+        'w': 2,
+        'c1': 2,
+        'c2': 2
+    }
     current_speed = {'a': 1, 'b': 1, 'c': 1}
     current_speeds = [
         current_speed,
@@ -159,10 +161,8 @@ def test_calculate_new_speed():
         personal_bests,
         parameter_dicts,
         best_parameters,
-        w,
         current_speeds,
-        c1,
-        c2
+        weight_dict
     )
     assert result[0]['a'] >= 2 and result[0]['a'] <= 20
     assert result[1]['b'] >= 2 and result[1]['b'] <= 14
@@ -170,9 +170,11 @@ def test_calculate_new_speed():
 
 
 def test_calculate_new_speed2():
-    w = 2
-    c1 = 2
-    c2 = 2
+    weight_dict = {
+        'w': 2,
+        'c1': 2,
+        'c2': 2
+    }
     values = {
         'num_boost_round': 371,
         'learning_rate': 0.07,
@@ -202,13 +204,11 @@ def test_calculate_new_speed2():
     error = False
     try:
         result = pm.calculate_new_speed(
-            w,
-            current_values,
-            current_speeds,
-            best_params,
             pb_list,
-            c1,
-            c2
+            current_values,
+            best_params,
+            current_speeds,
+            weight_dict
         )
     except TypeError:
         error = True
@@ -232,7 +232,7 @@ def test_calculate_new_position():
     ]
     values = {
         'num_boost_round': 1,
-        'learning_rate': 0.3,
+        'learning_rate': 1,
         'max_depth': 1,
         'gamma': 1,
         'min_child_weight': 1,
