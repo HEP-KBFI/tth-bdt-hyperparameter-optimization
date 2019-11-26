@@ -164,9 +164,9 @@ def test_calculate_new_speed():
         c1,
         c2
     )
-    assert result[0][0] >= 2 and result[0][0] <= 20
-    assert result[1][0] >= 2 and result[1][0] <= 14
-    assert result[2][0] >= 0 and result[2][0] <= 10
+    assert result[0]['a'] >= 2 and result[0]['a'] <= 20
+    assert result[1]['b'] >= 2 and result[1]['b'] <= 14
+    assert result[2]['c'] >= 0 and result[2]['c'] <= 10
 
 
 def test_calculate_new_speed2():
@@ -181,7 +181,7 @@ def test_calculate_new_speed2():
         'min_child_weight': 18,
         'subsample': 0.9,
         'colsample_bytree': 0.8,
-        'verbosity': 1,
+        'silent': 1,
         'objective': 'multi:softprob',
         'num_class': 10,
         'nthread': 2,
