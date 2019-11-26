@@ -48,6 +48,15 @@ def prepare_new_day(
 
     Parameters:
     ----------
+    personal_bests : list of dicts
+        Best parameters for each individual particle
+    parameter_dicts : list of dicts
+        Current iteration parameters for each particle
+    current_speeds : list of dicts
+        Speed in every parameter direction for each particle
+    w : float
+        Inertial weight
+    value_dicts : 
     '''
     current_speeds = calculate_new_speed(
         personal_bests, parameter_dicts, best_parameters,
@@ -201,6 +210,7 @@ def calculate_new_speed(
     for personal, current, inertia in zip(
         personal_bests, parameter_dicts, current_speeds
     ):
+        new_speed = {}
         rand1 = np.random.uniform()
         rand2 = np.random.uniform()
         for key in current:
