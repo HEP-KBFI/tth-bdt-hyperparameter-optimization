@@ -110,27 +110,73 @@ def calculate_personal_bests(
             new_dicts.append(personal_best)
     return new_dicts
 
-# XGB specific
+# # XGB specific
+# def calculate_new_position(
+#         current_speeds,
+#         parameter_dicts,
+#         value_dicts
+# ):
+#     new_values = []
+#     for current_speed, parameter_dict in zip(current_speeds, parameter_dicts):
+#         new_value = {}
+#         for i, speed in enumerate(current_speed):
+#             key = value_dicts[i]['p_name']
+#             if bool(value_dicts[i]['true_int']):
+#                 new_value[key] = int(np.ceil(parameter_dict[key] + speed))
+#             else:
+#                 new_value[key] = parameter_dict[key] + speed
+#             if new_value[key] < value_dicts[i]['range_start']:
+#                 new_value[key] = value_dicts[i]['range_start']
+#             elif new_value[key] > value_dicts[i]['range_end']:
+#                 new_value[key] = value_dicts[i]['range_end']
+#         new_values.append(new_value)
+#     return new_values
+
+
 def calculate_new_position(
         current_speeds,
         parameter_dicts,
         value_dicts
 ):
     new_values = []
-    for current_speed, parameter_dict in zip(current_speeds, parameter_dicts):
-        new_value = {}
-        for i, speed in enumerate(current_speed):
-            key = value_dicts[i]['p_name']
-            if bool(value_dicts[i]['true_int']):
-                new_value[key] = int(np.ceil(parameter_dict[key] + speed))
-            else:
-                new_value[key] = parameter_dict[key] + speed
-            if new_value[key] < value_dicts[i]['range_start']:
-                new_value[key] = value_dicts[i]['range_start']
-            elif new_value[key] > value_dicts[i]['range_end']:
-                new_value[key] = value_dicts[i]['range_end']
-        new_values.append(new_value)
-    return new_values
+    for parameter in value_dicts:
+
+# def calculate_new_speed(
+#         personal_bests,
+#         parameter_dicts,
+#         best_parameters,
+#         w,
+#         current_speeds,
+#         c1,
+#         c2
+# ):
+#     new_speeds = []
+#     i = 0
+#     for pb, current in zip(personal_bests, parameter_dicts):
+#         rand1 = np.random.uniform()
+#         rand2 = np.random.uniform()
+#         inertia = np.array(current_speeds[i])
+#         cognitive_array = []
+#         social_array = []
+#         for key in current:
+#             cognitive_component = (
+#                 pb[key] - current[key]
+#             )
+#             social_component = (
+#                 best_parameters[key] - current[key]
+#             )
+#             cognitive_array.append(cognitive_component)
+#             social_array.append(social_component)
+#         cognitive_array = np.array(cognitive_array)
+#         social_array = np.array(social_array)
+#         new_speed = (
+#             w * inertia
+#             + c1 * (rand1 * cognitive_array)
+#             + c2 * (rand2 * social_array)
+#         )
+#         new_speeds.append(new_speed)
+#         i = i + 1
+#     return new_speeds
 
 
 def calculate_new_speed(
@@ -144,31 +190,32 @@ def calculate_new_speed(
 ):
     new_speeds = []
     i = 0
-    for pb, current in zip(personal_bests, parameter_dicts):
+    for personal, current, inertia in zip(
+        personal_bests, parameter_dicts, current_speeds
+    ):
         rand1 = np.random.uniform()
         rand2 = np.random.uniform()
-        inertia = np.array(current_speeds[i])
-        cognitive_array = []
-        social_array = []
         for key in current:
-            cognitive_component = (
-                pb[key] - current[key]
+            cognitive_component = c1 * (personal[key] - current[key])
+            social_component = c2 * (best_parameters[key] - current[key])
+            inertial_component = w * inertia[key]
+            new_speed[key] = (
+                cognitive_component
+                + social_component
+                + inertial_component
             )
-            social_component = (
-                best_parameters[key] - current[key]
-            )
-            cognitive_array.append(cognitive_component)
-            social_array.append(social_component)
-        cognitive_array = np.array(cognitive_array)
-        social_array = np.array(social_array)
-        new_speed = (
-            w * inertia
-            + c1 * (rand1 * cognitive_array)
-            + c2 * (rand2 * social_array)
-        )
         new_speeds.append(new_speed)
-        i = i + 1
-    return new_speeds
+    return 
+
+
+def initialize_speeds(parameter_dicts):
+    speeds = []
+    for parameter_dict in parameter_dicts:
+        speed = {}
+        for key in parameter_dict:
+            speed[key] = 0
+        speeds.append(speed)
+    return speeds
 
 
 def read_weights(value_dicts):
@@ -242,7 +289,7 @@ def run_pso(
     w, w_step = get_weight_step(pso_settings)
     iterations = pso_settings['iterations']
     compactness_threshold = pso_settings['compactness_threshold']
-    number_parameters = get_number_parameters()
+    # number_parameters = get_number_parameters()
     i = 1
     new_parameters = parameter_dicts
     personal_bests = {}
@@ -260,7 +307,8 @@ def run_pso(
     }
     personal_bests = parameter_dicts
     best_fitnesses = fitnesses
-    current_speeds = np.zeros((pso_settings['sample_size'], number_parameters))
+    current_speeds = initialize_speeds(parameter_dicts)
+    # current_speeds = np.zeros((pso_settings['sample_size'], number_parameters))
     while i <= iterations and compactness_threshold < compactness:
         print('::::::: Iteration: '+ str(i) + ' ::::::::')
         parameter_dicts = new_parameters
