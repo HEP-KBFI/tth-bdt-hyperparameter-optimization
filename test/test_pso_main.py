@@ -13,7 +13,7 @@ value_dicts = [
         'p_name': 'num_boost_round',
         'range_start': 1,
         'range_end': 500,
-        'true_int': 'True',
+        'true_int': 1,
         'group_nr': 1,
         'true_corr': 'False'
     },
@@ -21,7 +21,7 @@ value_dicts = [
         'p_name': 'learning_rate',
         'range_start': 0,
         'range_end': 0.3,
-        'true_int': 'False',
+        'true_int': 0,
         'group_nr': 1,
         'true_corr': 'False'
     },
@@ -29,7 +29,7 @@ value_dicts = [
         'p_name': 'max_depth',
         'range_start': 1,
         'range_end': 10,
-        'true_int': 'True',
+        'true_int': 1,
         'group_nr': 2,
         'true_corr': 'False'
     },
@@ -37,7 +37,7 @@ value_dicts = [
         'p_name': 'gamma',
         'range_start': 0,
         'range_end': 5,
-        'true_int': 'False',
+        'true_int': 0,
         'group_nr': 2,
         'true_corr': 'False'
     },
@@ -45,7 +45,7 @@ value_dicts = [
         'p_name': 'min_child_weight',
         'range_start': 0,
         'range_end': 500,
-        'true_int': 'False',
+        'true_int': 0,
         'group_nr': 3,
         'true_corr': 'True'
     },
@@ -53,7 +53,7 @@ value_dicts = [
         'p_name': 'subsample',
         'range_start': 0.8,
         'range_end': 1,
-        'true_int': 'False',
+        'true_int': 0,
         'group_nr': 4,
         'true_corr': 'True'
     },
@@ -61,11 +61,19 @@ value_dicts = [
         'p_name': 'colsample_bytree',
         'range_start': 0.3,
         'range_end': 1,
-        'true_int': 'False',
+        'true_int': 0,
         'group_nr': 5,
         'true_corr': 'True'
     }
 ]
+
+
+def test_find_best_fitness():
+    fitnesses = [0.5, 0.7, 0.1, 0.2]
+    best_fitnesses = [0.4, 0.8, 0.7, 0.3]
+    expected = [0.5, 0.8, 0.7, 0.3]
+    result = pm.find_best_fitness(fitnsesses, best_fitnesses)
+    assert result == expected
 
 
 def test_calculate_personal_bests():

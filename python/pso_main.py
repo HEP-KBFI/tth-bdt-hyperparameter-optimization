@@ -220,8 +220,10 @@ def calculate_new_speed(
         rand1 = np.random.uniform()
         rand2 = np.random.uniform()
         for key in current:
-            cognitive_component = c1 * (personal[key] - current[key])
-            social_component = c2 * (best_parameters[key] - current[key])
+            cognitive_component = c1 * rand1 * (
+                personal[key] - current[key])
+            social_component = c2 * rand2 * (
+                best_parameters[key] - current[key])
             inertial_component = w * inertia[key]
             new_speed[key] = (
                 cognitive_component
