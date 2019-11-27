@@ -13,59 +13,67 @@ value_dicts = [
         'p_name': 'num_boost_round',
         'range_start': 1,
         'range_end': 500,
-        'true_int': 'True',
+        'true_int': 1,
         'group_nr': 1,
-        'true_corr': 'False'
+        'true_corr': 0
     },
     {
         'p_name': 'learning_rate',
         'range_start': 0,
         'range_end': 0.3,
-        'true_int': 'False',
+        'true_int': 0,
         'group_nr': 1,
-        'true_corr': 'False'
+        'true_corr': 0
     },
     {
         'p_name': 'max_depth',
         'range_start': 1,
         'range_end': 10,
-        'true_int': 'True',
+        'true_int': 1,
         'group_nr': 2,
-        'true_corr': 'False'
+        'true_corr': 0
     },
     {
         'p_name': 'gamma',
         'range_start': 0,
         'range_end': 5,
-        'true_int': 'False',
+        'true_int': 0,
         'group_nr': 2,
-        'true_corr': 'False'
+        'true_corr': 0
     },
     {
         'p_name': 'min_child_weight',
         'range_start': 0,
         'range_end': 500,
-        'true_int': 'False',
+        'true_int': 0,
         'group_nr': 3,
-        'true_corr': 'True'
+        'true_corr': 0
     },
     {
         'p_name': 'subsample',
         'range_start': 0.8,
         'range_end': 1,
-        'true_int': 'False',
+        'true_int': 0,
         'group_nr': 4,
-        'true_corr': 'True'
+        'true_corr': 0
     },
     {
         'p_name': 'colsample_bytree',
         'range_start': 0.3,
         'range_end': 1,
-        'true_int': 'False',
+        'true_int': 0,
         'group_nr': 5,
-        'true_corr': 'True'
+        'true_corr': 0
     }
 ]
+
+
+def test_find_best_fitness():
+    fitnesses = [0.5, 0.7, 0.1, 0.2]
+    best_fitnesses = [0.4, 0.8, 0.7, 0.3]
+    expected = [0.5, 0.8, 0.7, 0.3]
+    result = pm.find_best_fitness(fitnesses, best_fitnesses)
+    assert result == expected
 
 
 def test_calculate_personal_bests():
@@ -126,11 +134,18 @@ def test_calculate_personal_bests2():
     assert error == True
 
 
-def test_calculate_newSpeed():
-    w = 2
-    c1 = 2
-    c2 = 2
-    current_speeds = [1, 1, 1]
+def test_calculate_new_speed():
+    weight_dict = {
+        'w': 2,
+        'c1': 2,
+        'c2': 2
+    }
+    current_speed = {'a': 1, 'b': 1, 'c': 1}
+    current_speeds = [
+        current_speed,
+        current_speed,
+        current_speed
+    ]
     parameter_dicts = [
         {'a': 1, 'b': 1, 'c': 1},
         {'a': 2, 'b': 2, 'c': 2},
@@ -142,24 +157,24 @@ def test_calculate_newSpeed():
         {'a': 7, 'b': 7, 'c': 7}
     ]
     best_parameters = {'a': 2, 'b': 2, 'c': 2}
-    result = pm.calculate_newSpeed(
+    result = pm.calculate_new_speed(
         personal_bests,
         parameter_dicts,
         best_parameters,
-        w,
         current_speeds,
-        c1,
-        c2
+        weight_dict
     )
-    assert result[0][0] >= 2 and result[0][0] <= 20
-    assert result[1][0] >= 2 and result[1][0] <= 14
-    assert result[2][0] >= 0 and result[2][0] <= 10
+    assert result[0]['a'] >= 2 and result[0]['a'] <= 20
+    assert result[1]['b'] >= 2 and result[1]['b'] <= 14
+    assert result[2]['c'] >= 0 and result[2]['c'] <= 10
 
 
-def test_calculate_newSpeed2():
-    w = 2
-    c1 = 2
-    c2 = 2
+def test_calculate_new_speed2():
+    weight_dict = {
+        'w': 2,
+        'c1': 2,
+        'c2': 2
+    }
     values = {
         'num_boost_round': 371,
         'learning_rate': 0.07,
@@ -168,7 +183,7 @@ def test_calculate_newSpeed2():
         'min_child_weight': 18,
         'subsample': 0.9,
         'colsample_bytree': 0.8,
-        'verbosity': 1,
+        'silent': 1,
         'objective': 'multi:softprob',
         'num_class': 10,
         'nthread': 2,
@@ -188,21 +203,19 @@ def test_calculate_newSpeed2():
     best_params = values
     error = False
     try:
-        result = pm.calculate_newSpeed(
-            w,
-            current_values,
-            current_speeds,
-            best_params,
+        result = pm.calculate_new_speed(
             pb_list,
-            c1,
-            c2
+            current_values,
+            best_params,
+            current_speeds,
+            weight_dict
         )
     except TypeError:
         error = True
     assert error == True
 
 
-def test_calculate_newValue():
+def test_calculate_new_position():
     parameter_dict = {
         'num_boost_round': 0,
         'learning_rate': 0,
@@ -217,7 +230,6 @@ def test_calculate_newValue():
         parameter_dict,
         parameter_dict
     ]
-    nthread = 28
     values = {
         'num_boost_round': 1,
         'learning_rate': 1,
@@ -227,7 +239,15 @@ def test_calculate_newValue():
         'subsample': 1,
         'colsample_bytree': 1,
     }
-    current_speed = [1, 1, 1, 1, 1, 1, 1]
+    current_speed = {
+        'num_boost_round': 1,
+        'learning_rate': 1,
+        'max_depth': 1,
+        'gamma': 1,
+        'min_child_weight': 1,
+        'subsample': 1,
+        'colsample_bytree': 1,
+    }
     current_speeds = [
         current_speed,
         current_speed,
@@ -238,8 +258,8 @@ def test_calculate_newValue():
         values,
         values
     ]
-    result = pm.calculate_newValue(
-        current_speeds, parameter_dicts, nthread, value_dicts)
+    result = pm.calculate_new_position(
+        current_speeds, parameter_dicts, value_dicts)
     assert result == expected
 
 
@@ -272,7 +292,5 @@ def test_weight_normalization():
 
 
 def test_read_weights():
-    weightPaht = os.path.join(hyper_path, 'data')
-    result = pm.read_weights(value_dicts, weightPaht)
-    assert len(result) == 6
-    assert len(result['c1']) == len(value_dicts)
+    result = pm.read_weights()
+    assert len(result) == 7

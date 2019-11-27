@@ -320,6 +320,7 @@ def calculate_improvement_wAVG(avg_scores, improvements, threshold):
         List of improvements
     imporvement : float
         Improvement for comparing
+
     Comments:
     ---------
     Elif clause used in order to have last 2 iterations less than the threshold
@@ -334,7 +335,7 @@ def calculate_improvement_wAVG(avg_scores, improvements, threshold):
     return improvements, improvement
 
 
-def calculate_improvement_wSTDEV(parameter_dicts):
+def calculate_compactness(parameter_dicts):
     '''Calculates the improvement based on how similar are different sets of
     parameters
 
@@ -371,6 +372,7 @@ def values_to_list_dict(keys, parameter_dicts):
     '''
     list_dict = {}
     for key in keys:
+        key = str(key)
         list_dict[key] = []
         for parameter_dict in parameter_dicts:
             list_dict[key].append(parameter_dict[key])
@@ -585,8 +587,8 @@ def to_one_dict(list_of_dicts):
 
 
 def getParameters(parameters_path):
-    paramerList = read_parameters(parameters_path)
-    parameter_dict = to_one_dict(paramerList)
+    paramer_list = read_parameters(parameters_path)
+    parameter_dict = to_one_dict(paramer_list)
     return parameter_dict
 
 
