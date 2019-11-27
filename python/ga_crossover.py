@@ -1,4 +1,4 @@
-'''Functions used by the genetic algorithm for crossover 
+'''Functions used by the genetic algorithm for crossover
 and mutation'''
 from __future__ import division
 import random
@@ -84,7 +84,7 @@ def uniform_crossover(parents, parameters, mutation_chance=0):
     '''
 
     # Initialization
-    offspring = []
+    offspring = {}
     parent1 = encode_parent(parents[0], parameters)
     parent2 = encode_parent(parents[1], parameters)
 

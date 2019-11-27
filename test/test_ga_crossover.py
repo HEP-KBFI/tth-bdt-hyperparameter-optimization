@@ -1,16 +1,85 @@
 '''Testing the crossover functions for the genetic algorithm
-Missing tests for the following functions:
-    kpoint_crossover
-    uniform_crossover
-    group_crossover
-    group_mutate
-    mutation_fix
-    encode_parent
-    decode_offspring
-    grouping
-    degroup
 '''
 from tthAnalysis.bdtHyperparameterOptimization import ga_crossover as gc
+
+
+PARAMETERS = [
+    {
+        'p_name': 'a',
+        'range_start': 0,
+        'range_end': 10,
+        'true_int': 'True',
+        'group_nr': 1,
+        'true_corr': 'True'
+    },
+    {
+        'p_name': 'b',
+        'range_start': 1,
+        'range_end': 10,
+        'true_int': 'False',
+        'group_nr': 1,
+        'true_corr': 'True'
+    },
+    {
+        'p_name': 'c',
+        'range_start': 0,
+        'range_end': 1,
+        'true_int': 'False',
+        'group_nr': 2,
+        'true_corr': 'False'
+    },
+    {
+        'p_name': 'd',
+        'range_start': 5,
+        'range_end': 25,
+        'true_int': 'True',
+        'group_nr': 2,
+        'true_corr': 'False'
+    }
+]
+
+
+PARENTS = [
+    {
+        'a': 8,
+        'b': 1.62284,
+        'c': 0.31443,
+        'd': 15
+    },
+    {
+        'a': 4,
+        'b': 9.43930,
+        'c': 0.92191,
+        'd': 24
+    }
+]
+
+
+def test_kpoint_crossover():
+    '''Testing k-point crossover function'''
+    result = gc.kpoint_crossover(PARENTS, PARAMETERS)
+    for parent in PARENTS:
+        for key in parent:
+            assert key in result, 'test_kpoint_crossover failed'
+        assert len(result) == len(parent), 'test_kpoint_crossover failed'
+
+
+def test_uniform_crossover():
+    '''Testing uniform crossover function'''
+    result = gc.uniform_crossover(PARENTS, PARAMETERS)
+    for parent in PARENTS:
+        for key in parent:
+            assert key in result, 'test_uniform_crossover failed'
+        assert len(result) == len(parent), 'test_uniform_crossover failed'
+
+
+def test_group_crossover():
+    '''Testing group crossover function'''
+    result = gc.group_crossover(PARENTS, PARAMETERS)
+    for parent in PARENTS:
+        for key in parent:
+            assert key in result, 'test_group_crossover failed'
+        assert len(result) == len(parent), 'test_uniform_crossover failed'
 
 
 def test_chromosome_mutate():
@@ -20,11 +89,41 @@ def test_chromosome_mutate():
     # Mutation chance = 0
     result1 = gc.chromosome_mutate(initial, 0)
     assert initial == result1, 'test_chromosome_mutate failed'
+    for key in initial:
+        assert key in result1, 'test_chromosome_mutate failed'
+    assert len(initial) == len(result1), 'test_chromosome_mutate failed'
 
-    # Mutation chance = 1
-    result2 = gc.chromosome_mutate(
-        gc.chromosome_mutate(initial, 1), 1)
-    assert initial == result2, 'test_chromosome_mutate failed'
+    # Mutation chance = 0.5
+    result2 = gc.chromosome_mutate(initial, 0.5)
+    for key in initial:
+        assert key in result2, 'test_chromosome_mutate failed'
+    assert len(initial) == len(result2), 'test_chromosome_mutate failed'
+
+
+def test_group_mutate():
+    '''Testing group mutate function'''
+    initial = {'a': 8, 'b': 1.62284}
+
+    # Mutation chance = 0
+    result1 = gc.group_mutate(initial, 0, 0, 'True')
+    assert initial == result1, 'test_group_mutate failed'
+    for key in initial:
+        assert key in result1, 'test_group_mutate failed'
+    assert len(result1) == len(initial), 'test_group_mutate failed'
+
+    # Mutation chance = 0.5
+    result2 = gc.group_mutate(initial, 0.5, 0.25, 'False')
+    for key in initial:
+        assert key in result2, 'test_group_mutate failed'
+    assert len(result2) == len(initial), 'test_group_mutate failed'
+
+
+def test_mutation_fix():
+    '''Testing mutation fix function'''
+    initial = {'a': 10.01, 'b': 0.99999, 'c': 1.00001, 'd': 9.43930}
+    expected = {'a': 10, 'b': 1, 'c': 1, 'd': 9}
+    result = gc.mutation_fix(initial, PARAMETERS)
+    assert result == expected, 'test_mutation_fix failed'
 
 
 def test_int_encoding():
@@ -93,3 +192,47 @@ def test_float_decoding():
         results.append(gc.float_decoding(code))
     for i, result in enumerate(results):
         assert result == expected[i], 'float_int_decoding failed'
+
+
+def test_encode_parent():
+    '''Testing encoding parent function'''
+    initial = PARENTS[0]
+    expected = {
+        'a': '00000000000000000000000000001000',
+        'b': '00000000000000100111100111101100',
+        'c': '00000000000000000111101011010011',
+        'd': '00000000000000000000000000001111'
+    }
+    result = gc.encode_parent(initial, PARAMETERS)
+    assert result == expected, 'test_encode_parent failed'
+
+
+def test_decode_offspring():
+    '''Testing decoding offspring function'''
+    initial = {
+        'a': '00000000000000000000000000001000',
+        'b': '00000000000000100111100111101100',
+        'c': '00000000000000000111101011010011',
+        'd': '00000000000000000000000000001111'
+    }
+    expected = PARENTS[0]
+    result = gc.decode_offspring(initial, PARAMETERS)
+    assert result == expected, 'test_decode_offspring failed'
+
+
+def test_grouping():
+    '''Testing grouping function'''
+    initial = PARENTS[0]
+    expected1 = [{'a': 8, 'b': 1.62284}, {'c': 0.31443, 'd': 15}]
+    expected2 = ['True', 'False']
+    result1, result2 = gc.grouping(initial, PARAMETERS)
+    assert result1 == expected1, 'test_grouping failed'
+    assert result2 == expected2, 'test_grouping failed'
+
+
+def test_degroup():
+    '''Testing degrouping function'''
+    initial = [{'a': 8, 'b': 1.62284}, {'c': 0.31443, 'd': 15}]
+    expected = PARENTS[0]
+    result = gc.degroup(initial)
+    assert result == expected, 'test_degroup failed'
