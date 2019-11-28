@@ -482,7 +482,7 @@ def roc(labels, pred_vectors):
 
 def plotting(
         output_dir,
-        auc_info
+        auc_info,
         avg_scores
 ):
     '''Main function for plotting costfunction and the ROC.
