@@ -191,7 +191,7 @@ def read_fitness(output_dir):
         score_dict = universal.read_parameters(path)[0]
         score_dicts.append([sample_nr, score_dict])
     score_dicts = sorted(score_dicts, key=lambda x: x[0])
-    score_dicts = np.array([i[1] for i in score_dicts], dtype=float)
+    score_dicts = np.array([i[1] for i in score_dicts])
     return score_dicts
 
 
