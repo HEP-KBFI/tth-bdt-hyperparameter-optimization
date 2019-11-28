@@ -115,8 +115,8 @@ def run_iteration(
 
     Returns:
     -------
-    fitnesses : list
-        List of the fitnesses for each parameter-set
+    score_dicts : list of dicts
+        List of the score_dicts for each parameter-set
     pred_trains : list of lists
         List of probabilities for an event to belong to a certain label for
         test dataset
@@ -137,9 +137,9 @@ def run_iteration(
     wait_iteration(output_dir, pso_settings['sample_size'])
     pred_tests = create_result_lists(output_dir, 'pred_test')
     pred_trains = create_result_lists(output_dir, 'pred_train')
-    fitnesses = read_fitness(output_dir)
+    score_dicts = read_fitness(output_dir)
     delete_previous_files(output_dir)
-    return fitnesses, pred_trains, pred_tests
+    return score_dicts, pred_trains, pred_tests
 
 
 def create_result_lists(output_dir, pred_type):
@@ -170,7 +170,7 @@ def create_result_lists(output_dir, pred_type):
 
 
 def read_fitness(output_dir):
-    '''Creates the list of fitnesses of each sample. List is ordered
+    '''Creates the list of score dictionaries of each sample. List is ordered
     according to the number of the sample
 
     Parameters:
@@ -180,20 +180,19 @@ def read_fitness(output_dir):
 
     Returns:
     -------
-    fitnesses : list
-        List of fitnesses of each parameter-set
+    score_dicts : list of dicts
+        List of score_dicts of each parameter-set
     '''
     samples = os.path.join(output_dir, 'samples')
-    wild_card_path = os.path.join(samples, '*', 'score.txt')
-    fitnesses = []
+    wild_card_path = os.path.join(samples, '*', 'score.json')
+    score_dicts = []
     for path in glob.glob(wild_card_path):
         sample_nr = get_sample_nr(path)
-        with open(path, 'r') as file:
-            fitness = float(file.read())
-        fitnesses.append([sample_nr, fitness])
-    fitnesses = sorted(fitnesses, key=lambda x: x[0])
-    fitnesses = np.array([i[1] for i in fitnesses], dtype=float)
-    return fitnesses
+        score_dict = universal.read_parameters(path)[0]
+        score_dicts.append([sample_nr, score_dict])
+    score_dicts = sorted(score_dicts, key=lambda x: x[0])
+    score_dicts = np.array([i[1] for i in score_dicts], dtype=float)
+    return score_dicts
 
 
 def get_sample_nr(path):
@@ -296,13 +295,13 @@ def check_error(output_dir):
             raise SystemExit(0)
 
 
-def save_info(score, pred_train, pred_test, save_dir):
+def save_info(score_dict, pred_train, pred_test, save_dir):
     '''Saves the score, pred_train, pred_test into appropriate files in
     the wanted directory
 
     Parameters:
     ----------
-    score : float
+    score_dict : float
         Evaluation of the fitness of the parameters
     pred_train : list of lists
         Predicted probabilities for an event to have a certain label
@@ -310,10 +309,14 @@ def save_info(score, pred_train, pred_test, save_dir):
         Predicted probabilities for an event to have a certain label
     save_dir : str
         Path to the directory where restults will be saved
+
+    Returns:
+    -------
+    Nothing
     '''
     train_path = os.path.join(save_dir, "pred_train.lst")
     test_path = os.path.join(save_dir, "pred_test.lst")
-    score_path = os.path.join(save_dir, "score.txt")
+    score_path = os.path.join(save_dir, "score.json")
     with open(train_path, "w") as file:
         writer = csv.writer(file)
         writer.writerows(pred_train)
@@ -321,4 +324,4 @@ def save_info(score, pred_train, pred_test, save_dir):
         writer = csv.writer(file)
         writer.writerows(pred_test)
     with open(score_path, "w") as file:
-        file.write(str(score))
+        json.dump(score_dict, file)
