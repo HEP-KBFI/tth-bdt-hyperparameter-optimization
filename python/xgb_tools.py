@@ -106,7 +106,7 @@ def parameter_evaluation(parameter_dict, data_dict, nthread, num_class):
     g_score_test, f1_score_test = universal.calculate_f1_score(
         test_conf_matrix)
     train_auc, test_auc = universal.calculate_auc(
-        data_dict, pred_train, pred_test)[:1]
+        data_dict, pred_train, pred_test)[:2]
     score_dict = {
         'f1_score_test': f1_score_test,
         'g_score_test': g_score_test,
