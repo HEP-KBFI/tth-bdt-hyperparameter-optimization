@@ -188,7 +188,7 @@ def read_fitness(output_dir):
     number_samples = len(glob.glob(wild_card_path))
     score_dicts = []
     for number in range(number_samples):
-        path = os.path.join(samples, str(nr), 'score.json')
+        path = os.path.join(samples, str(number), 'score.json')
         score_dict = universal.read_parameters(path)[0]
         score_dicts.append(score_dict)
     return score_dicts
