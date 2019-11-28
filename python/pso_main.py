@@ -426,7 +426,7 @@ def run_pso(
             result_dict['best_train_auc'] = score_dicts[index]['train_auc']
         avg_scores = np.mean(fitnesses)
         result_dict['avg_scores'].append(avg_scores)
-        result_dict['compactnesses'].append(compactnesses)
+        result_dict['compactnesses'].append(compactness)
         result_dict['best_fitnesses'].append(result_dict['best_fitness'])
         result_dict['best_g_scores'].append(result_dict['best_g_score'])
         result_dict['best_train_aucs'].append(result_dict['best_train_auc'])
