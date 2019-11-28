@@ -101,10 +101,12 @@ def parameter_evaluation(parameter_dict, data_dict, nthread, num_class):
     pred_train = model.predict(data_dict['dtrain'])
     pred_test = model.predict(data_dict['dtest'])
     prob_train, prob_test = universal.get_most_probable(pred_train, pred_test)
-    test_conf_matrix = universal.calculate_conf_matrix(
-        prob_train, prob_test, data_dict)[1]
+    train_conf_matrix, test_conf_matrix = universal.calculate_conf_matrix(
+        prob_train, prob_test, data_dict)
     g_score_test, f1_score_test = universal.calculate_f1_score(
         test_conf_matrix)
+    g_score_train, f1_score_train = universal.calculate_f1_score(
+        train_conf_matrix)
     train_auc, test_auc = universal.calculate_auc(
         data_dict, pred_train, pred_test)[:2]
     score_dict = {
