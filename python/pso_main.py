@@ -383,13 +383,13 @@ def run_pso(
         'best_fitness': max(fitnesses),
         'avg_scores': [np.mean(fitnesses)],
         'best_g_score': score_dicts[index]['g_score_test'],
-        'best_test_auc': score_dicts[index]['best_test_auc'],
-        'best_train_auc': score_dicts[index]['best_train_auc'],
+        'best_test_auc': score_dicts[index]['test_auc'],
+        'best_train_auc': score_dicts[index]['train_auc'],
         'compactnesses': [compactness],
         'best_fitnesses': [max(fitnesses)],
         'best_g_scores': [score_dicts[index]['g_score_test']],
-        'best_test_aucs': [score_dicts[index]['best_test_auc']],
-        'best_train_aucs': [score_dicts[index]['best_train_auc']]
+        'best_test_aucs': [score_dicts[index]['test_auc']],
+        'best_train_aucs': [score_dicts[index]['train_auc']]
     }
     personal_bests = parameter_dicts
     best_fitnesses = fitnesses
@@ -422,8 +422,8 @@ def run_pso(
             result_dict['pred_test'] = pred_tests[index]
             result_dict['best_fitness'] = max(fitnesses)
             result_dict['best_g_score'] = score_dicts[index]['g_score_test']
-            result_dict['best_test_auc'] = score_dicts[index]['best_test_auc']
-            result_dict['best_train_auc'] = score_dicts[index]['best_train_auc']
+            result_dict['best_test_auc'] = score_dicts[index]['test_auc']
+            result_dict['best_train_auc'] = score_dicts[index]['train_auc']
         avg_scores = np.mean(fitnesses)
         result_dict['avg_scores'].append(avg_scores)
         result_dict['compactnesses'].append(compactnesses)
