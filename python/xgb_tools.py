@@ -136,21 +136,21 @@ def ensemble_fitnesses(parameter_dicts, data_dict, global_settings):
 
     Returns:
     -------
-    data_dictes : list
-        List of data_dictes of each parameter-set
+    score_dicts : list
+        List of score_dicts of each parameter-set
     pred_trains : list of lols
         List of pred_trains
     pred_tests : list of lols
         List of pred_tests
     '''
-    data_dicts = []
+    score_dicts = []
     pred_trains = []
     pred_tests = []
     for parameter_dict in parameter_dicts:
-        data_dict, pred_train, pred_test = parameter_evaluation(
+        score_dict, pred_train, pred_test = parameter_evaluation(
             parameter_dict, data_dict,
             global_settings['nthread'], global_settings['num_classes'])
-        data_dicts.append(data_dict)
+        score_dicts.append(score_dict)
         pred_trains.append(pred_train)
         pred_tests.append(pred_test)
-    return data_dicts, pred_trains, pred_tests
+    return score_dicts, pred_trains, pred_tests
