@@ -16,57 +16,57 @@ PARAMETERS = [
         'p_name': 'num_boost_round',
         'range_start': 1,
         'range_end': 500,
-        'true_int': 'True',
+        'true_int': 1,
         'group_nr': 1,
-        'true_corr': 'False'
+        'true_corr': 0
     },
     {
         'p_name': 'learning_rate',
         'range_start': 0,
         'range_end': 0.3,
-        'true_int': 'False',
+        'true_int': 0,
         'group_nr': 1,
-        'true_corr': 'False'
+        'true_corr': 0
     },
     {
         'p_name': 'max_depth',
         'range_start': 1,
         'range_end': 10,
-        'true_int': 'True',
+        'true_int': 1,
         'group_nr': 2,
-        'true_corr': 'False'
+        'true_corr': 0
     },
     {
         'p_name': 'gamma',
         'range_start': 0,
         'range_end': 5,
-        'true_int': 'False',
+        'true_int': 0,
         'group_nr': 2,
-        'true_corr': 'False'
+        'true_corr': 0
     },
     {
         'p_name': 'min_child_weight',
         'range_start': 0,
         'range_end': 500,
-        'true_int': 'False',
+        'true_int': 0,
         'group_nr': 3,
-        'true_corr': 'True'
+        'true_corr': 1
     },
     {
         'p_name': 'subsample',
         'range_start': 0.8,
         'range_end': 1,
-        'true_int': 'False',
+        'true_int': 0,
         'group_nr': 4,
-        'true_corr': 'True'
+        'true_corr': 1
     },
     {
         'p_name': 'colsample_bytree',
         'range_start': 0.3,
         'range_end': 1,
-        'true_int': 'False',
+        'true_int': 0,
         'group_nr': 5,
-        'true_corr': 'True'
+        'true_corr': 1
     }
 ]
 

@@ -120,8 +120,7 @@ def culling(population, fitnesses, settings, data, parameters):
         num -= 1
 
     # Replace destroyed members
-    new_members = xt.prepare_run_params(
-        settings['nthread'], parameters, size)
+    new_members = xt.prepare_run_params(parameters, size)
     population += new_members
     fitnesses += xt.ensemble_fitnesses(
         new_members, data, settings)[0]
@@ -225,8 +224,7 @@ def create_subpopulations(settings, parameters):
             sub_size = size//num
 
         # Generate subpopulation
-        sub_population = xt.prepare_run_params(
-            settings['nthread'], parameters, sub_size)
+        sub_population = xt.prepare_run_params(parameters, sub_size)
         subpopulations.append(sub_population)
 
     return subpopulations
@@ -416,8 +414,7 @@ def evolution(settings, data, parameters):
 
         # Create one population
         print('::::::: Creating population ::::::::\n')
-        population = xt.prepare_run_params(
-            settings['nthread'], parameters, settings['pop_size'])
+        population = xt.prepare_run_params(parameters, settings['pop_size'])
         print("Initial population: " + str(population))
 
         # Evolve population

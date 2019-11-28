@@ -224,7 +224,7 @@ def group_mutate(group, mutation_chance, cointoss, pos_corr):
     # Initialization
     mutation = {}
 
-    if pos_corr == 'True':
+    if pos_corr == 1:
 
         # Positively correlated mutation
         for i, key in enumerate(group):
@@ -273,7 +273,7 @@ def mutation_fix(offspring, parameters):
         key = parameter['p_name']
 
         # Forces int parameters to have integer values
-        if parameter['true_int'] == 'True':
+        if parameter['true_int'] == 1:
             offspring[key] = int(round(offspring[key]))
 
         # Forces parameter values not to be lower
@@ -386,7 +386,7 @@ def encode_parent(parent, parameters):
     for parameter in parameters:
         key = parameter['p_name']
         true_int = parameter['true_int']
-        if true_int == 'True':
+        if true_int == 1:
             encoded_parent[key] = int_encoding(parent[key])
         else:
             encoded_parent[key] = float_encoding(parent[key])
@@ -417,7 +417,7 @@ def decode_offspring(offspring, parameters):
     for parameter in parameters:
         key = parameter['p_name']
         true_int = parameter['true_int']
-        if true_int == 'True':
+        if true_int == 1:
             decoded_offspring[key] = int_decoding(offspring[key])
         else:
             decoded_offspring[key] = float_decoding(offspring[key])
