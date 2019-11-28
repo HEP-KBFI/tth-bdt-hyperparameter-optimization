@@ -336,7 +336,7 @@ def run_pso(
         data_dict,
         value_dicts,
         calculate_fitnesses,
-        parameter_dicts,
+        parameter_dicts
 ):
     '''Performs the whole particle swarm optimization
 
@@ -382,13 +382,13 @@ def run_pso(
         'pred_test': pred_tests[index],
         'best_fitness': max(fitnesses),
         'avg_scores': [np.mean(fitnesses)],
-        'best_g_score': score_dicts[index]['g_score_test']
-        'best_test_auc': score_dicts[index]['best_test_auc']
-        'best_train_auc': score_dicts[index]['best_train_auc']
+        'best_g_score': score_dicts[index]['g_score_test'],
+        'best_test_auc': score_dicts[index]['best_test_auc'],
+        'best_train_auc': score_dicts[index]['best_train_auc'],
         'compactnesses': [compactness],
         'best_fitnesses': [max(fitnesses)],
-        'best_g_scores': [score_dicts[index]['g_score_test']]
-        'best_test_aucs': [score_dicts[index]['best_test_auc']]
+        'best_g_scores': [score_dicts[index]['g_score_test']],
+        'best_test_aucs': [score_dicts[index]['best_test_auc']],
         'best_train_aucs': [score_dicts[index]['best_train_auc']]
     }
     personal_bests = parameter_dicts
