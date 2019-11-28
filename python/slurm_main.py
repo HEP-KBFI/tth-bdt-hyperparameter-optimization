@@ -185,13 +185,12 @@ def read_fitness(output_dir):
     '''
     samples = os.path.join(output_dir, 'samples')
     wild_card_path = os.path.join(samples, '*', 'score.json')
+    number_samples = len(glob.glob(wild_card_path))
     score_dicts = []
-    for path in glob.glob(wild_card_path):
-        sample_nr = get_sample_nr(path)
+    for number in range(number_samples):
+        path = os.path.join(samples, str(nr), 'score.json')
         score_dict = universal.read_parameters(path)[0]
-        score_dicts.append([sample_nr, score_dict])
-    score_dicts = sorted(score_dicts, key=lambda x: x[0])
-    score_dicts = np.array([i[1] for i in score_dicts])
+        score_dicts.append(score_dict)
     return score_dicts
 
 
