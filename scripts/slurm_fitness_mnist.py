@@ -36,7 +36,7 @@ def main(parameter_file):
     saveDir = str(path.parent)
     score, pred_train, pred_test = xt.parameter_evaluation(
         parameter_dict, data_dict, nthread, num_classes)
-    sm.save_info(score['f1_score_test'], pred_train, pred_test, saveDir)
+    sm.save_info(score, pred_train, pred_test, saveDir)
 
 
 if __name__ == '__main__':
