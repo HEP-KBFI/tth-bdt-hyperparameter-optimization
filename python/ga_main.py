@@ -122,8 +122,8 @@ def culling(population, fitnesses, settings, data, parameters):
     # Replace destroyed members
     new_members = xt.prepare_run_params(parameters, size)
     population += new_members
-    fitnesses += xt.ensemble_fitnesses(
-        new_members, data, settings)[0]
+    fitnesses += universal.fitness_to_list(
+        xt.ensemble_fitnesses(new_members, data, settings)[0])
 
     return population, fitnesses
 
@@ -337,10 +337,9 @@ def evolve(population, settings, data, parameters, final=False):
             print("Population: " + str(population))
 
         # Calculate fitness of the population
-        fitnesses, pred_trains, pred_tests = (
-            xt.ensemble_fitnesses(
+        score_dicts, pred_trains, pred_tests = xt.ensemble_fitnesses(
                 population, data, settings)
-        )
+        fitnesses = universal.fitness_to_list(score_dicts)
 
         # Save results
         best_scores.append(max(fitnesses))

@@ -746,6 +746,28 @@ def read_settings(group):
     return settings_dict
 
 
+def fitness_to_list(score_dicts, fitness_key='f1_score_test'):
+    '''Puts the fitness values according to the chosen fitness_key from
+    the dictionary to a list
+
+    Parameters:
+    ----------
+    score_dicts : list of dicts
+        List containing dictionaries filled with different scores
+    [fitness_key='f1_score_test'] : str
+        Name of the key what is used as the fitness score
+
+    Returns:
+    -------
+    fitnesses : list
+        List of fitness scores for each particle
+    '''
+    fitnesses = []
+    for score_dict in score_dicts:
+        fitnesses.append(score_dict[fitness_key])
+    return fitnesses
+    
+
 # One-vs-All ROC
 
 
