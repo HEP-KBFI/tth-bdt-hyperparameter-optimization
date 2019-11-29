@@ -549,7 +549,10 @@ def save_results(result_dict, output_dir):
     file_out1 = os.path.join(output_dir, 'scoring_metrics.json')
     file_out2 = os.path.join(output_dir, 'stopping_criteria.json')
     keys1 = [
-        'best_test_aucs', 'best_train_aucs', 'best_g_scores', 'best_fitnesses']
+        'best_test_aucs', 'best_train_aucs',
+        'best_g_scores', 'best_fitnesses',
+        'best_f1_scores'
+    ]
     keys2 = ['compactnesses', 'avg_scores']
 
 
