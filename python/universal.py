@@ -10,6 +10,7 @@ from sklearn.metrics import confusion_matrix
 import matplotlib
 matplotlib.use('agg')
 import matplotlib.pyplot as plt
+import matplotlib.ticker as ticker
 warnings.filterwarnings('ignore', category=RuntimeWarning)
 
 
@@ -255,7 +256,7 @@ def main_f1_calculate(pred_train, pred_test, data_dict):
     return assessment
 
 
-def save_results(result_dict, output_dir, plot_roc=True):
+def save_results(result_dict, output_dir, plot_roc=True, plot_extras=False):
     '''Saves the results from the result_dict to files. Optionally produces
     also plots for ROC and average
 
@@ -282,23 +283,54 @@ def save_results(result_dict, output_dir, plot_roc=True):
         result_dict['pred_train'],
         result_dict['pred_test'],
         result_dict['data_dict'])
-    x_train, y_train = roc(
-        data_dict['training_labels'], result_dict['pred_train'])
-    x_test, y_test = roc(
-        data_dict['testing_labels'], result_dict['pred_test'])
-    test_auc = np.trapz(y_test, x_test)
-    train_auc = np.trapz(y_train, x_train)
-    assessment['train_AUC'] = (-1) * train_auc
-    assessment['test_AUC'] = (-1) * test_auc
+    train_auc, test_auc, auc_info = calculate_auc(
+        data_dict, result_dict['pred_train'], result_dict['pred_test'])
+    assessment['train_AUC'] = train_auc
+    assessment['test_AUC'] = test_auc
     if plot_roc:
-        plotting(
-            output_dir,
-            x_train, y_train,
-            x_test, y_test,
-            result_dict['avg_scores']
-        )
+        plotting(output_dir, auc_info, result_dict['avg_scores'])
+    if plot_extras:
+        create_extra_plots(result_dict, output_dir)
+        save_results(result_dict, output_dir)
     best_to_file(
         result_dict['best_parameters'], output_dir, assessment)
+
+
+def calculate_auc(data_dict, pred_train, pred_test):
+    '''Calculates the area under curve for training and testing dataset using
+    the predicted labels
+
+    Parameters:
+    ----------
+    data_dict : dict
+        Dictionary that contains the labels for testing and training. Keys are
+        called 'testing_labels' and 'training_labels'
+    pred_train : list of lists
+        Predicted labels of the training dataset
+    pred_test : list of lists
+        Predicted labels of the testing dataset
+
+    Returns:
+    -------
+    train_auc : float
+        Area under curve for training dataset
+    test_aud : float
+        Area under curve for testing dataset
+    '''
+    x_train, y_train = roc(
+        data_dict['training_labels'], pred_train)
+    x_test, y_test = roc(
+        data_dict['testing_labels'], pred_test)
+    test_auc = (-1) * np.trapz(y_test, x_test)
+    train_auc = (-1) * np.trapz(y_train, x_train)
+    info = {
+        'x_train': x_train,
+        'y_train': y_train,
+        'x_test': x_test,
+        'y_test': y_test
+    }
+    return train_auc, test_auc, info
+
 
 
 def calculate_improvement_wAVG(avg_scores, improvements, threshold):
@@ -451,10 +483,7 @@ def roc(labels, pred_vectors):
 
 def plotting(
         output_dir,
-        x_train,
-        y_train,
-        x_test,
-        y_test,
+        auc_info,
         avg_scores
 ):
     '''Main function for plotting costfunction and the ROC.
@@ -463,14 +492,9 @@ def plotting(
     ----------
     output_dir : str
         Path to the directory where figures will be saved
-    x_train : list
-        List of false positives for given thresholds of the train sample
-    y_train : list
-        List of true positives for given thresholds of the train sample
-    x_test : list
-        List of false positives for given thresholds of the test sample
-    y_test : list
-        List of true positives for given thresholds of the test sample
+    auc_info : dict
+        Dictionary containing x and y values for test and train sample from
+        ROC calculation
     avg_scores : list
         List of average scores of all iterations
 
@@ -478,18 +502,125 @@ def plotting(
     -------
     Nothing
     '''
+
     if not os.path.exists(output_dir):
         os.makedirs(output_dir)
-    plot_roc_curve(output_dir, x_train, y_train, x_test, y_test)
+    plot_roc_curve(output_dir, auc_info)
     plot_costfunction(avg_scores, output_dir)
+
+
+def create_extra_plots(result_dict, output_dir):
+    '''Creates some additional figures
+
+    Parameters:
+    ----------
+    result_dicts : dict
+        Dictionary containing the results and info that is to be plotted
+    output_dir : str
+        Path to the directory where the plots are to be saved
+
+    Returns:
+    -------
+    Nothing
+    '''
+    plot_out1 = os.path.join(output_dir, 'scoring_metrics.png')
+    plot_out2 = os.path.join(output_dir, 'stopping_criteria.png')
+    keys1 = [
+        'best_test_aucs', 'best_train_aucs', 'best_g_scores', 'best_fitnesses']
+    keys2 = ['compactnesses', 'avg_scores']
+    plot_single_evolution(keys1, result_dict, 'Scoring metrics', plot_out1)
+    plot_single_evolution(keys2, result_dict, 'Stopping criteria', plot_out2)
+
+
+def save_results(result_dict, output_dir):
+    '''Saves the scoring and stopping criteria values to file.
+
+    Parameters:
+    ----------
+    result_dicts : dict
+        Dictionary containing the results and info that is to be plotted
+    output_dir : str
+        Path to the directory where the plots are to be saved
+
+    Returns:
+    -------
+    Nothing
+    '''
+    file_out1 = os.path.join(output_dir, 'scoring_metrics.json')
+    file_out2 = os.path.join(output_dir, 'stopping_criteria.json')
+    keys1 = [
+        'best_test_aucs', 'best_train_aucs', 'best_g_scores', 'best_fitnesses']
+    keys2 = ['compactnesses', 'avg_scores']
+
+
+def save_single_file(keys, result_dict, file_out):
+    '''Saves a single file with the results
+
+    Parameters:
+    ----------
+    keys : list
+        List of keys of values to be plotted
+    result_dict : dict
+        Dictionary containing the results and info that is to be plotted
+    file_out : str
+        Location where the file is to be saved
+
+    Returns:
+    -------
+    Nothing
+    '''
+    dict_list = []
+    for key in keys:
+        key_dict = {}
+        key_dict[key] = result_dict[key]
+        dict_list.append(key_dict)
+    with open(file_out, 'wt') as file:
+        for single_dict in dict_list:
+            json.dump(single_dict, file)
+            file.write('\n')
+
+
+def plot_single_evolution(keys, result_dict, title, plot_out):
+    '''Plots the chosen key_value evolution over iterations
+
+    Parameters:
+    ----------
+    keys : list
+        List of keys of values to be plotted
+    result_dict : dict
+        Dictionary containing the results and info that is to be plotted
+    title : str
+        Name of the figure
+    plot_out : str
+        Location where the figure is to be saved
+
+    Returns:
+    -------
+    Nothing
+    '''
+    n_gens = len(result_dict[keys[0]])
+    iteration_nr = np.arange(n_gens)
+    for key in keys:
+        plt.plot(iteration_nr, result_dict[key], label=key)
+    plt.xlabel('Iteration number / #')
+    plt.ylabel(key)
+    plt.xlim(0, n_gens - 1)
+    plt.xticks(np.arange(n_gens - 1))
+    axis = plt.gca()
+    axis.set_aspect('auto', adjustable='box')
+    axis.xaxis.set_major_locator(ticker.AutoLocator())
+    plt.grid(True)
+    plt.legend(loc='lower right')
+    plt.title(title)
+    plt.tick_params(top=True, right=True, direction='in')
+    plt.savefig(plot_out)
+    plt.close('all')
+
 
 
 def plot_roc_curve(
         output_dir,
-        x_train,
-        y_train,
-        x_test,
-        y_test
+        auc_info
 ):
     '''Creates the ROC plot.
 
@@ -497,14 +628,9 @@ def plot_roc_curve(
     ----------
     output_dir : str
         Path to the directory where figures will be saved
-    x_train : list
-        List of false positives for given thresholds of the train sample
-    y_train : list
-        List of true positives for given thresholds of the train sample
-    x_test : list
-        List of false positives for given thresholds of the test sample
-    y_test : list
-        List of true positives for given thresholds of the test sample
+    auc_info : dict
+        Dictionary containing x and y values for test and train sample from
+        ROC calculation
 
     Returns:
     -------
@@ -515,14 +641,14 @@ def plot_roc_curve(
     plt.ylabel('Proportion of true values')
     axis = plt.gca()
     axis.set_aspect('equal')
-    plt.xlim(0.0, 1.0)
-    plt.ylim(0.0, 1.0)
+    axis.set_xlim(0.0, 1.0)
+    axis.set_ylim(0.0, 1.0)
     plt.plot(
-        x_train, y_train, color='k', linestyle='--',
+        auc_info['x_train'], auc_info['y_train'], color='k', linestyle='--',
         label='optimized values, training data', zorder=100
     )
     plt.plot(
-        x_test, y_test, color='r', linestyle='-',
+        auc_info['x_test'], auc_info['y_test'], color='r', linestyle='-',
         label='optimized values, testing data'
     )
     plt.tick_params(top=True, right=True, direction='in')
@@ -572,7 +698,9 @@ def plot_costfunction(avg_scores, output_dir):
         plt.ylabel('Fitness score')
         axis = plt.gca()
         axis.set_aspect('auto', adjustable='box')
+        axis.xaxis.set_major_locator(ticker.AutoLocator())
         plt.grid(True)
+        plt.title('Avarage fitness over iterations')
         plt.tick_params(top=True, right=True, direction='in')
         plt.savefig(plot_out)
         plt.close('all')

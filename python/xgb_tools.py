@@ -101,15 +101,28 @@ def parameter_evaluation(parameter_dict, data_dict, nthread, num_class):
     pred_train = model.predict(data_dict['dtrain'])
     pred_test = model.predict(data_dict['dtest'])
     prob_train, prob_test = universal.get_most_probable(pred_train, pred_test)
-    test_confusion_matrix = universal.calculate_conf_matrix(
-        prob_train, prob_test, data_dict)[1]
-    score = universal.calculate_f1_score(test_confusion_matrix)[1]
-    return score, pred_train, pred_test
+    train_conf_matrix, test_conf_matrix = universal.calculate_conf_matrix(
+        prob_train, prob_test, data_dict)
+    g_score_test, f1_score_test = universal.calculate_f1_score(
+        test_conf_matrix)
+    g_score_train, f1_score_train = universal.calculate_f1_score(
+        train_conf_matrix)
+    train_auc, test_auc = universal.calculate_auc(
+        data_dict, pred_train, pred_test)[:2]
+    score_dict = {
+        'f1_score_test': f1_score_test,
+        'g_score_test': g_score_test,
+        'test_auc': test_auc,
+        'f1_score_train': f1_score_train,
+        'g_score_train': g_score_train,
+        'train_auc': train_auc
+    }
+    return score_dict, pred_train, pred_test
 
 
 # parameter evaluation as argument for the function. Move to universal
 def ensemble_fitnesses(parameter_dicts, data_dict, global_settings):
-    '''Finds the fitness, pred_train and pred_test for all particles
+    '''Finds the data_dict, pred_train and pred_test for all particles
 
     Parameters:
     ----------
@@ -123,21 +136,21 @@ def ensemble_fitnesses(parameter_dicts, data_dict, global_settings):
 
     Returns:
     -------
-    fitnesses : list
-        List of fitnesses of each parameter-set
+    score_dicts : list
+        List of score_dicts of each parameter-set
     pred_trains : list of lols
         List of pred_trains
     pred_tests : list of lols
         List of pred_tests
     '''
-    fitnesses = []
+    score_dicts = []
     pred_trains = []
     pred_tests = []
     for parameter_dict in parameter_dicts:
-        fitness, pred_train, pred_test = parameter_evaluation(
+        score_dict, pred_train, pred_test = parameter_evaluation(
             parameter_dict, data_dict,
             global_settings['nthread'], global_settings['num_classes'])
-        fitnesses.append(fitness)
+        score_dicts.append(score_dict)
         pred_trains.append(pred_train)
         pred_tests.append(pred_test)
-    return fitnesses, pred_trains, pred_tests
+    return score_dicts, pred_trains, pred_tests
