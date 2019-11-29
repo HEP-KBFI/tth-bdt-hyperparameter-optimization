@@ -46,6 +46,7 @@ def main():
         data_dict, value_dicts, sm.run_iteration, parameter_dicts
     )
     universal.save_results(result_dict, output_dir, plot_extras=True)
+    sm.clear_from_files(global_settings)
 
 
 if __name__ == '__main__':

@@ -291,6 +291,7 @@ def save_results(result_dict, output_dir, plot_roc=True, plot_extras=False):
         plotting(output_dir, auc_info, result_dict['avg_scores'])
     if plot_extras:
         create_extra_plots(result_dict, output_dir)
+        save_results(result_dict, output_dir)
     best_to_file(
         result_dict['best_parameters'], output_dir, assessment)
 
@@ -531,6 +532,54 @@ def create_extra_plots(result_dict, output_dir):
     plot_single_evolution(keys2, result_dict, 'Stopping criteria', plot_out2)
 
 
+def save_results(result_dict, output_dir):
+    '''Saves the scoring and stopping criteria values to file.
+
+    Parameters:
+    ----------
+    result_dicts : dict
+        Dictionary containing the results and info that is to be plotted
+    output_dir : str
+        Path to the directory where the plots are to be saved
+
+    Returns:
+    -------
+    Nothing
+    '''
+    file_out1 = os.path.join(output_dir, 'scoring_metrics.json')
+    file_out2 = os.path.join(output_dir, 'stopping_criteria.json')
+    keys1 = [
+        'best_test_aucs', 'best_train_aucs', 'best_g_scores', 'best_fitnesses']
+    keys2 = ['compactnesses', 'avg_scores']
+
+
+def save_single_file(keys, result_dict, file_out):
+    '''Saves a single file with the results
+
+    Parameters:
+    ----------
+    keys : list
+        List of keys of values to be plotted
+    result_dict : dict
+        Dictionary containing the results and info that is to be plotted
+    file_out : str
+        Location where the file is to be saved
+
+    Returns:
+    -------
+    Nothing
+    '''
+    dict_list = []
+    for key in keys:
+        key_dict = {}
+        key_dict[key] = result_dict[key]
+        dict_list.append(key_dict)
+    with open(file_out, 'wt') as file:
+        for single_dict in dict_list:
+            json.dump(single_dict, file)
+            file.write('\n')
+
+
 def plot_single_evolution(keys, result_dict, title, plot_out):
     '''Plots the chosen key_value evolution over iterations
 
@@ -556,7 +605,6 @@ def plot_single_evolution(keys, result_dict, title, plot_out):
     plt.xlabel('Iteration number / #')
     plt.ylabel(key)
     plt.xlim(0, n_gens - 1)
-    plt.ylim(0, 1)
     plt.xticks(np.arange(n_gens - 1))
     axis = plt.gca()
     axis.set_aspect('auto', adjustable='box')

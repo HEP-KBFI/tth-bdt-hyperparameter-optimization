@@ -14,6 +14,7 @@ import json
 import csv
 import glob
 from shutil import copyfile
+import shutil
 import numpy as np
 from tthAnalysis.bdtHyperparameterOptimization import universal
 warnings.filterwarnings('ignore', category=DeprecationWarning)
@@ -324,3 +325,23 @@ def save_info(score_dict, pred_train, pred_test, save_dir):
         writer.writerows(pred_test)
     with open(score_path, "w") as file:
         json.dump(score_dict, file)
+
+
+def clear_from_files(global_settings):
+    '''Cleans the output directory from the leftovers of the slurm run
+
+    Parameters:
+    ----------
+    global_settings : dict
+        Settings that contains the output directory of the run
+
+    Returns:
+    -------
+    Nothing
+    '''
+    output_dir = os.path.expandvars(global_settings['output_dir'])
+    wild_card_path = os.path.join(output_dir, 'parameter_*.sh')
+    for path in wild_card_path:
+        os.remove(path)
+    samples_dir = os.path.join(output_dir, 'samples')
+    shutil.rmtree(samples_dir)
