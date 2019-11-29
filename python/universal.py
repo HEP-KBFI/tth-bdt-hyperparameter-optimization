@@ -271,6 +271,8 @@ def save_results(result_dict, output_dir, plot_roc=True, plot_extras=False):
         not exist, one will be created
     [plotROC=True] : bool
         Whether to plot ROC curve and average scores. Optional
+    [plot_extras=False] : bool
+        Whether to plot extra features
 
     Returns:
     -------
