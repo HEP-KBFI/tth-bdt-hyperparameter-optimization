@@ -310,28 +310,6 @@ def get_weight_step(pso_settings):
     return inertial_weight, inertial_weight_step
 
 
-def fitness_to_list(score_dicts, fitness_key='f1_score_test'):
-    '''Puts the fitness values according to the chosen fitness_key from
-    the dictionary to a list
-
-    Parameters:
-    ----------
-    score_dicts : list of dicts
-        List containing dictionaries filled with different scores
-    [fitness_key='f1_score_test'] : str
-        Name of the key what is used as the fitness score
-
-    Returns:
-    -------
-    fitnesses : list
-        List of fitness scores for each particle
-    '''
-    fitnesses = []
-    for score_dict in score_dicts:
-        fitnesses.append(score_dict[fitness_key])
-    return fitnesses
-
-
 def run_pso(
         data_dict,
         value_dicts,
@@ -373,7 +351,7 @@ def run_pso(
     compactness = universal.calculate_compactness(parameter_dicts)
     score_dicts, pred_trains, pred_tests = calculate_fitnesses(
         parameter_dicts, data_dict, global_settings)
-    fitnesses = fitness_to_list(score_dicts, fitness_key='test_auc')
+    fitnesses = universal.fitness_to_list(score_dicts, fitness_key='test_auc')
     index = np.argmax(fitnesses)
     result_dict = {
         'data_dict': data_dict,
@@ -403,7 +381,7 @@ def run_pso(
         print(' --- Compactness: ' + str(compactness) + ' ---')
         score_dicts, pred_trains, pred_tests = calculate_fitnesses(
             parameter_dicts, data_dict, global_settings)
-        fitnesses = fitness_to_list(score_dicts, fitness_key='test_auc')
+        fitnesses = universal.fitness_to_list(score_dicts, fitness_key='test_auc')
         best_fitnesses = find_best_fitness(fitnesses, best_fitnesses)
         personal_bests = calculate_personal_bests(
             fitnesses, best_fitnesses, parameter_dicts, personal_bests)
