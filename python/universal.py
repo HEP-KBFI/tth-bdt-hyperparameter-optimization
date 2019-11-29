@@ -293,7 +293,7 @@ def save_results(result_dict, output_dir, plot_roc=True, plot_extras=False):
         plotting(output_dir, auc_info, result_dict['avg_scores'])
     if plot_extras:
         create_extra_plots(result_dict, output_dir)
-        save_results(result_dict, output_dir)
+        save_extra_results(result_dict, output_dir)
     best_to_file(
         result_dict['best_parameters'], output_dir, assessment)
 
@@ -534,7 +534,7 @@ def create_extra_plots(result_dict, output_dir):
     plot_single_evolution(keys2, result_dict, 'Stopping criteria', plot_out2)
 
 
-def save_results(result_dict, output_dir):
+def save_extra_results(result_dict, output_dir):
     '''Saves the scoring and stopping criteria values to file.
 
     Parameters:
@@ -556,6 +556,8 @@ def save_results(result_dict, output_dir):
         'best_f1_scores'
     ]
     keys2 = ['compactnesses', 'avg_scores']
+    save_single_file(keys1, result_dict, file_out1)
+    save_single_file(keys2, result_dict, file_out2)
 
 
 def save_single_file(keys, result_dict, file_out):
