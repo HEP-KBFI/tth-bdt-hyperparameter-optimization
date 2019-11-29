@@ -552,7 +552,7 @@ def plot_single_evolution(keys, result_dict, title, plot_out):
     n_gens = len(result_dict[keys[0]])
     iteration_nr = np.arange(n_gens)
     for key in keys:
-        plt.plot(result_dict[key], iteration_nr, label=key)
+        plt.plot(iteration_nr, result_dict[key], label=key)
     plt.xlabel('Iteration number / #')
     plt.ylabel(key)
     plt.xlim(0, n_gens - 1)
