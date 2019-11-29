@@ -128,33 +128,6 @@ def culling(population, fitnesses, settings, data, parameters):
     return population, fitnesses
 
 
-# NOT IN USE ANYMORE
-def add_parameters(offspring, nthread):
-    '''Add missing parameters to an offspring.
-
-    Parameters
-    ----------
-    offspring : dict
-        An individual with missing parameters
-    nthread : int
-        Number of threads
-
-    Returns
-    -------
-    offspring : dict
-        An individual with a complete set of parameters
-    '''
-    params = {
-        'silent': 1,
-        'objective': 'multi:softprob',
-        'num_classes': 10,
-        'nthread': nthread,
-        'seed': 1,
-    }
-    offspring.update(params)
-    return offspring
-
-
 def new_population(population, fitnesses, settings, parameters):
     '''Create the next generation population.
 
@@ -334,12 +307,11 @@ def evolve(population, settings, data, parameters, final=False):
                 population, fitnesses, settings, data, parameters)
             population = new_population(
                 population, fitnesses, settings, parameters)
-            print("Population: " + str(population))
 
         # Calculate fitness of the population
-        score_dicts, pred_trains, pred_tests = xt.ensemble_fitnesses(
-                population, data, settings)
-        fitnesses = universal.fitness_to_list(score_dicts)
+        fitnesses, pred_trains, pred_tests = xt.ensemble_fitnesses(
+            population, data, settings)
+        fitnesses = universal.fitness_to_list(fitnesses)
 
         # Save results
         best_scores.append(max(fitnesses))
@@ -414,7 +386,6 @@ def evolution(settings, data, parameters):
         # Create one population
         print('::::::: Creating population ::::::::\n')
         population = xt.prepare_run_params(parameters, settings['pop_size'])
-        print("Initial population: " + str(population))
 
         # Evolve population
         output = evolve(population, settings, data, parameters, True)

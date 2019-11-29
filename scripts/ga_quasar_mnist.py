@@ -24,7 +24,6 @@ def main(sample_dir, nthread, output_dir, param_file):
     print('::::::: Reading GA settings & XGBoost parameters :::::::')
     settings_dict = universal.read_settings('ga')
     settings_dict.update({'nthread': nthread})
-    print(settings_dict)
 
     # Load parameters for optimization
     param_dict = universal.read_parameters(param_file)

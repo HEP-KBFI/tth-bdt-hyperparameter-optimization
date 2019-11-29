@@ -146,22 +146,6 @@ def test_elitism():
     assert result == calculated, 'test_elitism failed'
 
 
-def test_add_parameters():
-    '''Testing the add_parameters function'''
-    dictionary = {'test': 1}
-    nthread = 8
-    calculated = gm.add_parameters(dictionary, nthread)
-    result = {
-        'test': 1,
-        'silent': 1,
-        'objective': 'multi:softprob',
-        'num_classes': 10,
-        'nthread': nthread,
-        'seed': 1,
-    }
-    assert result == calculated, 'test_add_parameters failed'
-
-
 def test_new_population():
     '''Testing the new_population function'''
     SETTINGS.update({'pop_size': 3})
