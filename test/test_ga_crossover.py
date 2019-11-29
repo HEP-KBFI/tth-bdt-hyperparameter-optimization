@@ -8,33 +8,33 @@ PARAMETERS = [
         'p_name': 'a',
         'range_start': 0,
         'range_end': 10,
-        'true_int': 'True',
+        'true_int': 1,
         'group_nr': 1,
-        'true_corr': 'True'
+        'true_corr': 1
     },
     {
         'p_name': 'b',
         'range_start': 1,
         'range_end': 10,
-        'true_int': 'False',
+        'true_int': 0,
         'group_nr': 1,
-        'true_corr': 'True'
+        'true_corr': 1
     },
     {
         'p_name': 'c',
         'range_start': 0,
         'range_end': 1,
-        'true_int': 'False',
+        'true_int': 0,
         'group_nr': 2,
-        'true_corr': 'False'
+        'true_corr': 0
     },
     {
         'p_name': 'd',
         'range_start': 5,
         'range_end': 25,
-        'true_int': 'True',
+        'true_int': 1,
         'group_nr': 2,
-        'true_corr': 'False'
+        'true_corr': 0
     }
 ]
 
@@ -105,14 +105,14 @@ def test_group_mutate():
     initial = {'a': 8, 'b': 1.62284}
 
     # Mutation chance = 0
-    result1 = gc.group_mutate(initial, 0, 0, 'True')
+    result1 = gc.group_mutate(initial, 0, 0, 1)
     assert initial == result1, 'test_group_mutate failed'
     for key in initial:
         assert key in result1, 'test_group_mutate failed'
     assert len(result1) == len(initial), 'test_group_mutate failed'
 
     # Mutation chance = 0.5
-    result2 = gc.group_mutate(initial, 0.5, 0.25, 'False')
+    result2 = gc.group_mutate(initial, 0.5, 0.25, 0)
     for key in initial:
         assert key in result2, 'test_group_mutate failed'
     assert len(result2) == len(initial), 'test_group_mutate failed'
@@ -224,7 +224,7 @@ def test_grouping():
     '''Testing grouping function'''
     initial = PARENTS[0]
     expected1 = [{'a': 8, 'b': 1.62284}, {'c': 0.31443, 'd': 15}]
-    expected2 = ['True', 'False']
+    expected2 = [1, 0]
     result1, result2 = gc.grouping(initial, PARAMETERS)
     assert result1 == expected1, 'test_grouping failed'
     assert result2 == expected2, 'test_grouping failed'

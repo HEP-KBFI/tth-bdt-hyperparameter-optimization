@@ -34,7 +34,7 @@ def kpoint_crossover(parents, parameters, mutation_chance=0, k=1):
 
     # Choose crossover points
     for i in range(k):
-        point = round(random.random() * len(parent1))
+        point = int(round(random.random() * 31))
         points.append(point)
 
     # k-point crossover of parents
