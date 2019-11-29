@@ -285,8 +285,8 @@ def save_results(result_dict, output_dir, plot_roc=True, plot_extras=False):
         result_dict['data_dict'])
     train_auc, test_auc, auc_info = calculate_auc(
         data_dict, result_dict['pred_train'], result_dict['pred_test'])
-    assessment['train_AUC'] = (-1) * train_auc
-    assessment['test_AUC'] = (-1) * test_auc
+    assessment['train_AUC'] = train_auc
+    assessment['test_AUC'] = test_auc
     if plot_roc:
         plotting(output_dir, auc_info, result_dict['avg_scores'])
     if plot_extras:
@@ -320,8 +320,8 @@ def calculate_auc(data_dict, pred_train, pred_test):
         data_dict['training_labels'], pred_train)
     x_test, y_test = roc(
         data_dict['testing_labels'], pred_test)
-    test_auc = np.trapz(y_test, x_test)
-    train_auc = np.trapz(y_train, x_train)
+    test_auc = (-1) * np.trapz(y_test, x_test)
+    train_auc = (-1) * np.trapz(y_train, x_train)
     info = {
         'x_train': x_train,
         'y_train': y_train,
@@ -556,6 +556,7 @@ def plot_single_evolution(keys, result_dict, title, plot_out):
     plt.xlabel('Iteration number / #')
     plt.ylabel(key)
     plt.xlim(0, n_gens - 1)
+    plt.ylim(0, 1)
     plt.xticks(np.arange(n_gens - 1))
     axis = plt.gca()
     axis.set_aspect('auto', adjustable='box')
@@ -651,6 +652,7 @@ def plot_costfunction(avg_scores, output_dir):
         axis.set_aspect('auto', adjustable='box')
         axis.xaxis.set_major_locator(ticker.AutoLocator())
         plt.grid(True)
+        plt.title('Avarage fitness over iterations')
         plt.tick_params(top=True, right=True, direction='in')
         plt.savefig(plot_out)
         plt.close('all')
