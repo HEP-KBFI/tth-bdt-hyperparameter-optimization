@@ -558,10 +558,10 @@ def save_extra_results(result_dict, output_dir):
     keys2 = ['compactnesses', 'avg_scores']
     save_single_file(keys1, result_dict, file_out1)
     save_single_file(keys2, result_dict, file_out2)
-    save_fitness_improvement(result_dict, output_dir)
+    save_fitness_improvement(result_dict, keys1, output_dir)
 
 
-def save_fitness_improvement(result_dict, output_dir):
+def save_fitness_improvement(result_dict, keys, output_dir):
     '''Finds how much the performance increased based on different scoring
     metrics
 
@@ -576,7 +576,7 @@ def save_fitness_improvement(result_dict, output_dir):
     '''
     output_path = os.path.join(output_dir, 'fitness_improvement.json')
     relative_improvement = {}
-    for key in result_dict:
+    for key in keys:
         improvement = result_dict[key][-1] - result_dict[key][0]
         relative_improvement[key] = improvement/result_dict[key][0]
     with open(output_path, 'w') as file:
