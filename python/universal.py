@@ -258,7 +258,7 @@ def main_f1_calculate(pred_train, pred_test, data_dict):
     return assessment
 
 
-def get_scores_dict(prob_train, prob_test, data_dict):
+def get_scores_dict(pred_train, pred_test, data_dict):
     '''Calculates different scoring metrics
 
     Parameters:

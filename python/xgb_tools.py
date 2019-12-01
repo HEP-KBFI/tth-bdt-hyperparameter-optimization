@@ -100,7 +100,7 @@ def parameter_evaluation(parameter_dict, data_dict, nthread, num_class):
     )
     pred_train = model.predict(data_dict['dtrain'])
     pred_test = model.predict(data_dict['dtest'])
-    score_dict = universal.get_scores_dict(prob_train, prob_test, data_dict)
+    score_dict = universal.get_scores_dict(pred_train, pred_test, data_dict)
     return score_dict, pred_train, pred_test
 
 
