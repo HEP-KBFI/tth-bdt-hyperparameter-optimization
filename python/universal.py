@@ -6,9 +6,11 @@ import itertools
 import json
 import os
 import numpy as np
+import glob
 from sklearn.metrics import confusion_matrix
 import matplotlib
 matplotlib.use('agg')
+import shutil
 import matplotlib.pyplot as plt
 import matplotlib.ticker as ticker
 warnings.filterwarnings('ignore', category=RuntimeWarning)
@@ -56,7 +58,7 @@ def best_to_file(best_values, output_dir, assesment):
         json.dump(assesment, file)
 
 
-def calculate_fitness(
+def calculate_d_score(
         pred_train,
         pred_test,
         data_dict
@@ -78,7 +80,7 @@ def calculate_fitness(
 
     Returns:
     -------
-    score : float
+    d_score : float
         Score for the parameters used.
     '''
     train_value = []
@@ -99,8 +101,8 @@ def calculate_fitness(
         if pair[0] == pair[1]:
             test_n = test_n + 1
     test_score = float(test_n)/len(data_dict['testing_labels'])
-    evaluation = score(train_score, test_score)
-    return evaluation
+    d_score = score(train_score, test_score)
+    return d_score
 
 
 def score(train_score, test_score):
@@ -116,15 +118,15 @@ def score(train_score, test_score):
 
     Returns:
     -------
-    evaluation : float
+    d_score : float
         Score for the set of parameters.
     '''
-    evaluation = np.mean([
+    d_score = np.mean([
         (1 - (train_score - test_score)),
         (1 - (train_score - test_score)),
         test_score
     ])
-    return evaluation
+    return d_score
 
 
 def calculate_conf_matrix(predicted_train, predicted_test, data_dict):
@@ -256,6 +258,48 @@ def main_f1_calculate(pred_train, pred_test, data_dict):
     return assessment
 
 
+def get_scores_dict(pred_train, pred_test, data_dict):
+    '''Calculates different scoring metrics
+
+    Parameters:
+    ----------
+    pred_train : list
+        List of numpy arrays containing probabilities for all labels
+        for the training sample
+    pred_test : list
+        List of numpy arrays containing probabilities for all labels
+        for the testing sample
+    data_dict : dict
+        Dictionary that contains the labels for testing and training. Keys are
+        called 'testing_labels' and 'training_labels'
+
+    Returns:
+    -------
+    score_dict : dict
+        Dictionary containing different scoring metrics
+    '''
+    prob_train, prob_test = get_most_probable(pred_train, pred_test)
+    train_conf_matrix, test_conf_matrix = calculate_conf_matrix(
+        prob_train, prob_test, data_dict)
+    g_score_test, f1_score_test = calculate_f1_score(
+        test_conf_matrix)
+    g_score_train, f1_score_train = calculate_f1_score(
+        train_conf_matrix)
+    d_score = calculate_d_score(pred_train, pred_test, data_dict)
+    train_auc, test_auc = calculate_auc(
+        data_dict, pred_train, pred_test)[:2]
+    score_dict = {
+        'f1_score_test': f1_score_test,
+        'g_score_test': g_score_test,
+        'test_auc': test_auc,
+        'f1_score_train': f1_score_train,
+        'g_score_train': g_score_train,
+        'train_auc': train_auc,
+        'd_score': d_score
+    }
+    return score_dict
+
+
 def save_results(result_dict, output_dir, plot_roc=True, plot_extras=False):
     '''Saves the results from the result_dict to files. Optionally produces
     also plots for ROC and average
@@ -269,8 +313,10 @@ def save_results(result_dict, output_dir, plot_roc=True, plot_extras=False):
     output_dir : str
         Path to the dictionary where results are saved. If the directory does
         not exist, one will be created
-    [plotROC=True] : bool
-        Whether to plot ROC curve and average scores. Optional
+    plotROC=True : bool
+        [optional] Whether to plot ROC curve and average scores. Optional
+    plot_extras=False : bool
+        [optional] Whether to plot extra features
 
     Returns:
     -------
@@ -278,22 +324,53 @@ def save_results(result_dict, output_dir, plot_roc=True, plot_extras=False):
     '''
     if not os.path.exists(output_dir):
         os.makedirs(output_dir)
-    data_dict = result_dict['data_dict']
-    assessment = main_f1_calculate(
+    keys = [
+        'best_test_auc', 'best_train_auc',
+        'best_g_score', 'best_f1_score',
+        'best_d_score'
+    ]
+    assessment = dict(
+        (key, result_dict[key]) for key in keys if key in result_dict)
+    auc_info = calculate_auc(
+        result_dict['data_dict'],
         result_dict['pred_train'],
-        result_dict['pred_test'],
-        result_dict['data_dict'])
-    train_auc, test_auc, auc_info = calculate_auc(
-        data_dict, result_dict['pred_train'], result_dict['pred_test'])
-    assessment['train_AUC'] = train_auc
-    assessment['test_AUC'] = test_auc
+        result_dict['pred_test']
+    )[-1]
     if plot_roc:
         plotting(output_dir, auc_info, result_dict['avg_scores'])
     if plot_extras:
         create_extra_plots(result_dict, output_dir)
-        save_results(result_dict, output_dir)
+        save_extra_results(result_dict, output_dir)
     best_to_file(
         result_dict['best_parameters'], output_dir, assessment)
+    save_run_settings(output_dir)
+
+
+def save_run_settings(output_dir):
+    '''Saves the run settings for future reference
+
+    Parameters:
+    ----------
+    output_dir : str
+        Path to the output directory
+
+    Returns:
+    -------
+    Nothing
+    '''
+    settings_dir = os.path.join(output_dir, 'run_settings')
+    if not os.path.exists(settings_dir):
+        os.makedirs(settings_dir)
+    cmssw_base = os.path.expandvars('$CMSSW_BASE')
+    wild_card_path = os.path.join(
+        cmssw_base,
+        'src',
+        'tthAnalysis',
+        'bdtHyperparameterOptimization',
+        'data',
+        '*.json')
+    for path in glob.glob(wild_card_path):
+        shutil.copy(path, settings_dir)
 
 
 def calculate_auc(data_dict, pred_train, pred_test):
@@ -526,13 +603,15 @@ def create_extra_plots(result_dict, output_dir):
     plot_out1 = os.path.join(output_dir, 'scoring_metrics.png')
     plot_out2 = os.path.join(output_dir, 'stopping_criteria.png')
     keys1 = [
-        'best_test_aucs', 'best_train_aucs', 'best_g_scores', 'best_fitnesses']
+        'best_test_aucs', 'best_train_aucs',
+        'best_g_scores', 'best_f1_scores',
+        'best_d_scores']
     keys2 = ['compactnesses', 'avg_scores']
     plot_single_evolution(keys1, result_dict, 'Scoring metrics', plot_out1)
     plot_single_evolution(keys2, result_dict, 'Stopping criteria', plot_out2)
 
 
-def save_results(result_dict, output_dir):
+def save_extra_results(result_dict, output_dir):
     '''Saves the scoring and stopping criteria values to file.
 
     Parameters:
@@ -549,8 +628,36 @@ def save_results(result_dict, output_dir):
     file_out1 = os.path.join(output_dir, 'scoring_metrics.json')
     file_out2 = os.path.join(output_dir, 'stopping_criteria.json')
     keys1 = [
-        'best_test_aucs', 'best_train_aucs', 'best_g_scores', 'best_fitnesses']
+        'best_test_aucs', 'best_train_aucs',
+        'best_g_scores', 'best_fitnesses',
+        'best_f1_scores', 'best_d_scores'
+    ]
     keys2 = ['compactnesses', 'avg_scores']
+    save_single_file(keys1, result_dict, file_out1)
+    save_single_file(keys2, result_dict, file_out2)
+    save_fitness_improvement(result_dict, keys1, output_dir)
+
+
+def save_fitness_improvement(result_dict, keys, output_dir):
+    '''Finds how much the performance increased based on different scoring
+    metrics
+
+    Parameters:
+    ----------
+    result_dict : dict
+        Dictionary containing the results and info that is to be plotted
+
+    Returns:
+    -------
+    Nothing
+    '''
+    output_path = os.path.join(output_dir, 'fitness_improvement.json')
+    relative_improvement = {}
+    for key in keys:
+        improvement = result_dict[key][-1] - result_dict[key][0]
+        relative_improvement[key] = improvement/result_dict[key][0]
+    with open(output_path, 'w') as file:
+        json.dump(relative_improvement, file)
 
 
 def save_single_file(keys, result_dict, file_out):
@@ -603,7 +710,7 @@ def plot_single_evolution(keys, result_dict, title, plot_out):
     for key in keys:
         plt.plot(iteration_nr, result_dict[key], label=key)
     plt.xlabel('Iteration number / #')
-    plt.ylabel(key)
+    plt.ylabel('scoring_metric')
     plt.xlim(0, n_gens - 1)
     plt.xticks(np.arange(n_gens - 1))
     axis = plt.gca()
@@ -707,17 +814,24 @@ def plot_costfunction(avg_scores, output_dir):
 
 
 def to_one_dict(list_of_dicts):
+    '''Puts dictionaries from list into one big dictionary. (can't have same
+    keys)
+
+    Parameters:
+    ----------
+    list_of_dicts : list of dicts
+        List filled with dictionaries to be put together into one big dict
+
+    Returns:
+    -------
+    main_dict : dict
+        Dictionary containing all the small dictionary keys.
+    '''
     main_dict = {}
     for elem in list_of_dicts:
         key = list(elem.keys())[0]
         main_dict[key] = elem[key]
     return main_dict
-
-
-def getParameters(parameters_path):
-    paramer_list = read_parameters(parameters_path)
-    parameter_dict = to_one_dict(paramer_list)
-    return parameter_dict
 
 
 def read_settings(group):

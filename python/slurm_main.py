@@ -341,7 +341,7 @@ def clear_from_files(global_settings):
     '''
     output_dir = os.path.expandvars(global_settings['output_dir'])
     wild_card_path = os.path.join(output_dir, 'parameter_*.sh')
-    for path in wild_card_path:
+    for path in glob.glob(wild_card_path):
         os.remove(path)
     samples_dir = os.path.join(output_dir, 'samples')
     shutil.rmtree(samples_dir)

@@ -310,28 +310,6 @@ def get_weight_step(pso_settings):
     return inertial_weight, inertial_weight_step
 
 
-def fitness_to_list(score_dicts, fitness_key='f1_score_test'):
-    '''Puts the fitness values according to the chosen fitness_key from
-    the dictionary to a list
-
-    Parameters:
-    ----------
-    score_dicts : list of dicts
-        List containing dictionaries filled with different scores
-    [fitness_key='f1_score_test'] : str
-        Name of the key what is used as the fitness score
-
-    Returns:
-    -------
-    fitnesses : list
-        List of fitness scores for each particle
-    '''
-    fitnesses = []
-    for score_dict in score_dicts:
-        fitnesses.append(score_dict[fitness_key])
-    return fitnesses
-
-
 def run_pso(
         data_dict,
         value_dicts,
@@ -373,7 +351,8 @@ def run_pso(
     compactness = universal.calculate_compactness(parameter_dicts)
     score_dicts, pred_trains, pred_tests = calculate_fitnesses(
         parameter_dicts, data_dict, global_settings)
-    fitnesses = fitness_to_list(score_dicts, fitness_key='test_auc')
+    fitnesses = universal.fitness_to_list(
+        score_dicts, fitness_key=global_settings['fitness_fn'])
     index = np.argmax(fitnesses)
     result_dict = {
         'data_dict': data_dict,
@@ -389,7 +368,11 @@ def run_pso(
         'best_fitnesses': [max(fitnesses)],
         'best_g_scores': [score_dicts[index]['g_score_test']],
         'best_test_aucs': [score_dicts[index]['test_auc']],
-        'best_train_aucs': [score_dicts[index]['train_auc']]
+        'best_train_aucs': [score_dicts[index]['train_auc']],
+        'best_f1_score': score_dicts[index]['f1_score_test'],
+        'best_f1_scores': [score_dicts[index]['f1_score_test']],
+        'best_d_score': score_dicts[index]['d_score'],
+        'best_d_scores': [score_dicts[index]['d_score']]
     }
     personal_bests = parameter_dicts
     best_fitnesses = fitnesses
@@ -401,7 +384,8 @@ def run_pso(
         print(' --- Compactness: ' + str(compactness) + ' ---')
         score_dicts, pred_trains, pred_tests = calculate_fitnesses(
             parameter_dicts, data_dict, global_settings)
-        fitnesses = fitness_to_list(score_dicts, fitness_key='test_auc')
+        fitnesses = universal.fitness_to_list(
+            score_dicts, fitness_key=global_settings['fitness_fn'])
         best_fitnesses = find_best_fitness(fitnesses, best_fitnesses)
         personal_bests = calculate_personal_bests(
             fitnesses, best_fitnesses, parameter_dicts, personal_bests)
@@ -424,6 +408,8 @@ def run_pso(
             result_dict['best_g_score'] = score_dicts[index]['g_score_test']
             result_dict['best_test_auc'] = score_dicts[index]['test_auc']
             result_dict['best_train_auc'] = score_dicts[index]['train_auc']
+            result_dict['best_d_score'] = score_dicts[index]['d_score']
+            result_dict['best_f1_score'] = score_dicts[index]['f1_score_test']
         avg_scores = np.mean(fitnesses)
         result_dict['avg_scores'].append(avg_scores)
         result_dict['compactnesses'].append(compactness)
@@ -431,6 +417,8 @@ def run_pso(
         result_dict['best_g_scores'].append(result_dict['best_g_score'])
         result_dict['best_train_aucs'].append(result_dict['best_train_auc'])
         result_dict['best_test_aucs'].append(result_dict['best_test_auc'])
+        result_dict['best_f1_scores'].append(result_dict['best_f1_score'])
+        result_dict['best_d_scores'].append(result_dict['best_d_score'])
         inertial_weight += inertial_weight_step
         i += 1
     return result_dict
