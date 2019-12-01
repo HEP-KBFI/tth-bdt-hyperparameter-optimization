@@ -6,9 +6,11 @@ import itertools
 import json
 import os
 import numpy as np
+import glob
 from sklearn.metrics import confusion_matrix
 import matplotlib
 matplotlib.use('agg')
+from shutil import copy
 import matplotlib.pyplot as plt
 import matplotlib.ticker as ticker
 warnings.filterwarnings('ignore', category=RuntimeWarning)
@@ -296,6 +298,32 @@ def save_results(result_dict, output_dir, plot_roc=True, plot_extras=False):
         save_extra_results(result_dict, output_dir)
     best_to_file(
         result_dict['best_parameters'], output_dir, assessment)
+    save_run_settings(output_dir)
+
+
+def save_run_settings(output_dir):
+    '''Saves the run settings for future reference
+
+    Parameters:
+    ----------
+    output_dir : str
+        Path to the output directory
+
+    Returns:
+    -------
+    Nothing
+    '''
+    settings_dir = os.path.join(output_dir, 'run_settings')
+    cmssw_base = os.path.expandvars('$CMSSW_BASE')
+    wild_card_path = os.path.join(
+        cmssw_base,
+        'src',
+        'tthAnalysis',
+        'bdtHyperparameterOptimization',
+        'data',
+        '*.json')
+    for path in glob.glob(wild_card_path):
+        shutil.copy(path, settings_dir)
 
 
 def calculate_auc(data_dict, pred_train, pred_test):

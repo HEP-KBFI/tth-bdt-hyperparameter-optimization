@@ -351,7 +351,8 @@ def run_pso(
     compactness = universal.calculate_compactness(parameter_dicts)
     score_dicts, pred_trains, pred_tests = calculate_fitnesses(
         parameter_dicts, data_dict, global_settings)
-    fitnesses = universal.fitness_to_list(score_dicts, fitness_key='test_auc')
+    fitnesses = universal.fitness_to_list(
+        score_dicts, fitness_key=global_settings['fitness_fn'])
     index = np.argmax(fitnesses)
     result_dict = {
         'data_dict': data_dict,
@@ -381,7 +382,8 @@ def run_pso(
         print(' --- Compactness: ' + str(compactness) + ' ---')
         score_dicts, pred_trains, pred_tests = calculate_fitnesses(
             parameter_dicts, data_dict, global_settings)
-        fitnesses = universal.fitness_to_list(score_dicts, fitness_key='test_auc')
+        fitnesses = universal.fitness_to_list(
+            score_dicts, fitness_key=global_settings['fitness_fn'])
         best_fitnesses = find_best_fitness(fitnesses, best_fitnesses)
         personal_bests = calculate_personal_bests(
             fitnesses, best_fitnesses, parameter_dicts, personal_bests)

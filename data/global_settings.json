@@ -6,3 +6,4 @@
 {"bdtType": "evtLevelTT_TTH"}
 {"trainvar": "noHTT"}
 {"channel": "3l_1tau"}
+{"fitness_fn": "test_auc"}
