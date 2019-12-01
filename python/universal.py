@@ -10,7 +10,7 @@ import glob
 from sklearn.metrics import confusion_matrix
 import matplotlib
 matplotlib.use('agg')
-from shutil import copy
+from shutil
 import matplotlib.pyplot as plt
 import matplotlib.ticker as ticker
 warnings.filterwarnings('ignore', category=RuntimeWarning)
