@@ -73,8 +73,8 @@ def parameter_evaluation(parameter_dict, data_dict, nthread, num_class):
 
     Returns:
     -------
-    score : float
-        Fitness of the parameter-set
+    score_dict : dict
+        Dictionary containing different scoring metrics
     pred_train : list
         List of numpy arrays containing probabilities for all labels
         for the training sample
@@ -100,25 +100,7 @@ def parameter_evaluation(parameter_dict, data_dict, nthread, num_class):
     )
     pred_train = model.predict(data_dict['dtrain'])
     pred_test = model.predict(data_dict['dtest'])
-    prob_train, prob_test = universal.get_most_probable(pred_train, pred_test)
-    train_conf_matrix, test_conf_matrix = universal.calculate_conf_matrix(
-        prob_train, prob_test, data_dict)
-    g_score_test, f1_score_test = universal.calculate_f1_score(
-        test_conf_matrix)
-    g_score_train, f1_score_train = universal.calculate_f1_score(
-        train_conf_matrix)
-    d_score = calculate_d_score(pred_train, pred_test, data_dict)
-    train_auc, test_auc = universal.calculate_auc(
-        data_dict, pred_train, pred_test)[:2]
-    score_dict = {
-        'f1_score_test': f1_score_test,
-        'g_score_test': g_score_test,
-        'test_auc': test_auc,
-        'f1_score_train': f1_score_train,
-        'g_score_train': g_score_train,
-        'train_auc': train_auc,
-        'd_score': d_score
-    }
+    score_dict = universal.get_scores_dict(prob_train, prob_test, data_dict)
     return score_dict, pred_train, pred_test
 
 

@@ -258,6 +258,48 @@ def main_f1_calculate(pred_train, pred_test, data_dict):
     return assessment
 
 
+def get_scores_dict(prob_train, prob_test, data_dict):
+    '''Calculates different scoring metrics
+
+    Parameters:
+    ----------
+    pred_train : list
+        List of numpy arrays containing probabilities for all labels
+        for the training sample
+    pred_test : list
+        List of numpy arrays containing probabilities for all labels
+        for the testing sample
+    data_dict : dict
+        Dictionary that contains the labels for testing and training. Keys are
+        called 'testing_labels' and 'training_labels'
+
+    Returns:
+    -------
+    score_dict : dict
+        Dictionary containing different scoring metrics
+    '''
+    prob_train, prob_test = get_most_probable(pred_train, pred_test)
+    train_conf_matrix, test_conf_matrix = calculate_conf_matrix(
+        prob_train, prob_test, data_dict)
+    g_score_test, f1_score_test = calculate_f1_score(
+        test_conf_matrix)
+    g_score_train, f1_score_train = calculate_f1_score(
+        train_conf_matrix)
+    d_score = calculate_d_score(pred_train, pred_test, data_dict)
+    train_auc, test_auc = calculate_auc(
+        data_dict, pred_train, pred_test)[:2]
+    score_dict = {
+        'f1_score_test': f1_score_test,
+        'g_score_test': g_score_test,
+        'test_auc': test_auc,
+        'f1_score_train': f1_score_train,
+        'g_score_train': g_score_train,
+        'train_auc': train_auc,
+        'd_score': d_score
+    }
+    return score_dict
+
+
 def save_results(result_dict, output_dir, plot_roc=True, plot_extras=False):
     '''Saves the results from the result_dict to files. Optionally produces
     also plots for ROC and average
