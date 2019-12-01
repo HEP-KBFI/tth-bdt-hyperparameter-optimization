@@ -528,7 +528,7 @@ def create_extra_plots(result_dict, output_dir):
     plot_out1 = os.path.join(output_dir, 'scoring_metrics.png')
     plot_out2 = os.path.join(output_dir, 'stopping_criteria.png')
     keys1 = [
-        'best_test_aucs', 'best_train_aucs', 'best_g_scores', 'best_fitnesses']
+        'best_test_aucs', 'best_train_aucs', 'best_g_scores', 'best_f1_scores']
     keys2 = ['compactnesses', 'avg_scores']
     plot_single_evolution(keys1, result_dict, 'Scoring metrics', plot_out1)
     plot_single_evolution(keys2, result_dict, 'Stopping criteria', plot_out2)
@@ -558,6 +558,29 @@ def save_extra_results(result_dict, output_dir):
     keys2 = ['compactnesses', 'avg_scores']
     save_single_file(keys1, result_dict, file_out1)
     save_single_file(keys2, result_dict, file_out2)
+    save_fitness_improvement(result_dict, output_dir)
+
+
+def save_fitness_improvement(result_dict, output_dir):
+    '''Finds how much the performance increased based on different scoring
+    metrics
+
+    Parameters:
+    ----------
+    result_dict : dict
+        Dictionary containing the results and info that is to be plotted
+
+    Returns:
+    -------
+    Nothing
+    '''
+    output_path = os.path.join(output_dir, 'fitness_improvement.json')
+    relative_improvement = {}
+    for key in result_dict:
+        improvement = result_dict[key][-1] - result_dict[key][0]
+        relative_improvement[key] = improvement/result_dict[key][0]
+    with open(output_path, 'w') as file:
+        json.dump(relative_improvement, file)
 
 
 def save_single_file(keys, result_dict, file_out):
@@ -610,7 +633,7 @@ def plot_single_evolution(keys, result_dict, title, plot_out):
     for key in keys:
         plt.plot(iteration_nr, result_dict[key], label=key)
     plt.xlabel('Iteration number / #')
-    plt.ylabel(key)
+    plt.ylabel('scoring_metric')
     plt.xlim(0, n_gens - 1)
     plt.xticks(np.arange(n_gens - 1))
     axis = plt.gca()
@@ -714,17 +737,24 @@ def plot_costfunction(avg_scores, output_dir):
 
 
 def to_one_dict(list_of_dicts):
+    '''Puts dictionaries from list into one big dictionary. (can't have same
+    keys)
+
+    Parameters:
+    ----------
+    list_of_dicts : list of dicts
+        List filled with dictionaries to be put together into one big dict
+
+    Returns:
+    -------
+    main_dict : dict
+        Dictionary containing all the small dictionary keys.
+    '''
     main_dict = {}
     for elem in list_of_dicts:
         key = list(elem.keys())[0]
         main_dict[key] = elem[key]
     return main_dict
-
-
-def getParameters(parameters_path):
-    paramer_list = read_parameters(parameters_path)
-    parameter_dict = to_one_dict(paramer_list)
-    return parameter_dict
 
 
 def read_settings(group):
