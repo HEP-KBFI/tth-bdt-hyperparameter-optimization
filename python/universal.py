@@ -332,7 +332,10 @@ def save_results(result_dict, output_dir, plot_roc=True, plot_extras=False):
     assessment = dict(
         (key, result_dict[key]) for key in keys if key in result_dict)
     auc_info = calculate_auc(
-        data_dict, result_dict['pred_train'], result_dict['pred_test'])[-1]
+        result_dict['data_dict'],
+        result_dict['pred_train'],
+        result_dict['pred_test']
+    )[-1]
     if plot_roc:
         plotting(output_dir, auc_info, result_dict['avg_scores'])
     if plot_extras:
