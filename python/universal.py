@@ -314,6 +314,8 @@ def save_run_settings(output_dir):
     Nothing
     '''
     settings_dir = os.path.join(output_dir, 'run_settings')
+    if not os.path.exists(settings_dir):
+        os.makedirs(settings_dir)
     cmssw_base = os.path.expandvars('$CMSSW_BASE')
     wild_card_path = os.path.join(
         cmssw_base,
