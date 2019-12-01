@@ -330,7 +330,7 @@ def save_results(result_dict, output_dir, plot_roc=True, plot_extras=False):
         'best_d_score'
     ]
     assessment = dict(
-        (key, result_dict[key]) for key in keys if key in result_dict)
+        (key, result_dict[key]) for key in keys1 if key in result_dict)
     if plot_roc:
         plotting(output_dir, auc_info, result_dict['avg_scores'])
     if plot_extras:
