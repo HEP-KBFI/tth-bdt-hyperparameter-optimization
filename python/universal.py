@@ -58,7 +58,7 @@ def best_to_file(best_values, output_dir, assesment):
         json.dump(assesment, file)
 
 
-def calculate_fitness(
+def calculate_d_score(
         pred_train,
         pred_test,
         data_dict
@@ -80,7 +80,7 @@ def calculate_fitness(
 
     Returns:
     -------
-    score : float
+    d_score : float
         Score for the parameters used.
     '''
     train_value = []
@@ -101,8 +101,8 @@ def calculate_fitness(
         if pair[0] == pair[1]:
             test_n = test_n + 1
     test_score = float(test_n)/len(data_dict['testing_labels'])
-    evaluation = score(train_score, test_score)
-    return evaluation
+    d_score = score(train_score, test_score)
+    return d_score
 
 
 def score(train_score, test_score):
@@ -118,15 +118,15 @@ def score(train_score, test_score):
 
     Returns:
     -------
-    evaluation : float
+    d_score : float
         Score for the set of parameters.
     '''
-    evaluation = np.mean([
+    d_score = np.mean([
         (1 - (train_score - test_score)),
         (1 - (train_score - test_score)),
         test_score
     ])
-    return evaluation
+    return d_score
 
 
 def calculate_conf_matrix(predicted_train, predicted_test, data_dict):
@@ -558,7 +558,9 @@ def create_extra_plots(result_dict, output_dir):
     plot_out1 = os.path.join(output_dir, 'scoring_metrics.png')
     plot_out2 = os.path.join(output_dir, 'stopping_criteria.png')
     keys1 = [
-        'best_test_aucs', 'best_train_aucs', 'best_g_scores', 'best_f1_scores']
+        'best_test_aucs', 'best_train_aucs',
+        'best_g_scores', 'best_f1_scores',
+        'best_d_scores']
     keys2 = ['compactnesses', 'avg_scores']
     plot_single_evolution(keys1, result_dict, 'Scoring metrics', plot_out1)
     plot_single_evolution(keys2, result_dict, 'Stopping criteria', plot_out2)
@@ -583,7 +585,7 @@ def save_extra_results(result_dict, output_dir):
     keys1 = [
         'best_test_aucs', 'best_train_aucs',
         'best_g_scores', 'best_fitnesses',
-        'best_f1_scores'
+        'best_f1_scores', 'best_d_scores'
     ]
     keys2 = ['compactnesses', 'avg_scores']
     save_single_file(keys1, result_dict, file_out1)

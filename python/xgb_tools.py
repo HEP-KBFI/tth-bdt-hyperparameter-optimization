@@ -107,6 +107,7 @@ def parameter_evaluation(parameter_dict, data_dict, nthread, num_class):
         test_conf_matrix)
     g_score_train, f1_score_train = universal.calculate_f1_score(
         train_conf_matrix)
+    d_score = calculate_d_score(pred_train, pred_test, data_dict)
     train_auc, test_auc = universal.calculate_auc(
         data_dict, pred_train, pred_test)[:2]
     score_dict = {
@@ -115,7 +116,8 @@ def parameter_evaluation(parameter_dict, data_dict, nthread, num_class):
         'test_auc': test_auc,
         'f1_score_train': f1_score_train,
         'g_score_train': g_score_train,
-        'train_auc': train_auc
+        'train_auc': train_auc,
+        'd_score': d_score
     }
     return score_dict, pred_train, pred_test
 

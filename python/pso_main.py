@@ -370,7 +370,9 @@ def run_pso(
         'best_test_aucs': [score_dicts[index]['test_auc']],
         'best_train_aucs': [score_dicts[index]['train_auc']],
         'best_f1_score': score_dicts[index]['f1_score_test'],
-        'best_f1_scores': [score_dicts[index]['f1_score_test']]
+        'best_f1_scores': [score_dicts[index]['f1_score_test']],
+        'best_d_score': score_dicts[index]['d_score'],
+        'best_d_scores': [score_dicts[index]['d_score']]
     }
     personal_bests = parameter_dicts
     best_fitnesses = fitnesses
@@ -406,6 +408,7 @@ def run_pso(
             result_dict['best_g_score'] = score_dicts[index]['g_score_test']
             result_dict['best_test_auc'] = score_dicts[index]['test_auc']
             result_dict['best_train_auc'] = score_dicts[index]['train_auc']
+            result_dict['best_d_score'] = score_dicts[index]['d_score']
             result_dict['best_f1_score'] = score_dicts[index]['f1_score_test']
         avg_scores = np.mean(fitnesses)
         result_dict['avg_scores'].append(avg_scores)
@@ -415,6 +418,7 @@ def run_pso(
         result_dict['best_train_aucs'].append(result_dict['best_train_auc'])
         result_dict['best_test_aucs'].append(result_dict['best_test_auc'])
         result_dict['best_f1_scores'].append(result_dict['best_f1_score'])
+        result_dict['best_d_scores'].append(result_dict['best_d_score'])
         inertial_weight += inertial_weight_step
         i += 1
     return result_dict
