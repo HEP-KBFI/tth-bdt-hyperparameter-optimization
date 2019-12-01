@@ -324,13 +324,15 @@ def save_results(result_dict, output_dir, plot_roc=True, plot_extras=False):
     '''
     if not os.path.exists(output_dir):
         os.makedirs(output_dir)
-    keys1 = [
+    keys = [
         'best_test_auc', 'best_train_auc',
         'best_g_score', 'best_f1_score',
         'best_d_score'
     ]
     assessment = dict(
-        (key, result_dict[key]) for key in keys1 if key in result_dict)
+        (key, result_dict[key]) for key in keys if key in result_dict)
+    auc_info = calculate_auc(
+        data_dict, result_dict['pred_train'], result_dict['pred_test'])[-1]
     if plot_roc:
         plotting(output_dir, auc_info, result_dict['avg_scores'])
     if plot_extras:
