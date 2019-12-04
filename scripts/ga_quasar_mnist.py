@@ -16,6 +16,7 @@ import os
 import docopt
 from tthAnalysis.bdtHyperparameterOptimization import universal
 from tthAnalysis.bdtHyperparameterOptimization import mnist_filereader as mf
+from tthAnalysis.bdtHyperparameterOptimization import xgb_tools as xt
 from tthAnalysis.bdtHyperparameterOptimization import ga_main as ga
 
 
@@ -32,7 +33,7 @@ def main(sample_dir, nthread, output_dir, param_file):
     data_dict = mf.create_datasets(sample_dir, nthread)
 
     # Run genetic algorithm and save results
-    result = ga.evolution(settings_dict, data_dict, param_dict)
+    result = ga.evolution(settings_dict, data_dict, param_dict, xt.prepare_run_params, xt.ensemble_fitnesses)
     universal.save_results(result, output_dir)
 
 

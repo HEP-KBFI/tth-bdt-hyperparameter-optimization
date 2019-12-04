@@ -1,7 +1,6 @@
 '''Main functions for the genetic algorithm'''
 from __future__ import division
 import numpy as np
-from tthAnalysis.bdtHyperparameterOptimization import xgb_tools as xt
 from tthAnalysis.bdtHyperparameterOptimization import universal
 from tthAnalysis.bdtHyperparameterOptimization import ga_selection as select
 from tthAnalysis.bdtHyperparameterOptimization import ga_crossover as gc
@@ -81,7 +80,7 @@ def elitism(population, fitnesses, elites):
     return elite
 
 
-def culling(population, fitnesses, settings, data, parameters):
+def culling(population, fitnesses, settings, data, parameters, create_set, evaluate):
     '''Cull worst performing members
     and replace them with random new ones
 
@@ -120,10 +119,10 @@ def culling(population, fitnesses, settings, data, parameters):
         num -= 1
 
     # Replace destroyed members
-    new_members = xt.prepare_run_params(parameters, size)
+    new_members = create_set(parameters, size)
     population += new_members
     fitnesses += universal.fitness_to_list(
-        xt.ensemble_fitnesses(new_members, data, settings)[0])
+        evaluate(new_members, data, settings)[0])
 
     return population, fitnesses
 
@@ -164,7 +163,7 @@ def new_population(population, fitnesses, settings, parameters):
     return next_population
 
 
-def create_subpopulations(settings, parameters):
+def create_subpopulations(settings, parameters, create_set):
     '''Create num amount of subpopulations
 
     Parameters
@@ -197,13 +196,13 @@ def create_subpopulations(settings, parameters):
             sub_size = size//num
 
         # Generate subpopulation
-        sub_population = xt.prepare_run_params(parameters, sub_size)
+        sub_population = create_set(parameters, sub_size)
         subpopulations.append(sub_population)
 
     return subpopulations
 
 
-def sub_evolution(subpopulations, settings, data, parameters):
+def sub_evolution(subpopulations, settings, data, parameters, create_set):
     '''Evolve subpopulations separately and then merge them into one
 
     Parameters
@@ -236,7 +235,7 @@ def sub_evolution(subpopulations, settings, data, parameters):
     for population in subpopulations:
         print('\n::::: Subpopulation: ' + str(sub_iteration) + ' :::::')
         final_population, scores_dict = evolve(
-            population, settings, data, parameters)
+            population, settings, data, parameters, create_set, evaluate)
 
         # Saving results in dictionaries
         # (key indicates the subpopulation)
@@ -258,7 +257,7 @@ def sub_evolution(subpopulations, settings, data, parameters):
     return merged_population, scores_dict
 
 
-def evolve(population, settings, data, parameters, final=False):
+def evolve(population, settings, data, parameters, create_set, evaluate, final=False):
     '''Evolve a population until reaching the threshold
     or maximum number of iterations
 
@@ -304,12 +303,12 @@ def evolve(population, settings, data, parameters, final=False):
         if iteration != 0:
             print('::::: Iteration:     ' + str(iteration) + ' :::::')
             population, fitnesses = culling(
-                population, fitnesses, settings, data, parameters)
+                population, fitnesses, settings, data, parameters, create_set, evaluate)
             population = new_population(
                 population, fitnesses, settings, parameters)
 
         # Calculate fitness of the population
-        fitnesses, pred_trains, pred_tests = xt.ensemble_fitnesses(
+        fitnesses, pred_trains, pred_tests = evaluate(
             population, data, settings)
         fitnesses = universal.fitness_to_list(fitnesses)
 
@@ -337,7 +336,7 @@ def evolve(population, settings, data, parameters, final=False):
     return population, scores_dict
 
 
-def evolution(settings, data, parameters):
+def evolution(settings, data, parameters, create_set, evolve):
     '''Evolution of the parameter values
 
     Parameters
@@ -363,15 +362,15 @@ def evolution(settings, data, parameters):
 
         # Create subpopulations
         print('::::::: Creating subpopulations ::::::::')
-        subpopulations = create_subpopulations(settings, parameters)
+        subpopulations = create_subpopulations(settings, parameters, create_set)
 
         # Evolve subpopulations
         merged_population, scores_dict = sub_evolution(
-            subpopulations, settings, data, parameters)
+            subpopulations, settings, data, parameters, create_set)
 
         # Evolve merged population
         print(('\n::::: Merged population:::::'))
-        output = evolve(merged_population, settings, data, parameters, True)
+        output = evolve(merged_population, settings, data, parameters, create_set, evaluate, True)
 
         scores_dict['best_scores'].update(
             {'final': output[1]['best_scores']})
@@ -385,10 +384,10 @@ def evolution(settings, data, parameters):
 
         # Create one population
         print('::::::: Creating population ::::::::\n')
-        population = xt.prepare_run_params(parameters, settings['pop_size'])
+        population = create_set(parameters, settings['pop_size'])
 
         # Evolve population
-        output = evolve(population, settings, data, parameters, True)
+        output = evolve(population, settings, data, parameters, create_set, evaluate, True)
 
     # Finalize results
     index = np.argmax(output[2])
