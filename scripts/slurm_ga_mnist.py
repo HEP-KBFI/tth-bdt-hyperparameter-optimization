@@ -1,16 +1,19 @@
 '''
 Genetic algorithm for the hyperparameters optimization of XGBoost.
-(MNIST numbers).
+(MNIST numbers). Version for slurm.
 Call with 'python'
 
-Usage: ga_quasar_mnist.py
+Usage: slurm_pso_mnist.py
 '''
 from __future__ import division
 import os
+import warnings
+from tthAnalysis.bdtHyperparameterOptimization import slurm_main as sm
+from tthAnalysis.bdtHyperparameterOptimization import mnist_filereader  as mf
 from tthAnalysis.bdtHyperparameterOptimization import universal
-from tthAnalysis.bdtHyperparameterOptimization import mnist_filereader as mf
-from tthAnalysis.bdtHyperparameterOptimization import xgb_tools as xt
 from tthAnalysis.bdtHyperparameterOptimization import ga_main as ga
+from tthAnalysis.bdtHyperparameterOptimization import xgb_tools as xt
+warnings.filterwarnings('ignore', category=DeprecationWarning)
 
 
 def main():
@@ -46,9 +49,10 @@ def main():
         data_dict,
         param_dict,
         xt.prepare_run_params,
-        xt.ensemble_fitnesses
+        sm.run_iteration
     )
-    universal.save_results(result, global_settings['output_dir'])
+    universal.save_results(result, output_dir)
+    sm.clear_from_files(global_settings)
 
 
 if __name__ == '__main__':
