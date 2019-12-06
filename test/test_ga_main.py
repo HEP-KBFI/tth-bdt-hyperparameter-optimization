@@ -49,7 +49,7 @@ PARAMETERS = [
 SETTINGS = {
     'num_classes': 10,
     'pop_size': 3,
-    'iterations': 2,
+    'iterations': 1,
     'threshold': 0.001,
     'mut_chance': 0.03,
     'elites': 1,
@@ -169,5 +169,10 @@ def test_create_subpopulations():
 #         DATA,
 #         PARAMETERS,
 #         xt.prepare_run_params,
-#         xt.ensemble_fitnesses
+#         xt.ensemble_fitnesses,
+#         True
 #         )
+#     assert len(result[0]) == len(POPULATION), 'test_evolve failed'
+#     for key in result[1]:
+#         assert len(result[1][key] == SETTINGS['iterations']), 'test_evolve failed'
+#     assert len(result[2]) == len(result[0]), 'test_evolve failed'

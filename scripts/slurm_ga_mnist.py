@@ -25,7 +25,7 @@ def main():
         os.makedirs(output_dir)
 
     settings_dict = universal.read_settings('ga')
-    settings_dict.update({'nthread': global_settings['nthread']})
+    settings_dict.update(global_settings)
 
     cmssw_base_path = os.path.expandvars('$CMSSW_BASE')
     param_file = os.path.join(
