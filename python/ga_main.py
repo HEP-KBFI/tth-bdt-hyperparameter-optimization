@@ -202,7 +202,7 @@ def create_subpopulations(settings, parameters, create_set):
     return subpopulations
 
 
-def sub_evolution(subpopulations, settings, data, parameters, create_set):
+def sub_evolution(subpopulations, settings, data, parameters, create_set, evaluate):
     '''Evolve subpopulations separately and then merge them into one
 
     Parameters
@@ -336,7 +336,7 @@ def evolve(population, settings, data, parameters, create_set, evaluate, final=F
     return population, scores_dict
 
 
-def evolution(settings, data, parameters, create_set, evolve):
+def evolution(settings, data, parameters, create_set, evaluate):
     '''Evolution of the parameter values
 
     Parameters
@@ -366,7 +366,7 @@ def evolution(settings, data, parameters, create_set, evolve):
 
         # Evolve subpopulations
         merged_population, scores_dict = sub_evolution(
-            subpopulations, settings, data, parameters, create_set)
+            subpopulations, settings, data, parameters, create_set, evaluate)
 
         # Evolve merged population
         print(('\n::::: Merged population:::::'))
