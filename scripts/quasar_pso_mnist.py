@@ -43,7 +43,7 @@ def main():
         data_dict, value_dicts, xt.ensemble_fitnesses, parameter_dicts
     )
     universal.save_results(result_dict, output_dir, plot_extras=True)
-
+    print("Results saved to " + str(output_dir))
 
 if __name__ == '__main__':
     main()

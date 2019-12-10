@@ -47,6 +47,7 @@ def main():
     )
     universal.save_results(result_dict, output_dir, plot_extras=True)
     sm.clear_from_files(global_settings)
+    print("Results saved to " + str(output_dir))
 
 
 if __name__ == '__main__':
