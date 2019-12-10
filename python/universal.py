@@ -323,7 +323,7 @@ def get_scores_dict(pred_train, pred_test, data_dict):
         'd_score': d_score
     }
     kappas = [0.0, 0.5, 1.0, 1.5, 2.0]
-    for kappa in kappas
+    for kappa in kappas:
         d_roc = calculate_d_roc(train_auc, test_auc, kappa)
         key_name = 'd_roc_' + str(kappa)
         score_dict[key_name] = d_roc
