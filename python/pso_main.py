@@ -310,6 +310,56 @@ def get_weight_step(pso_settings):
     return inertial_weight, inertial_weight_step
 
 
+def track_best_scores(
+        keys,
+        score_dicts,
+        index,
+        result_dict,
+        fitnesses,
+        compactness,
+        pred_trains,
+        pred_tests,
+        new_bests=False,
+        initialize_lists=False
+):
+    '''Tracks best scores to a dict
+
+    Parameters:
+    ----------
+    keys : list
+        list of keys to be added to the initial result_dict
+    score_dicts : list of dicts
+        list containing the scores for each particle
+    index : int
+        index of best parameter
+    result_dict : dict
+        Dictionary containing the best scores
+    [initialize=False]: bool
+        Whether to initialize also the lists
+
+    Returns:
+    -------
+    result_dict : dict
+        Dictionary containing the best scores
+    '''
+    for key in keys:
+        key_name = 'best_' + key
+        list_key = key_name + 's'
+        if new_bests:
+            result_dict[key_name] = score_dicts[index][key]
+        if initialize_lists:
+            result_dict[list_key] = []
+        result_dict[list_key].append(result_dict[key_name])
+    if new_bests:
+        result_dict['best_fitness'] = max(fitnesses)
+        result_dict['pred_train'] = pred_trains[index]
+        result_dict['pred_test'] = pred_tests[index]
+        result_dict['best_parameters'] = parameter_dicts[index]
+    result_dict['avg_scores'].append(np.mean(fitnesses))
+    result_dict['compactnesses'].append(compactness)
+    return result_dict
+
+
 def run_pso(
         data_dict,
         value_dicts,
@@ -339,6 +389,7 @@ def run_pso(
         Dictionary that contains the results like best_parameters,
         best_fitnesses, avg_scores, pred_train, pred_test, data_dict
     '''
+    scoring_keys = ['g_score', 'f1_score', 'd_score', 'test_auc', 'train_auc']
     print(':::::::: Initializing :::::::::')
     global_settings = universal.read_settings('global')
     pso_settings = read_weights()
@@ -354,6 +405,7 @@ def run_pso(
     fitnesses = universal.fitness_to_list(
         score_dicts, fitness_key=global_settings['fitness_fn'])
     index = np.argmax(fitnesses)
+    result_dict = {'data_dict': data_dict}
     result_dict = {
         'data_dict': data_dict,
         'best_parameters': parameter_dicts[index],
@@ -361,16 +413,16 @@ def run_pso(
         'pred_test': pred_tests[index],
         'best_fitness': max(fitnesses),
         'avg_scores': [np.mean(fitnesses)],
-        'best_g_score': score_dicts[index]['g_score_test'],
-        'best_test_auc': score_dicts[index]['test_auc'],
-        'best_train_auc': score_dicts[index]['train_auc'],
         'compactnesses': [compactness],
         'best_fitnesses': [max(fitnesses)],
-        'best_g_scores': [score_dicts[index]['g_score_test']],
+        'best_g_score': score_dicts[index]['g_score'],
+        'best_g_scores': [score_dicts[index]['g_score']],
+        'best_test_auc': score_dicts[index]['test_auc'],
         'best_test_aucs': [score_dicts[index]['test_auc']],
+        'best_train_auc': score_dicts[index]['train_auc'],
         'best_train_aucs': [score_dicts[index]['train_auc']],
-        'best_f1_score': score_dicts[index]['f1_score_test'],
-        'best_f1_scores': [score_dicts[index]['f1_score_test']],
+        'best_f1_score': score_dicts[index]['f1_score'],
+        'best_f1_scores': [score_dicts[index]['f1_score']],
         'best_d_score': score_dicts[index]['d_score'],
         'best_d_scores': [score_dicts[index]['d_score']]
     }
@@ -401,6 +453,7 @@ def run_pso(
         )
         index = np.argmax(fitnesses)
         if result_dict['best_fitness'] < max(fitnesses):
+            
             result_dict['best_parameters'] = parameter_dicts[index]
             result_dict['pred_train'] = pred_trains[index]
             result_dict['pred_test'] = pred_tests[index]
@@ -410,7 +463,6 @@ def run_pso(
             result_dict['best_train_auc'] = score_dicts[index]['train_auc']
             result_dict['best_d_score'] = score_dicts[index]['d_score']
             result_dict['best_f1_score'] = score_dicts[index]['f1_score_test']
-        avg_scores = np.mean(fitnesses)
         result_dict['avg_scores'].append(avg_scores)
         result_dict['compactnesses'].append(compactness)
         result_dict['best_fitnesses'].append(result_dict['best_fitness'])
