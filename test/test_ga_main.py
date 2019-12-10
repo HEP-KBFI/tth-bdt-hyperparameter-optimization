@@ -1,11 +1,6 @@
-'''
-Testing the main functions of the genetic algorithm.
-Missing tests for the following functions:
-    sub_evolution
-    evolve
-    evolution
-'''
+'''Testing the main functions of the genetic algorithm.'''
 import os
+import pytest
 from tthAnalysis.bdtHyperparameterOptimization import ga_main as gm
 from tthAnalysis.bdtHyperparameterOptimization import xgb_tools as xt
 from tthAnalysis.bdtHyperparameterOptimization import mnist_filereader as mf
@@ -54,7 +49,7 @@ SETTINGS = {
     'mut_chance': 0.03,
     'elites': 1,
     'culling': 1,
-    'nthread': 8
+    'nthread': 16
 }
 
 POPULATION = [
@@ -81,7 +76,7 @@ POPULATION = [
 FITNESSES = [0.4, 0.6, 0.8]
 
 # temporary solution for data during testing
-DATA = mf.create_datasets(os.path.expandvars('$HOME/MNIST'), 8)
+DATA = mf.create_datasets(os.path.expandvars('$HOME/MNIST'), 16)
 
 def test_set_num():
     '''Testing the set_num function'''
@@ -105,6 +100,7 @@ def test_elitism():
     assert result == excpected, 'test_elitism failed'
 
 
+@pytest.mark.skip(reason="Runs too long")
 def test_culling():
     '''Testing the culling function'''
     result = gm.culling(
@@ -132,7 +128,7 @@ def test_new_population():
 def test_create_subpopulations():
     '''Testing the create_subpopulations function'''
     nums = [1, 2, 3]
-    excpected = [[1], [2, 1], [1, 1, 1]]
+    excpected = [[3], [2, 1], [1, 1, 1]]
     i = 0
     for num in nums:
         j = 0
@@ -148,31 +144,37 @@ def test_create_subpopulations():
         i += 1
 
 
-# def test_sub_evolution():
-#     '''Testing the sub_evolution function'''
-#     result = gm.sub_evolution(
-#         [POPULATION[0:2], POPULATION[2]],
-#         SETTINGS,
-#         DATA,
-#         PARAMETERS,
-#         xt.prepare_run_params,
-#         xt.ensemble_fitnesses
-#     )
-#     assert len(result) == len(POPULATION)
+@pytest.mark.skip(reason="Runs too long")
+def test_sub_evolution():
+    '''Testing the sub_evolution function'''
+    SETTINGS.update({'culling': 0})
+    result = gm.sub_evolution(
+        [POPULATION[:2], POPULATION[2:]],
+        SETTINGS,
+        DATA,
+        PARAMETERS,
+        xt.prepare_run_params,
+        xt.ensemble_fitnesses
+    )
+    assert len(result[0]) == len(POPULATION), 'test_sub_evolution failed'
 
 
-# def test_evolve():
-#     '''Testing the evolve function'''
-#     result = gm.evolve(
-#         POPULATION,
-#         SETTINGS,
-#         DATA,
-#         PARAMETERS,
-#         xt.prepare_run_params,
-#         xt.ensemble_fitnesses,
-#         True
-#         )
-#     assert len(result[0]) == len(POPULATION), 'test_evolve failed'
-#     for key in result[1]:
-#         assert len(result[1][key] == SETTINGS['iterations']), 'test_evolve failed'
-#     assert len(result[2]) == len(result[0]), 'test_evolve failed'
+@pytest.mark.skip(reason="Runs too long")
+def test_evolve():
+    '''Testing the evolve function'''
+    initial = POPULATION[:1]
+    SETTINGS.update({'culling': 0})
+    result = gm.evolve(
+        initial,
+        SETTINGS,
+        DATA,
+        PARAMETERS,
+        xt.prepare_run_params,
+        xt.ensemble_fitnesses,
+        True
+        )
+    assert len(result[0]) == len(initial), 'test_evolve failed'
+    for key in result[1]:
+        assert len(result[1][key]) == SETTINGS['iterations'] + 1, \
+            'test_evolve failed'
+    assert len(result[2]) == len(result[0]), 'test_evolve failed'
