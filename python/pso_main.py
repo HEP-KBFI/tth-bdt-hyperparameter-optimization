@@ -311,6 +311,7 @@ def get_weight_step(pso_settings):
 
 
 def track_best_scores(
+        parameter_dicts
         keys,
         score_dicts,
         result_dict,
@@ -407,6 +408,7 @@ def run_pso(
         score_dicts, fitness_key=global_settings['fitness_fn'])
     result_dict = {'data_dict': data_dict}
     result_dict = track_best_scores(
+        parameter_dicts,
         scoring_keys,
         score_dicts,
         result_dict,
@@ -445,6 +447,7 @@ def run_pso(
         )
         if result_dict['best_fitness'] < max(fitnesses):
             result_dict = track_best_scores(
+                parameter_dicts,
                 scoring_keys,
                 score_dicts,
                 result_dict,
@@ -455,6 +458,7 @@ def run_pso(
                 new_bests=True,
             )
         result_dict = track_best_scores(
+            parameter_dicts,
             scoring_keys,
             score_dicts,
             result_dict,
