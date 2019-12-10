@@ -313,14 +313,14 @@ def get_weight_step(pso_settings):
 def track_best_scores(
         keys,
         score_dicts,
-        index,
         result_dict,
         fitnesses,
         compactness,
         pred_trains,
         pred_tests,
         new_bests=False,
-        initialize_lists=False
+        initialize_lists=False,
+        append_lists=False
 ):
     '''Tracks best scores to a dict
 
@@ -330,8 +330,6 @@ def track_best_scores(
         list of keys to be added to the initial result_dict
     score_dicts : list of dicts
         list containing the scores for each particle
-    index : int
-        index of best parameter
     result_dict : dict
         Dictionary containing the best scores
     [initialize=False]: bool
@@ -342,6 +340,7 @@ def track_best_scores(
     result_dict : dict
         Dictionary containing the best scores
     '''
+    index = np.argmax(fitnesses)
     for key in keys:
         key_name = 'best_' + key
         list_key = key_name + 's'
@@ -349,14 +348,16 @@ def track_best_scores(
             result_dict[key_name] = score_dicts[index][key]
         if initialize_lists:
             result_dict[list_key] = []
-        result_dict[list_key].append(result_dict[key_name])
+        if append_lists:
+            result_dict[list_key].append(result_dict[key_name])
     if new_bests:
         result_dict['best_fitness'] = max(fitnesses)
         result_dict['pred_train'] = pred_trains[index]
         result_dict['pred_test'] = pred_tests[index]
         result_dict['best_parameters'] = parameter_dicts[index]
-    result_dict['avg_scores'].append(np.mean(fitnesses))
-    result_dict['compactnesses'].append(compactness)
+    if append_lists:
+        result_dict['avg_scores'].append(np.mean(fitnesses))
+        result_dict['compactnesses'].append(compactness)
     return result_dict
 
 
@@ -404,28 +405,19 @@ def run_pso(
         parameter_dicts, data_dict, global_settings)
     fitnesses = universal.fitness_to_list(
         score_dicts, fitness_key=global_settings['fitness_fn'])
-    index = np.argmax(fitnesses)
     result_dict = {'data_dict': data_dict}
-    result_dict = {
-        'data_dict': data_dict,
-        'best_parameters': parameter_dicts[index],
-        'pred_train': pred_trains[index],
-        'pred_test': pred_tests[index],
-        'best_fitness': max(fitnesses),
-        'avg_scores': [np.mean(fitnesses)],
-        'compactnesses': [compactness],
-        'best_fitnesses': [max(fitnesses)],
-        'best_g_score': score_dicts[index]['g_score'],
-        'best_g_scores': [score_dicts[index]['g_score']],
-        'best_test_auc': score_dicts[index]['test_auc'],
-        'best_test_aucs': [score_dicts[index]['test_auc']],
-        'best_train_auc': score_dicts[index]['train_auc'],
-        'best_train_aucs': [score_dicts[index]['train_auc']],
-        'best_f1_score': score_dicts[index]['f1_score'],
-        'best_f1_scores': [score_dicts[index]['f1_score']],
-        'best_d_score': score_dicts[index]['d_score'],
-        'best_d_scores': [score_dicts[index]['d_score']]
-    }
+    result_dict = track_best_scores(
+        scoring_keys,
+        score_dicts,
+        result_dict,
+        fitnesses,
+        compactness,
+        pred_trains,
+        pred_tests,
+        new_bests=True,
+        initialize_lists=True,
+        append_lists=True
+    )
     personal_bests = parameter_dicts
     best_fitnesses = fitnesses
     current_speeds = initialize_speeds(parameter_dicts)
@@ -451,26 +443,27 @@ def run_pso(
             current_speeds, value_dicts,
             weight_dict
         )
-        index = np.argmax(fitnesses)
         if result_dict['best_fitness'] < max(fitnesses):
-            
-            result_dict['best_parameters'] = parameter_dicts[index]
-            result_dict['pred_train'] = pred_trains[index]
-            result_dict['pred_test'] = pred_tests[index]
-            result_dict['best_fitness'] = max(fitnesses)
-            result_dict['best_g_score'] = score_dicts[index]['g_score_test']
-            result_dict['best_test_auc'] = score_dicts[index]['test_auc']
-            result_dict['best_train_auc'] = score_dicts[index]['train_auc']
-            result_dict['best_d_score'] = score_dicts[index]['d_score']
-            result_dict['best_f1_score'] = score_dicts[index]['f1_score_test']
-        result_dict['avg_scores'].append(avg_scores)
-        result_dict['compactnesses'].append(compactness)
-        result_dict['best_fitnesses'].append(result_dict['best_fitness'])
-        result_dict['best_g_scores'].append(result_dict['best_g_score'])
-        result_dict['best_train_aucs'].append(result_dict['best_train_auc'])
-        result_dict['best_test_aucs'].append(result_dict['best_test_auc'])
-        result_dict['best_f1_scores'].append(result_dict['best_f1_score'])
-        result_dict['best_d_scores'].append(result_dict['best_d_score'])
+            result_dict = track_best_scores(
+                scoring_keys,
+                score_dicts,
+                result_dict,
+                fitnesses,
+                compactness,
+                pred_trains,
+                pred_tests,
+                new_bests=True,
+            )
+        result_dict = track_best_scores(
+            scoring_keys,
+            score_dicts,
+            result_dict,
+            fitnesses,
+            compactness,
+            pred_trains,
+            pred_tests,
+            append_lists=True,
+        )
         inertial_weight += inertial_weight_step
         i += 1
     return result_dict
