@@ -311,7 +311,7 @@ def get_weight_step(pso_settings):
 
 
 def track_best_scores(
-        parameter_dicts
+        parameter_dicts,
         keys,
         score_dicts,
         result_dict,
