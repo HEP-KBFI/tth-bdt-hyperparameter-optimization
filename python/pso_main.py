@@ -342,6 +342,9 @@ def track_best_scores(
         Dictionary containing the best scores
     '''
     index = np.argmax(fitnesses)
+    if initialize_lists:
+        result_dict['avg_scores'] = []
+        result_dict['compactnesses'] = []
     for key in keys:
         key_name = 'best_' + key
         list_key = key_name + 's'
