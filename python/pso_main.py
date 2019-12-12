@@ -311,6 +311,7 @@ def get_weight_step(pso_settings):
 
 
 def track_best_scores(
+        feature_importances,
         parameter_dicts,
         keys,
         score_dicts,
@@ -359,6 +360,7 @@ def track_best_scores(
         result_dict['pred_train'] = pred_trains[index]
         result_dict['pred_test'] = pred_tests[index]
         result_dict['best_parameters'] = parameter_dicts[index]
+        result_dict['feature_importances'] = feature_importances[index]
     if append_lists:
         result_dict['avg_scores'].append(np.mean(fitnesses))
         result_dict['compactnesses'].append(compactness)
@@ -405,12 +407,13 @@ def run_pso(
     new_parameters = parameter_dicts
     personal_bests = {}
     compactness = universal.calculate_compactness(parameter_dicts)
-    score_dicts, pred_trains, pred_tests = calculate_fitnesses(
+    score_dicts, pred_trains, pred_tests, feature_importances = calculate_fitnesses(
         parameter_dicts, data_dict, global_settings)
     fitnesses = universal.fitness_to_list(
         score_dicts, fitness_key=global_settings['fitness_fn'])
     result_dict = {'data_dict': data_dict}
     result_dict = track_best_scores(
+        feature_importances,
         parameter_dicts,
         scoring_keys,
         score_dicts,
@@ -431,7 +434,7 @@ def run_pso(
         parameter_dicts = new_parameters
         compactness = universal.calculate_compactness(parameter_dicts)
         print(' --- Compactness: ' + str(compactness) + ' ---')
-        score_dicts, pred_trains, pred_tests = calculate_fitnesses(
+        score_dicts, pred_trains, pred_tests, feature_importances = calculate_fitnesses(
             parameter_dicts, data_dict, global_settings)
         fitnesses = universal.fitness_to_list(
             score_dicts, fitness_key=global_settings['fitness_fn'])
@@ -450,6 +453,7 @@ def run_pso(
         )
         if result_dict['best_fitness'] < max(fitnesses):
             result_dict = track_best_scores(
+                feature_importances,
                 parameter_dicts,
                 scoring_keys,
                 score_dicts,
@@ -461,6 +465,7 @@ def run_pso(
                 new_bests=True,
             )
         result_dict = track_best_scores(
+            feature_importances,
             parameter_dicts,
             scoring_keys,
             score_dicts,

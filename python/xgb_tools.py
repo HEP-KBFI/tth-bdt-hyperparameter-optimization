@@ -101,7 +101,8 @@ def parameter_evaluation(parameter_dict, data_dict, nthread, num_class):
     pred_train = model.predict(data_dict['dtrain'])
     pred_test = model.predict(data_dict['dtest'])
     score_dict = universal.get_scores_dict(pred_train, pred_test, data_dict)
-    return score_dict, pred_train, pred_test
+    feature_importance = model.get_score(importance_type='gain')
+    return score_dict, pred_train, pred_test, feature_importance
 
 
 # parameter evaluation as argument for the function. Move to universal
@@ -130,11 +131,13 @@ def ensemble_fitnesses(parameter_dicts, data_dict, global_settings):
     score_dicts = []
     pred_trains = []
     pred_tests = []
+    feature_importances = []
     for parameter_dict in parameter_dicts:
-        score_dict, pred_train, pred_test = parameter_evaluation(
+        score_dict, pred_train, pred_test, feature_importance = parameter_evaluation(
             parameter_dict, data_dict,
             global_settings['nthread'], global_settings['num_classes'])
         score_dicts.append(score_dict)
         pred_trains.append(pred_train)
         pred_tests.append(pred_test)
-    return score_dicts, pred_trains, pred_tests
+        feature_importances.append(feature_importance)
+    return score_dicts, pred_trains, pred_tests, feature_importances
