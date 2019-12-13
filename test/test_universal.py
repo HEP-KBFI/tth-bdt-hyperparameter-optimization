@@ -195,7 +195,7 @@ def test_read_parameters():
         {'a': 1, 'b': 2, 'c': 3},
         {'stuff': 1}
     ]
-    assert (result == expected).all()
+    assert result == expected
 
 
 def test_best_to_file():
@@ -248,7 +248,7 @@ def test_calculate_d_roc():
 
 
 def test_calculate_conf_matrix():
-    pred_train = [0, 0]
+    pred_train = [0, 1]
     pred_test = [0, 0]
     data_dict = {
         'training_labels': [0, 0],
@@ -257,7 +257,7 @@ def test_calculate_conf_matrix():
     train_conf, test_conf = universal.calculate_conf_matrix(
         pred_train, pred_test, data_dict)
     expected1 = [[1, 1], [0, 0]]
-    expected2 = [[2, 0], [0, 0]]
+    expected2 = [[1, 1], [0, 0]]
     assert (expected1 == train_conf).all()
     assert (expected2 == test_conf).all()
 
