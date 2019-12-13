@@ -251,9 +251,45 @@ def test_calculate_conf_matrix():
         pred_train, pred_test, data_dict)
     expected1 = [[1, 1], [0, 0]]
     expected2 = [[2, 0], [0, 0]]
-    assert expected1 == train_conf
-    assert expected2 == test_conf
+    assert (expected1 == train_conf).all()
+    assert (expected2 == test_conf).all()
 
+
+def test_get_most_probable():
+    pred_train = [
+        [0.3, 0.4, 0.3],
+        [0.4, 0.5, 0.1],
+        [0.8, 0.15, 0.05]
+    ]
+    pred_test = [
+        [0.1, 0.4, 0.5],
+        [0.5, 0.2, 0.3],
+        [0.6, 0.2, 0.2]
+    ]
+    expected_train = [1, 1, 0]
+    expected_test = [2, 0, 0]
+    result = universal.get_most_probable(pred_train, pred_test)
+    assert expected_test == result[1]
+    assert expected_train == result[0]
+
+
+def test_main_f1_calculate():
+    pred_train = [0, 0]
+    pred_test = [0, 0]
+    data_dict = {
+        'training_labels': [0, 1],
+        'testing_labels': [0, 0]
+    }
+    result = universal.main_f1_calculate(pred_train, pred_test, data_dict)
+    np.testing.assert_almost_equal(
+        result['Test_F1'],
+        2/3,
+        6)
+    np.testing.assert_almost_equal(
+        result['Test_G'],
+        np.sqrt(0.5),
+        6
+    )
 
 
 def test_dummy_delete_files():
