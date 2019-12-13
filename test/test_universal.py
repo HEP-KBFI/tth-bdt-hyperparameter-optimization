@@ -189,13 +189,13 @@ def test_save_results():
 
 
 def test_read_parameters():
-    path_to_test_file = os.path.join(result_dict, 'best_parameters.json')
+    path_to_test_file = os.path.join(resources_dir, 'best_parameters.json')
     result = universal.read_parameters(path_to_test_file)
     expected = [
         {'a': 1, 'b': 2, 'c': 3},
         {'stuff': 1}
     ]
-    assert result == expected
+    assert (result == expected).all()
 
 
 def test_best_to_file():
@@ -210,11 +210,11 @@ def test_best_to_file():
 
 
 def test_calculate_d_score():
-    pred_train = [0, 0, 0, 0]
-    pred_test = [0, 0, 1, 0]
+    pred_test = [0, 0, 0, 0]
+    pred_train = [0, 0, 1, 0]
     data_dict = {
-        'training_labels': [0, 1, 0, 0],
-        'testing_labels': [0, 0, 1, 0]
+        'testing_labels': [0, 1, 0, 0],
+        'training_labels': [0, 0, 1, 0]
     }
     d_score = universal.calculate_d_score(pred_train, pred_test, data_dict)
     expected = 0.833
@@ -282,11 +282,11 @@ def test_main_f1_calculate():
     }
     result = universal.main_f1_calculate(pred_train, pred_test, data_dict)
     np.testing.assert_almost_equal(
-        result['Test_F1'],
+        result['Train_F1'],
         2/3,
         6)
     np.testing.assert_almost_equal(
-        result['Test_G'],
+        result['Train_G'],
         np.sqrt(0.5),
         6
     )
