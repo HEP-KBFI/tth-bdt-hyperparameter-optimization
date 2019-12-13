@@ -213,7 +213,7 @@ def test_calculate_d_score():
     pred_train = [0, 0, 0, 0]
     pred_test = [0, 0, 1, 0]
     data_dict = {
-        'training_labels': [0, 1, 0, 0]
+        'training_labels': [0, 1, 0, 0],
         'testing_labels': [0, 0, 1, 0]
     }
     d_score = universal.calculate_d_score(pred_train, pred_test, data_dict)
@@ -222,6 +222,38 @@ def test_calculate_d_score():
         d_score,
         expected,
         3)
+
+
+def test_score():
+    train_score = 1
+    test_score = 1
+    d_score = universal.score(train_score, test_score)
+    assert d_score == 1
+
+
+def test_calculate_d_roc():
+    train_auc = 0.5
+    test_auc = 0.5
+    kappa = 0
+    d_roc = universal.calculate_d_roc(train_auc, test_auc, kappa)
+    expected = 0.5
+    assert d_roc == expected
+
+
+def test_calculate_conf_matrix():
+    pred_train = [0, 0]
+    pred_test = [0, 0]
+    data_dict = {
+        'training_labels': [0, 1],
+        'testing_labels': [0, 0]
+    }
+    train_conf, test_conf = universal.calculate_conf_matrix(
+        pred_train, pred_test, data_dict)
+    expected1 = [[1, 1], [0, 0]]
+    expected2 = [[2, 0], [0, 0]]
+    assert expected1 == train_conf
+    assert expected2 == test_conf
+
 
 
 def test_dummy_delete_files():
