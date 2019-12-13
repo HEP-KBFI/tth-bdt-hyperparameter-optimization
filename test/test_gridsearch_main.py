@@ -1,6 +1,6 @@
 from __future__ import division
 import numpy as np
-from tthAnalysis.bdtHyperparameterOptimization import gridSearch_main as gm
+from tthAnalysis.bdtHyperparameterOptimization import gridsearch_main as gm
 from tthAnalysis.bdtHyperparameterOptimization import xgb_tools as xt
 
 
