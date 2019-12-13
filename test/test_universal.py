@@ -241,8 +241,8 @@ def test_calculate_conf_matrix():
     pred_train = [0, 0]
     pred_test = [0, 0]
     data_dict = {
-        'training_labels': [0, 1],
-        'testing_labels': [0, 0]
+        'training_labels': [0, 0],
+        'testing_labels': [0, 1]
     }
     train_conf, test_conf = universal.calculate_conf_matrix(
         pred_train, pred_test, data_dict)
