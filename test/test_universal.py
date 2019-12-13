@@ -5,7 +5,7 @@ import os
 import shutil
 from tthAnalysis.bdtHyperparameterOptimization import universal
 dir_path = os.path.dirname(os.path.realpath(__file__))
-resourcesDir = os.path.join(dir_path, 'resources', 'tmp')
+resources_dir = os.path.join(dir_path, 'resources', 'tmp')
 
 
 def test_create_pairs():
@@ -65,15 +65,15 @@ def test_plot_costfunction():
     avg_scores = [0.9, 0.95, 0.99, 1]
     error = False
     try:
-        universal.plot_costfunction(avg_scores, resourcesDir)
+        universal.plot_costfunction(avg_scores, resources_dir)
     except:
         error = True
     assert error == False
 
 
 def test_dummy_delete_files():
-    if os.path.exists(resourcesDir):
-        shutil.rmtree(resourcesDir)
+    if os.path.exists(resources_dir):
+        shutil.rmtree(resources_dir)
 
 
 
@@ -182,12 +182,48 @@ def test_save_results():
     }
     error = False
     try:
-        universal.save_results(result_dict, resourcesDir)
+        universal.save_results(result_dict, resources_dir)
     except:
         error = True
     assert error == False
 
 
+def test_read_parameters():
+    path_to_test_file = os.path.join(result_dict, 'best_parameters.json')
+    result = universal.read_parameters(path_to_test_file)
+    expected = [
+        {'a': 1, 'b': 2, 'c': 3},
+        {'stuff': 1}
+    ]
+    assert result == expected
+
+
+def test_best_to_file():
+    best_values = {'a': 1, 'b': 2, 'c': 3}
+    assessment = {'g': 3, 'h': 4}
+    good = True
+    try:
+        universal.best_to_file(best_values, resources_dir, assessment)
+    except:
+        good = False
+    assert good
+
+
+def test_calculate_d_score():
+    pred_train = [0, 0, 0, 0]
+    pred_test = [0, 0, 1, 0]
+    data_dict = {
+        'training_labels': [0, 1, 0, 0]
+        'testing_labels': [0, 0, 1, 0]
+    }
+    d_score = universal.calculate_d_score(pred_train, pred_test, data_dict)
+    expected = 0.833
+    np.testing.assert_almost_equal(
+        d_score,
+        expected,
+        3)
+
+
 def test_dummy_delete_files():
-    if os.path.exists(resourcesDir):
-        shutil.rmtree(resourcesDir)
+    if os.path.exists(resources_dir):
+        shutil.rmtree(resources_dir)
