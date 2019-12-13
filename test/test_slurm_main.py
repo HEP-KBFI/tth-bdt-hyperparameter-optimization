@@ -57,10 +57,12 @@ def test_get_sample_nr():
 
 @timeout_decorator.timeout(10)
 def test_wait_iteration():
-    start = timeit.timeit()
-    sm.wait_iteration(resourcesDir, 2)
-    end = timeit.timeit()
-    assert end - start < 1
+    working = False
+    try:
+        sm.wait_iteration(resourcesDir, 2)
+    except SystemExit: 
+        working = True
+    assert working
 
 
 def test_delete_previous_files():
@@ -88,7 +90,7 @@ def test_check_error():
         sm.check_error(resourcesDir)
     except:
         error = True
-    assert error == True
+    assert error
 
 
 def test_prepare_job_file():

@@ -357,7 +357,7 @@ def save_info(
     with open(score_path, 'w') as file:
         json.dump(score_dict, file)
     with open(importance_path, 'w') as file:
-        json.dump(feature_imporance, file)
+        json.dump(feature_importance, file)
 
 
 def clear_from_files(global_settings):
