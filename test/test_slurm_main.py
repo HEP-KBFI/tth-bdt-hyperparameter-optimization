@@ -129,7 +129,7 @@ def test_save_info():
     sm.save_info(score, pred_train, pred_test, saveDir, feature_importances)
     train_path = os.path.join(saveDir, 'pred_train.lst')
     test_path = os.path.join(saveDir, 'pred_test.lst')
-    score_path = os.path.join(saveDir, 'score.txt')
+    score_path = os.path.join(saveDir, 'score.json')
     count1 = len(open(train_path).readlines())
     count2 = len(open(test_path).readlines())
     count3 = len(open(score_path).readlines())
