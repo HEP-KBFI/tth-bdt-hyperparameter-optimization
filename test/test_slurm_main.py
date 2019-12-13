@@ -41,8 +41,9 @@ def test_create_result_lists():
     outputDir = os.path.join(resourcesDir)
     result = sm.create_result_lists(outputDir, 'pred_test')
     expected = np.array([
+        [[1, 2, 3], [4, 5, 6], [7, 8, 9]],
         [[9, 8, 7], [6, 5, 4], [3, 2, 1]],
-        [[1, 2, 3], [4, 5, 6], [7, 8, 9]]
+        [[1, 2, 3], [4, 5, 6], [7, 8, 9]],
     ], dtype=int)
     assert (result == expected).all()
 
@@ -77,7 +78,7 @@ def test_delete_previous_files():
 
 def test_read_fitness():
     result = sm.read_fitness(resourcesDir)[0]
-    expected = 1
+    expected = {"foo": 1, "bar": 2, "baz": 3}
     assert result == expected
 
 
@@ -123,7 +124,7 @@ def test_save_info():
     saveDir = tmp_folder
     if not os.path.exists(saveDir):
         os.makedirs(saveDir)
-    sm.save_info(score, pred_train, pred_test, saveDir, )
+    sm.save_info(score, pred_train, pred_test, saveDir, feature_importances)
     train_path = os.path.join(saveDir, 'pred_train.lst')
     test_path = os.path.join(saveDir, 'pred_test.lst')
     score_path = os.path.join(saveDir, 'score.txt')
