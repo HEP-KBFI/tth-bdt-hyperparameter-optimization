@@ -17,7 +17,7 @@ def test_single_paramSet():
         'second': 6,
         'third': 8
     }
-    result = gm.single_paramSet(parameters, iterations, grid_size)
+    result = gm.single_paramset(parameters, iterations, grid_size)
     assert result == expected
 
 

@@ -118,11 +118,12 @@ def test_dummy_delete_files():
 def test_save_info():
     pred_train = [[1, 2, 3], [4, 5, 6], [7, 8, 9]]
     pred_test = [[9, 8, 7], [6, 5, 4], [3, 2, 1]]
-    score = 2
+    score = {'f1_score': 0.8, 'g_score': 0.79}
+    feature_importances = {'f0': 12, 'f1': 0.5, 'f2': 50.2}
     saveDir = tmp_folder
     if not os.path.exists(saveDir):
         os.makedirs(saveDir)
-    sm.save_info(score, pred_train, pred_test, saveDir)
+    sm.save_info(score, pred_train, pred_test, saveDir, )
     train_path = os.path.join(saveDir, 'pred_train.lst')
     test_path = os.path.join(saveDir, 'pred_test.lst')
     score_path = os.path.join(saveDir, 'score.txt')
