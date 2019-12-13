@@ -346,6 +346,7 @@ def track_best_scores(
     if initialize_lists:
         result_dict['avg_scores'] = []
         result_dict['compactnesses'] = []
+        result_dict['best_fitnesses'] = []
     for key in keys:
         key_name = 'best_' + key
         list_key = key_name + 's'
@@ -364,6 +365,7 @@ def track_best_scores(
     if append_lists:
         result_dict['avg_scores'].append(np.mean(fitnesses))
         result_dict['compactnesses'].append(compactness)
+        best_fitness['best_fitnesses'].append(result_dict['best_fitness'])
     return result_dict
 
 
