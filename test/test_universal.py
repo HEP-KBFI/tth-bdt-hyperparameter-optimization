@@ -189,7 +189,8 @@ def test_save_results():
 
 
 def test_read_parameters():
-    path_to_test_file = os.path.join(resources_dir, 'best_parameters.json')
+    path_to_test_file = os.path.join(
+        dir_path, 'resources', 'best_parameters.json')
     result = universal.read_parameters(path_to_test_file)
     expected = [
         {'a': 1, 'b': 2, 'c': 3},
@@ -256,8 +257,8 @@ def test_calculate_conf_matrix():
     }
     train_conf, test_conf = universal.calculate_conf_matrix(
         pred_train, pred_test, data_dict)
-    expected1 = [[1, 1], [0, 0]]
-    expected2 = [[1, 1], [0, 0]]
+    expected1 = [[1, 0], [1, 0]]
+    expected2 = [[1, 0], [1, 0]]
     assert (expected1 == train_conf).all()
     assert (expected2 == test_conf).all()
 
