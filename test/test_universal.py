@@ -210,8 +210,18 @@ def test_best_to_file():
 
 
 def test_calculate_d_score():
-    pred_test = [0, 0, 0, 0]
-    pred_train = [0, 0, 1, 0]
+    pred_test = [
+        [0.5, 0.4, 0.1],
+        [0.5, 0.4, 0.1],
+        [0.5, 0.4, 0.1],
+        [0.5, 0.4, 0.1]
+    ]
+    pred_train = [
+        [0.5, 0.4, 0.1],
+        [0.5, 0.4, 0.1],
+        [0.4, 0.5, 0.1],
+        [0.5, 0.4, 0.1],
+    ]
     data_dict = {
         'testing_labels': [0, 1, 0, 0],
         'training_labels': [0, 0, 1, 0]
