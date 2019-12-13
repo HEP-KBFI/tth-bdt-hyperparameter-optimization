@@ -343,10 +343,6 @@ def track_best_scores(
         Dictionary containing the best scores
     '''
     index = np.argmax(fitnesses)
-    if initialize_lists:
-        result_dict['avg_scores'] = []
-        result_dict['compactnesses'] = []
-        result_dict['best_fitnesses'] = []
     for key in keys:
         key_name = 'best_' + key
         list_key = key_name + 's'
@@ -362,6 +358,10 @@ def track_best_scores(
         result_dict['pred_test'] = pred_tests[index]
         result_dict['best_parameters'] = parameter_dicts[index]
         result_dict['feature_importances'] = feature_importances[index]
+    if initialize_lists:
+        result_dict['avg_scores'] = []
+        result_dict['compactnesses'] = []
+        result_dict['best_fitnesses'] = []
     if append_lists:
         result_dict['avg_scores'].append(np.mean(fitnesses))
         result_dict['compactnesses'].append(compactness)
