@@ -107,7 +107,7 @@ def calculate_d_score(
 
 def score(train_score, test_score):
     '''Calculates the final score by minimizing the difference of test and
-    train score. [Currently not used anymore]
+    train score.
 
     Parameters:
     ----------

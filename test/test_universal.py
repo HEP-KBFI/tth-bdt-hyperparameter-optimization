@@ -217,11 +217,8 @@ def test_calculate_d_score():
         'training_labels': [0, 0, 1, 0]
     }
     d_score = universal.calculate_d_score(pred_train, pred_test, data_dict)
-    expected = 0.833
-    np.testing.assert_almost_equal(
-        d_score,
-        expected,
-        3)
+    expected = 0.75
+    assert d_score == expected
 
 
 def test_score():
