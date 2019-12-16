@@ -211,6 +211,7 @@ def read_feature_importances(output_dir):
     '''
     samples = os.path.join(output_dir, 'samples')
     wild_card_path = os.path.join(samples, '*', 'feature_importances.json')
+    number_samples = len(glob.glob(wild_card_path))
     feature_importances = []
     for number in range(number_samples):
         path = os.path.join(samples, str(number), 'feature_importances.json')
