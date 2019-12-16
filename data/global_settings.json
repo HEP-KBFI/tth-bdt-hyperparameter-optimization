@@ -1,4 +1,5 @@
 {"sample_dir": "/foo/bar"}
+{"optimization_algo": "pso"}
 {"nthread": 28}
 {"output_dir": "$HOME/foobar"}
 {"sample_type": "tth"}

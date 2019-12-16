@@ -181,7 +181,7 @@ def create_subpopulations(settings, parameters, create_set):
 
     # Initialization
     subpopulations = []
-    size = settings['pop_size']
+    size = settings['sample_size']
     num = settings['sub_pops']
 
     # Return empty list in case of invalid settings

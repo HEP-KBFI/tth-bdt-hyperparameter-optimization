@@ -126,7 +126,7 @@ def run_iteration(
         test dataset
     '''
     output_dir = os.path.expandvars(global_settings['output_dir'])
-    pso_settings = universal.read_settings('pso')
+    opt_settings = universal.read_settings(global_settings['optimization_algo'])
     parameters_to_file(output_dir, parameter_dicts)
     wild_card_path = os.path.join(output_dir, 'samples', '*', 'parameters.json')
     for parameter_file in glob.glob(wild_card_path):
@@ -135,7 +135,7 @@ def run_iteration(
             parameter_file, sample_nr, global_settings
         )
         subprocess.call(['sbatch', job_file])
-    wait_iteration(output_dir, pso_settings['sample_size'])
+    wait_iteration(output_dir, opt_settings['sample_size'])
     pred_tests = create_result_lists(output_dir, 'pred_test')
     pred_trains = create_result_lists(output_dir, 'pred_train')
     score_dicts = read_fitness(output_dir)

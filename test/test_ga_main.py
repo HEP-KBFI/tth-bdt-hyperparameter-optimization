@@ -43,7 +43,7 @@ PARAMETERS = [
 
 SETTINGS = {
     'num_classes': 10,
-    'pop_size': 3,
+    'sample_size': 3,
     'iterations': 1,
     'threshold': 0.001,
     'mut_chance': 0.03,
