@@ -308,7 +308,7 @@ def evolve(population, settings, data, parameters, create_set, evaluate, final=F
                 population, fitnesses, settings, parameters)
 
         # Calculate fitness of the population
-        fitnesses, pred_trains, pred_tests = evaluate(
+        fitnesses, pred_trains, pred_tests, feature_importances = evaluate(
             population, data, settings)
         fitnesses = universal.fitness_to_list(fitnesses)
 
