@@ -282,8 +282,14 @@ def test_get_most_probable():
 
 
 def test_main_f1_calculate():
-    pred_train = [0, 0]
-    pred_test = [0, 0]
+    pred_train = [
+        [0.7, 0.3],
+        [0.7, 0.3]
+    ]
+    pred_test = [
+        [0.7, 0.3],
+        [0.7, 0.3]
+    ]
     data_dict = {
         'training_labels': [0, 1],
         'testing_labels': [0, 0]

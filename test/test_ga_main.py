@@ -102,6 +102,7 @@ for file in file_list:
             shutil.copyfileobj(f_in, f_out)
 DATA = mf.create_datasets(sample_dir, 16)
 
+
 def test_set_num():
     '''Testing the set_num function'''
     initial = [1, 2, 3]
