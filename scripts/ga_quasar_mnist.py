@@ -48,7 +48,7 @@ def main():
         xt.prepare_run_params,
         xt.ensemble_fitnesses
     )
-    universal.save_results(result, global_settings['output_dir'])
+    universal.save_results(result, output_dir)
 
 
 if __name__ == '__main__':

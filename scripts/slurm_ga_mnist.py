@@ -3,7 +3,7 @@ Genetic algorithm for the hyperparameters optimization of XGBoost.
 (MNIST numbers). Version for slurm.
 Call with 'python'
 
-Usage: slurm_pso_mnist.py
+Usage: slurm_ga_mnist.py
 '''
 from __future__ import division
 import os
