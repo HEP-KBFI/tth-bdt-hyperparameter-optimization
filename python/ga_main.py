@@ -357,7 +357,7 @@ def evolution(settings, data, parameters, create_set, evaluate):
     if settings['sub_pops'] > 1:
 
         # Checking settings for validity
-        assert settings['pop_size'] > settings['sub_pops'], \
+        assert settings['sample_size'] > settings['sub_pops'], \
             'Invalid parameters for subpopulation creation'
 
         # Create subpopulations
@@ -384,7 +384,7 @@ def evolution(settings, data, parameters, create_set, evaluate):
 
         # Create one population
         print('::::::: Creating population ::::::::\n')
-        population = create_set(parameters, settings['pop_size'])
+        population = create_set(parameters, settings['sample_size'])
 
         # Evolve population
         output = evolve(population, settings, data, parameters, create_set, evaluate, True)
