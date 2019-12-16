@@ -1,14 +1,9 @@
-'''
-Testing the main functions of the genetic algorithm.
-Missing tests for the following functions:
-    culling
-    sub_evolution
-    evolve
-    evolution
-'''
-# from __future__ import division
+'''Testing the main functions of the genetic algorithm.'''
+import os
+import pytest
 from tthAnalysis.bdtHyperparameterOptimization import ga_main as gm
-
+from tthAnalysis.bdtHyperparameterOptimization import xgb_tools as xt
+from tthAnalysis.bdtHyperparameterOptimization import mnist_filereader as mf
 
 # parameters and settings for testing
 PARAMETERS = [
@@ -43,139 +38,143 @@ PARAMETERS = [
         'true_int': 0,
         'group_nr': 2,
         'true_corr': 0
-    },
-    {
-        'p_name': 'min_child_weight',
-        'range_start': 0,
-        'range_end': 500,
-        'true_int': 0,
-        'group_nr': 3,
-        'true_corr': 1
-    },
-    {
-        'p_name': 'subsample',
-        'range_start': 0.8,
-        'range_end': 1,
-        'true_int': 0,
-        'group_nr': 4,
-        'true_corr': 1
-    },
-    {
-        'p_name': 'colsample_bytree',
-        'range_start': 0.3,
-        'range_end': 1,
-        'true_int': 0,
-        'group_nr': 5,
-        'true_corr': 1
     }
 ]
 
 SETTINGS = {
-    'iterations': 2,
-    'threshold': 0.002,
-    'mut_chance': 0.1,
-    'elites': 2,
-    'nthread': 8
+    'num_classes': 10,
+    'pop_size': 3,
+    'iterations': 1,
+    'threshold': 0.001,
+    'mut_chance': 0.03,
+    'elites': 1,
+    'culling': 1,
+    'nthread': 16
 }
 
-SAMPLE = [
+POPULATION = [
     {
-        'num_boost_round': 38,
-        'learning_rate': 0.29915544328166055,
-        'max_depth': 9,
-        'gamma': 0.0005718740867244332,
-        'min_child_weight': 151.16628631591988,
-        'subsample': 0.8293511781634226,
-        'colsample_bytree': 0.3646370163381584,
-        'silent': 1,
-        'objective': 'multi:softprob',
-        'num_class': 10,
-        'nthread': 8,
-        'seed': 1
+        'num_boost_round': 300,
+        'learning_rate': 0.20323,
+        'max_depth': 1,
+        'gamma': 0.31544
     },
     {
-        'num_boost_round': 461,
-        'learning_rate': 0.11637322234860221,
-        'max_depth': 7,
-        'gamma': 4.677695354030159,
-        'min_child_weight': 423.15545834300855,
-        'subsample': 0.8626547033864551,
-        'colsample_bytree': 0.66718371170101,
-        'silent': 1,
-        'objective': 'multi:softprob',
-        'num_class': 10,
-        'nthread': 8,
-        'seed': 1
+        'num_boost_round': 55,
+        'learning_rate': 0.07981,
+        'max_depth': 8,
+        'gamma': 4.12071
     },
     {
-        'num_boost_round': 253,
-        'learning_rate': 0.2634352309172836,
-        'max_depth': 3,
-        'gamma': 4.569810122896165,
-        'min_child_weight': 228.60240399349414,
-        'subsample': 0.8861397134369418,
-        'colsample_bytree': 0.9573894525965381,
-        'silent': 1,
-        'objective': 'multi:softprob',
-        'num_class': 10,
-        'nthread': 8,
-        'seed': 1
+        'num_boost_round': 481,
+        'learning_rate': 0.00411,
+        'max_depth': 4,
+        'gamma': 0.62212
     }
 ]
 
-SIMPLE = [1, 2, 3]
 FITNESSES = [0.4, 0.6, 0.8]
-NUMS = [0.5, 1, 2, 3]
 
+# temporary solution for data during testing
+DATA = mf.create_datasets(os.path.expandvars('$HOME/MNIST'), 16)
 
 def test_set_num():
     '''Testing the set_num function'''
-    result = [2, 1, 2, 3]
-    calculated = []
-    for num in NUMS:
-        calculated.append(gm.set_num(num, SIMPLE))
-    assert result == calculated, 'test_set_num failed'
+    initial = [1, 2, 3]
+    nums = [0.5, 1, 2, 3]
+    excpected = [2, 1, 2, 3]
+    result = []
+    for num in nums:
+        result.append(gm.set_num(num, initial))
+    assert result == excpected, 'test_set_num failed'
 
 
 def test_elitism():
     '''Testing the elitism function'''
-    result = [[3, 2], [3], [3, 2], [3, 2, 1]]
-    calculated = []
-    for num in NUMS:
-        calculated.append(gm.elitism(SIMPLE, FITNESSES, num))
-    assert result == calculated, 'test_elitism failed'
+    initial = [1, 2, 3]
+    nums = [0.5, 1, 2, 3]
+    excpected = [[3, 2], [3], [3, 2], [3, 2, 1]]
+    result = []
+    for num in nums:
+        result.append(gm.elitism(initial, FITNESSES, num))
+    assert result == excpected, 'test_elitism failed'
+
+
+@pytest.mark.skip(reason="Runs too long")
+def test_culling():
+    '''Testing the culling function'''
+    result = gm.culling(
+        POPULATION,
+        FITNESSES,
+        SETTINGS,
+        DATA,
+        PARAMETERS,
+        xt.prepare_run_params,
+        xt.ensemble_fitnesses
+    )
+    assert len(result) == 2, 'test_culling failed'
+    for element in result:
+        assert len(element) == len(POPULATION), 'test_culling failed'
 
 
 def test_new_population():
     '''Testing the new_population function'''
-    SETTINGS.update({'pop_size': 3})
-    calculated = gm.new_population(
-        SAMPLE, FITNESSES, SETTINGS, PARAMETERS)
-    assert len(calculated) == len(SAMPLE), \
+    result = gm.new_population(
+        POPULATION, FITNESSES, SETTINGS, PARAMETERS)
+    assert len(result) == len(POPULATION), \
         'test_new_population failed'
 
 
 def test_create_subpopulations():
     '''Testing the create_subpopulations function'''
-    nums = NUMS[1:]
-    sizes = [1, 2, 4, 7, 11]
-    result = [
-        [1], [], [],
-        [2], [1, 1], [],
-        [4], [2, 2], [2, 1, 1],
-        [7], [4, 3], [3, 2, 2],
-        [11], [6, 5], [5, 3, 3]
-    ]
+    nums = [1, 2, 3]
+    excpected = [[3], [2, 1], [1, 1, 1]]
     i = 0
-    for size in sizes:
-        for num in nums:
-            j = 0
-            SETTINGS.update({'pop_size': size, 'sub_pops': num})
-            calculated = gm.create_subpopulations(SETTINGS, PARAMETERS)
-            assert len(calculated) == len(result[i]), \
+    for num in nums:
+        j = 0
+        SETTINGS.update({'sub_pops': num})
+        result = gm.create_subpopulations(
+            SETTINGS, PARAMETERS, xt.prepare_run_params)
+        assert len(result) == len(excpected[i]), \
+            'test_create_subpopulations failed'
+        for element in result:
+            assert len(element) == excpected[i][j], \
                 'test_create_subpopulations failed'
-            for element in calculated:
-                assert len(element) == result[i][j], \
-                    'test_create_subpopulations failed'
-                j += 1
-            i += 1
+            j += 1
+        i += 1
+
+
+@pytest.mark.skip(reason="Runs too long")
+def test_sub_evolution():
+    '''Testing the sub_evolution function'''
+    SETTINGS.update({'culling': 0})
+    result = gm.sub_evolution(
+        [POPULATION[:2], POPULATION[2:]],
+        SETTINGS,
+        DATA,
+        PARAMETERS,
+        xt.prepare_run_params,
+        xt.ensemble_fitnesses
+    )
+    assert len(result[0]) == len(POPULATION), 'test_sub_evolution failed'
+
+
+@pytest.mark.skip(reason="Runs too long")
+def test_evolve():
+    '''Testing the evolve function'''
+    initial = POPULATION[:1]
+    SETTINGS.update({'culling': 0})
+    result = gm.evolve(
+        initial,
+        SETTINGS,
+        DATA,
+        PARAMETERS,
+        xt.prepare_run_params,
+        xt.ensemble_fitnesses,
+        True
+        )
+    assert len(result[0]) == len(initial), 'test_evolve failed'
+    for key in result[1]:
+        assert len(result[1][key]) == SETTINGS['iterations'] + 1, \
+            'test_evolve failed'
+    assert len(result[2]) == len(result[0]), 'test_evolve failed'
