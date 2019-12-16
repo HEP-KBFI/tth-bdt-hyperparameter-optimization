@@ -1,9 +1,7 @@
 from __future__ import division
 from subprocess import call
-import numpy as np
 import os
 import shutil
-import glob
 import gzip
 import shutil
 import urllib
