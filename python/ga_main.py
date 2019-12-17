@@ -122,7 +122,7 @@ def culling(population, fitnesses, settings, data, parameters, create_set, evalu
     new_members = create_set(parameters, size)
     population += new_members
     curr_settings = settings.copy()
-    curr_settings.update('sample_size': size)
+    curr_settings.update({'sample_size': size})
     fitnesses += universal.fitness_to_list(
         evaluate(new_members, data, curr_settings)[0])
 
@@ -311,7 +311,7 @@ def evolve(population, settings, data, parameters, create_set, evaluate, final=F
 
         # Calculate fitness of the population
         curr_settings = settings.copy()
-        curr_settings.update('sample_size': len(population))
+        curr_settings.update({'sample_size': len(population)})
         fitnesses, pred_trains, pred_tests, feature_importances = evaluate(
             population, data, settings)
         fitnesses = universal.fitness_to_list(fitnesses)
