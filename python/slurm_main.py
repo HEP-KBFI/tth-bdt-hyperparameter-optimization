@@ -98,7 +98,8 @@ python %s --parameter_file %s
 def run_iteration(
         parameter_dicts,
         data_dict,
-        global_settings
+        global_settings,
+        sample_size=0
 ):
     '''The main function call that is the slurm equivalent of ensemble_fitness
     in xgb_tools
@@ -113,6 +114,9 @@ def run_iteration(
         data and its labels
     global_settings : dict
         Global settings for the hyperparameter optimization
+    sample_size: integer
+        Sample size in case where it does not correspond to the value given
+        in the settings file
 
     Returns:
     -------
@@ -126,7 +130,9 @@ def run_iteration(
         test dataset
     '''
     output_dir = os.path.expandvars(global_settings['output_dir'])
-    opt_settings = universal.read_settings(global_settings['optimization_algo'])
+    if sample_size = 0:
+        opt_settings = universal.read_settings(global_settings['optimization_algo'])
+        sample_size = opt_settings['sample_size']
     parameters_to_file(output_dir, parameter_dicts)
     wild_card_path = os.path.join(output_dir, 'samples', '*', 'parameters.json')
     for parameter_file in glob.glob(wild_card_path):
@@ -135,7 +141,7 @@ def run_iteration(
             parameter_file, sample_nr, global_settings
         )
         subprocess.call(['sbatch', job_file])
-    wait_iteration(output_dir, opt_settings['sample_size'])
+    wait_iteration(output_dir, sample_size)
     pred_tests = create_result_lists(output_dir, 'pred_test')
     pred_trains = create_result_lists(output_dir, 'pred_train')
     score_dicts = read_fitness(output_dir)
