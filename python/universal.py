@@ -224,9 +224,15 @@ def calculate_f1_score(confusionmatrix):
         g_scores.append(g_score)
         mean_f1 = np.mean(f1_scores)
         mean_g = np.mean(g_scores)
-    elif nr_labels < 2:
-        raise ValueError('The passed confusionmatrix has less than one label')
-    else:
+    elif nr_labels == 1:
+        true_positives = confusion_matrix[0][0]
+        false_positives = 0
+        false_negatives = 0
+        precision = true_positives / (true_positives + false_positives)
+        recall = true_positives / (true_positives + false_negatives)
+        mean_f1 = 2 * (precision * recall) / (precision + recall)
+        mean_g = np.sqrt(precision * recall)
+    elif nr_labels == 2:
         true_positives = confusionmatrix[0][0]
         false_negatives = confusionmatrix[1][0]
         false_positives = confusionmatrix[0][1]
@@ -234,6 +240,8 @@ def calculate_f1_score(confusionmatrix):
         recall = true_positives / (true_positives + false_negatives)
         mean_f1 = 2 * (precision * recall) / (precision + recall)
         mean_g = np.sqrt(precision * recall)
+    else:
+        raise ValueError('The passed confusionmatrix is not correct')
     return mean_f1, mean_g
 
 
