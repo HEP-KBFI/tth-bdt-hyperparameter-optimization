@@ -3,6 +3,7 @@ import numpy as np
 import sys
 import os
 import shutil
+import glob
 from tthAnalysis.bdtHyperparameterOptimization import universal
 dir_path = os.path.dirname(os.path.realpath(__file__))
 resources_dir = os.path.join(dir_path, 'resources', 'tmp')
@@ -320,6 +321,65 @@ def test_calculate_f1_score2():
         np.sqrt(0.5),
         6
     )
+
+
+def test_calculate_f1_score3():
+    confusion_matrix = np.array([
+        np.array([1, 1]),
+        np.array([0, 0])
+    ])
+    result = universal.calculate_f1_score(confusion_matrix)
+
+
+def test_get_scores_dict():
+    data_dict = {
+        'training_labels': [1, 2, 3, 4],
+        'testing_labels': [1, 2, 3, 4]
+    }
+    pred_train = [
+        [0.9, 0.05, 0.03, 0.02],
+        [0.1, 0.8, 0.05, 0.05],
+        [0.1, 0.8, 0.05, 0.05],
+        [0.1, 0.1, 0.1, 0.7]
+    ]
+    pred_test = [
+        [0.9, 0.05, 0.03, 0.02],
+        [0.1, 0.8, 0.05, 0.05],
+        [0.1, 0.8, 0.05, 0.05],
+        [0.1, 0.1, 0.1, 0.7]
+    ]
+    score_dict = universal.get_scores_dict(pred_train, pred_test, data_dict)
+    assert len(score_dict.keys()) == 12
+
+
+def test_save_run_settings():
+    universal.save_run_settings(resources_dir)
+    wild_card_path = os.path.join(resources_dir, 'run_settings', '*.json')
+    number_settings = len(glob.glob(wild_card_path))
+    assert number_settings == 4
+
+
+def test_calculate_auc():
+    data_dict = {
+        'training_labels': [0, 1, 1, 3],
+        'testing_labels': [0, 1, 1, 3]
+    }
+    pred_train = [
+        [0.9, 0.05, 0.03, 0.02],
+        [0.1, 0.8, 0.05, 0.05],
+        [0.1, 0.8, 0.05, 0.05],
+        [0.1, 0.1, 0.1, 0.7]
+    ]
+    pred_test = [
+        [0.9, 0.05, 0.03, 0.02],
+        [0.1, 0.8, 0.05, 0.05],
+        [0.1, 0.8, 0.05, 0.05],
+        [0.1, 0.1, 0.1, 0.7]
+    ]
+    train_auc, test_auc, info = universal.calculate_auc(
+        data_dict, pred_train, pred_test)
+    assert train_auc == 1 and test_auc == 1
+
 
 
 def test_dummy_delete_files():
