@@ -258,7 +258,7 @@ def test_calculate_conf_matrix():
     train_conf, test_conf = universal.calculate_conf_matrix(
         pred_train, pred_test, data_dict)
     expected1 = [[1, 0], [1, 0]]
-    expected2 = [[1, 0], [1, 0]]
+    expected2 = [[1, 1], [0, 0]]
     assert (expected1 == train_conf).all()
     assert (expected2 == test_conf).all()
 

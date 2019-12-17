@@ -173,11 +173,18 @@ def calculate_conf_matrix(predicted_train, predicted_test, data_dict):
         Confusion matrix of true and predicted labels for train samples
     test_confusionMatrix : array, shape = [n_classes, n_classes]
         Confusion matrix of true and predicted labels for test samples
+
+    Comments:
+    --------
+    Since sklearn's confusion matrix returns it in the form of:
+    [[TN, FN],[FP, TP]] if given the parameters in the order of
+    (true, predicted) and we want to have it in the form [[TP, FP], [FN, TN]],
+    then we switch the order of the parameters
     '''
     true_test = data_dict['testing_labels']
     true_train = data_dict['training_labels']
-    test_confusionmatrix = confusion_matrix(true_test, predicted_test)
-    train_confusionmatrix = confusion_matrix(true_train, predicted_train)
+    test_confusionmatrix = confusion_matrix(predicted_test, true_test)
+    train_confusionmatrix = confusion_matrix(predicted_train, true_train)
     return train_confusionmatrix, test_confusionmatrix
 
 
