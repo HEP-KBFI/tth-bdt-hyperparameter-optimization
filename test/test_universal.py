@@ -305,7 +305,7 @@ def test_calculate_f1_score():
     assert result[1] == 1
 
 
-def test_calculate_f1_score():
+def test_calculate_f1_score2():
     confusion_matrix = np.array([
         np.array([1, 1]),
         np.array([0, 0])
