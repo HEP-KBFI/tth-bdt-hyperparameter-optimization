@@ -76,18 +76,6 @@ def test_dummy_delete_files():
         shutil.rmtree(resources_dir)
 
 
-
-def test_calculate_f1_score():
-    confusionMatrix = np.array([
-        np.array([1, 0, 0]),
-        np.array([0, 1, 0]),
-        np.array([0, 0, 1])
-    ])
-    result = universal.calculate_f1_score(confusionMatrix)
-    assert result[0] == 1
-    assert result[1] == 1
-
-
 def test_calculate_compactness():
     parameter_dict1 = {
         'a': 1,
@@ -301,6 +289,34 @@ def test_main_f1_calculate():
         6)
     np.testing.assert_almost_equal(
         result['Train_G'],
+        np.sqrt(0.5),
+        6
+    )
+
+
+def test_calculate_f1_score():
+    confusion_matrix = np.array([
+        np.array([1, 0, 0]),
+        np.array([0, 1, 0]),
+        np.array([0, 0, 1])
+    ])
+    result = universal.calculate_f1_score(confusion_matrix)
+    assert result[0] == 1
+    assert result[1] == 1
+
+
+def test_calculate_f1_score():
+    confusion_matrix = np.array([
+        np.array([1, 1]),
+        np.array([0, 0])
+    ])
+    result = universal.calculate_f1_score(confusion_matrix)
+    np.testing.assert_almost_equal(
+        result[0],
+        2/3,
+        6)
+    np.testing.assert_almost_equal(
+        result[1],
         np.sqrt(0.5),
         6
     )
