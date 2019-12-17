@@ -5,7 +5,7 @@ import os
 import shutil
 from tthAnalysis.bdtHyperparameterOptimization import universal
 dir_path = os.path.dirname(os.path.realpath(__file__))
-resourcesDir = os.path.join(dir_path, 'resources', 'tmp')
+resources_dir = os.path.join(dir_path, 'resources', 'tmp')
 
 
 def test_create_pairs():
@@ -65,15 +65,15 @@ def test_plot_costfunction():
     avg_scores = [0.9, 0.95, 0.99, 1]
     error = False
     try:
-        universal.plot_costfunction(avg_scores, resourcesDir)
+        universal.plot_costfunction(avg_scores, resources_dir)
     except:
         error = True
     assert error == False
 
 
 def test_dummy_delete_files():
-    if os.path.exists(resourcesDir):
-        shutil.rmtree(resourcesDir)
+    if os.path.exists(resources_dir):
+        shutil.rmtree(resources_dir)
 
 
 
@@ -182,12 +182,130 @@ def test_save_results():
     }
     error = False
     try:
-        universal.save_results(result_dict, resourcesDir)
+        universal.save_results(result_dict, resources_dir)
     except:
         error = True
     assert error == False
 
 
+def test_read_parameters():
+    path_to_test_file = os.path.join(
+        dir_path, 'resources', 'best_parameters.json')
+    result = universal.read_parameters(path_to_test_file)
+    expected = [
+        {'a': 1, 'b': 2, 'c': 3},
+        {'stuff': 1}
+    ]
+    assert result == expected
+
+
+def test_best_to_file():
+    best_values = {'a': 1, 'b': 2, 'c': 3}
+    assessment = {'g': 3, 'h': 4}
+    good = True
+    try:
+        universal.best_to_file(best_values, resources_dir, assessment)
+    except:
+        good = False
+    assert good
+
+
+def test_calculate_d_score():
+    pred_test = [
+        [0.5, 0.4, 0.1],
+        [0.5, 0.4, 0.1],
+        [0.5, 0.4, 0.1],
+        [0.5, 0.4, 0.1]
+    ]
+    pred_train = [
+        [0.5, 0.4, 0.1],
+        [0.5, 0.4, 0.1],
+        [0.4, 0.5, 0.1],
+        [0.5, 0.4, 0.1],
+    ]
+    data_dict = {
+        'testing_labels': [0, 1, 0, 0],
+        'training_labels': [0, 0, 1, 0]
+    }
+    d_score = universal.calculate_d_score(pred_train, pred_test, data_dict)
+    expected = 0.75
+    assert d_score == expected
+
+
+def test_score():
+    train_score = 1
+    test_score = 1
+    d_score = universal.score(train_score, test_score)
+    assert d_score == 1
+
+
+def test_calculate_d_roc():
+    train_auc = 0.5
+    test_auc = 0.5
+    kappa = 0
+    d_roc = universal.calculate_d_roc(train_auc, test_auc, kappa)
+    expected = 0.5
+    assert d_roc == expected
+
+
+def test_calculate_conf_matrix():
+    pred_train = [0, 1]
+    pred_test = [0, 0]
+    data_dict = {
+        'training_labels': [0, 0],
+        'testing_labels': [0, 1]
+    }
+    train_conf, test_conf = universal.calculate_conf_matrix(
+        pred_train, pred_test, data_dict)
+    expected1 = [[1, 0], [1, 0]]
+    expected2 = [[1, 1], [0, 0]]
+    assert (expected1 == train_conf).all()
+    assert (expected2 == test_conf).all()
+
+
+def test_get_most_probable():
+    pred_train = [
+        [0.3, 0.4, 0.3],
+        [0.4, 0.5, 0.1],
+        [0.8, 0.15, 0.05]
+    ]
+    pred_test = [
+        [0.1, 0.4, 0.5],
+        [0.5, 0.2, 0.3],
+        [0.6, 0.2, 0.2]
+    ]
+    expected_train = [1, 1, 0]
+    expected_test = [2, 0, 0]
+    result = universal.get_most_probable(pred_train, pred_test)
+    assert expected_test == result[1]
+    assert expected_train == result[0]
+
+
+def test_main_f1_calculate():
+    pred_train = [
+        [0.7, 0.3],
+        [0.7, 0.3]
+    ]
+    pred_test = [
+        [0.7, 0.3],
+        [0.7, 0.3]
+    ]
+    data_dict = {
+        'training_labels': [0, 1],
+        'testing_labels': [0, 0]
+    }
+    result = universal.main_f1_calculate(pred_train, pred_test, data_dict)
+    np.testing.assert_almost_equal(
+        result['Train_F1'],
+        2/3,
+        6)
+    np.testing.assert_almost_equal(
+        result['Train_G'],
+        np.sqrt(0.5),
+        6
+    )
+
+
 def test_dummy_delete_files():
-    if os.path.exists(resourcesDir):
-        shutil.rmtree(resourcesDir)
+    if os.path.exists(resources_dir):
+        shutil.rmtree(resources_dir)

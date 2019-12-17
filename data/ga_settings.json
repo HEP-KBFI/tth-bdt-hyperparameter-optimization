@@ -1,4 +1,4 @@
-{"pop_size": 2}
+{"sample_size": 2}
 {"sub_pops": 1}
 {"iterations": 2}
 {"threshold": 0.001}

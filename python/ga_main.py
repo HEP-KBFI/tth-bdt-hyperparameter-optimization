@@ -181,7 +181,7 @@ def create_subpopulations(settings, parameters, create_set):
 
     # Initialization
     subpopulations = []
-    size = settings['pop_size']
+    size = settings['sample_size']
     num = settings['sub_pops']
 
     # Return empty list in case of invalid settings
@@ -308,7 +308,7 @@ def evolve(population, settings, data, parameters, create_set, evaluate, final=F
                 population, fitnesses, settings, parameters)
 
         # Calculate fitness of the population
-        fitnesses, pred_trains, pred_tests = evaluate(
+        fitnesses, pred_trains, pred_tests, feature_importances = evaluate(
             population, data, settings)
         fitnesses = universal.fitness_to_list(fitnesses)
 
@@ -357,7 +357,7 @@ def evolution(settings, data, parameters, create_set, evaluate):
     if settings['sub_pops'] > 1:
 
         # Checking settings for validity
-        assert settings['pop_size'] > settings['sub_pops'], \
+        assert settings['sample_size'] > settings['sub_pops'], \
             'Invalid parameters for subpopulation creation'
 
         # Create subpopulations
@@ -384,7 +384,7 @@ def evolution(settings, data, parameters, create_set, evaluate):
 
         # Create one population
         print('::::::: Creating population ::::::::\n')
-        population = create_set(parameters, settings['pop_size'])
+        population = create_set(parameters, settings['sample_size'])
 
         # Evolve population
         output = evolve(population, settings, data, parameters, create_set, evaluate, True)

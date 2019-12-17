@@ -126,7 +126,7 @@ def run_iteration(
         test dataset
     '''
     output_dir = os.path.expandvars(global_settings['output_dir'])
-    pso_settings = universal.read_settings('pso')
+    opt_settings = universal.read_settings(global_settings['optimization_algo'])
     parameters_to_file(output_dir, parameter_dicts)
     wild_card_path = os.path.join(output_dir, 'samples', '*', 'parameters.json')
     for parameter_file in glob.glob(wild_card_path):
@@ -135,12 +135,13 @@ def run_iteration(
             parameter_file, sample_nr, global_settings
         )
         subprocess.call(['sbatch', job_file])
-    wait_iteration(output_dir, pso_settings['sample_size'])
+    wait_iteration(output_dir, opt_settings['sample_size'])
     pred_tests = create_result_lists(output_dir, 'pred_test')
     pred_trains = create_result_lists(output_dir, 'pred_train')
     score_dicts = read_fitness(output_dir)
+    feature_importances = read_feature_importances(output_dir)
     delete_previous_files(output_dir)
-    return score_dicts, pred_trains, pred_tests
+    return score_dicts, pred_trains, pred_tests, feature_importances
 
 
 def create_result_lists(output_dir, pred_type):
@@ -193,6 +194,30 @@ def read_fitness(output_dir):
         score_dict = universal.read_parameters(path)[0]
         score_dicts.append(score_dict)
     return score_dicts
+
+
+def read_feature_importances(output_dir):
+    '''Reads the importances of all the parameter-sets
+
+    Parameters:
+    ----------
+    output_dir : str
+        Location where results were saved by the slurm script
+
+    Returns:
+    -------
+    feature_importances : list of dicts
+        Feature importances of all the parameter-sets
+    '''
+    samples = os.path.join(output_dir, 'samples')
+    wild_card_path = os.path.join(samples, '*', 'feature_importances.json')
+    number_samples = len(glob.glob(wild_card_path))
+    feature_importances = []
+    for number in range(number_samples):
+        path = os.path.join(samples, str(number), 'feature_importances.json')
+        feature_importance = universal.read_parameters(path)[0]
+        feature_importances.append(feature_importance)
+    return feature_importances
 
 
 def get_sample_nr(path):
@@ -295,7 +320,13 @@ def check_error(output_dir):
             raise SystemExit(0)
 
 
-def save_info(score_dict, pred_train, pred_test, save_dir):
+def save_info(
+        score_dict,
+        pred_train,
+        pred_test,
+        save_dir,
+        feature_importance
+):
     '''Saves the score, pred_train, pred_test into appropriate files in
     the wanted directory
 
@@ -314,17 +345,20 @@ def save_info(score_dict, pred_train, pred_test, save_dir):
     -------
     Nothing
     '''
-    train_path = os.path.join(save_dir, "pred_train.lst")
-    test_path = os.path.join(save_dir, "pred_test.lst")
-    score_path = os.path.join(save_dir, "score.json")
-    with open(train_path, "w") as file:
+    train_path = os.path.join(save_dir, 'pred_train.lst')
+    test_path = os.path.join(save_dir, 'pred_test.lst')
+    score_path = os.path.join(save_dir, 'score.json')
+    importance_path = os.path.join(save_dir, 'feature_importances.json')
+    with open(train_path, 'w') as file:
         writer = csv.writer(file)
         writer.writerows(pred_train)
-    with open(test_path, "w") as file:
+    with open(test_path, 'w') as file:
         writer = csv.writer(file)
         writer.writerows(pred_test)
-    with open(score_path, "w") as file:
+    with open(score_path, 'w') as file:
         json.dump(score_dict, file)
+    with open(importance_path, 'w') as file:
+        json.dump(feature_importance, file)
 
 
 def clear_from_files(global_settings):

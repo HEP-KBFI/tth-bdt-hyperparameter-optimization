@@ -107,7 +107,7 @@ def calculate_d_score(
 
 def score(train_score, test_score):
     '''Calculates the final score by minimizing the difference of test and
-    train score. [Currently not used anymore]
+    train score.
 
     Parameters:
     ----------
@@ -129,6 +129,31 @@ def score(train_score, test_score):
     return d_score
 
 
+def calculate_d_roc(train_auc, test_auc, kappa):
+    ''' Calculates the score from test and train AUC score with the method as
+    in the D-score
+
+    Parameters:
+    ----------
+    train_auc : float
+        AUC of the training sample
+    test_auc : float
+        AUC of the testing sample
+    kappa : float
+        Weighing factor for the difference between test and train auc
+
+    Returns:
+    -------
+    d_roc : float
+        Score based on D-score and AUC
+    '''
+    difference = max(0, train_auc - test_auc)
+    weighed_difference = kappa * (1 - difference)
+    denominator = kappa + 1
+    d_roc = (test_auc + weighed_difference) / denominator
+    return d_roc
+
+
 def calculate_conf_matrix(predicted_train, predicted_test, data_dict):
     '''Produces the confusion matrix for train and test sample
 
@@ -148,11 +173,18 @@ def calculate_conf_matrix(predicted_train, predicted_test, data_dict):
         Confusion matrix of true and predicted labels for train samples
     test_confusionMatrix : array, shape = [n_classes, n_classes]
         Confusion matrix of true and predicted labels for test samples
+
+    Comments:
+    --------
+    Since sklearn's confusion matrix returns it in the form of:
+    [[TN, FN],[FP, TP]] if given the parameters in the order of
+    (true, predicted) and we want to have it in the form [[TP, FP], [FN, TN]],
+    then we switch the order of the parameters
     '''
     true_test = data_dict['testing_labels']
     true_train = data_dict['training_labels']
-    test_confusionmatrix = confusion_matrix(true_test, predicted_test)
-    train_confusionmatrix = confusion_matrix(true_train, predicted_train)
+    test_confusionmatrix = confusion_matrix(predicted_test, true_test)
+    train_confusionmatrix = confusion_matrix(predicted_train, true_train)
     return train_confusionmatrix, test_confusionmatrix
 
 
@@ -289,14 +321,19 @@ def get_scores_dict(pred_train, pred_test, data_dict):
     train_auc, test_auc = calculate_auc(
         data_dict, pred_train, pred_test)[:2]
     score_dict = {
-        'f1_score_test': f1_score_test,
-        'g_score_test': g_score_test,
+        'f1_score': f1_score_test,
+        'g_score': g_score_test,
         'test_auc': test_auc,
         'f1_score_train': f1_score_train,
         'g_score_train': g_score_train,
         'train_auc': train_auc,
         'd_score': d_score
     }
+    kappas = [0.0, 0.5, 1.0, 1.5, 2.0]
+    for kappa in kappas:
+        d_roc = calculate_d_roc(train_auc, test_auc, kappa)
+        key_name = 'd_roc_' + str(kappa)
+        score_dict[key_name] = d_roc
     return score_dict
 
 
@@ -860,7 +897,7 @@ def read_settings(group):
     return settings_dict
 
 
-def fitness_to_list(score_dicts, fitness_key='f1_score_test'):
+def fitness_to_list(score_dicts, fitness_key='f1_score'):
     '''Puts the fitness values according to the chosen fitness_key from
     the dictionary to a list
 
@@ -868,7 +905,7 @@ def fitness_to_list(score_dicts, fitness_key='f1_score_test'):
     ----------
     score_dicts : list of dicts
         List containing dictionaries filled with different scores
-    [fitness_key='f1_score_test'] : str
+    [fitness_key='f1_score'] : str
         Name of the key what is used as the fitness score
 
     Returns:

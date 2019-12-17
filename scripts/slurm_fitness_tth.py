@@ -45,9 +45,9 @@ def main(parameter_file):
     parameter_dict = universal.read_parameters(parameter_file)[0]
     path = Path(parameter_file)
     saveDir = str(path.parent)
-    score, pred_train, pred_test = xt.parameter_evaluation(
+    score, pred_train, pred_test, feature_importance = xt.parameter_evaluation(
         parameter_dict, data_dict, nthread, num_classes)
-    sm.save_info(score, pred_train, pred_test, saveDir)
+    sm.save_info(score, pred_train, pred_test, saveDir, feature_importance)
 
 
 if __name__ == '__main__':

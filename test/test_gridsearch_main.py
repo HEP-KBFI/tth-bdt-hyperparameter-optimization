@@ -1,6 +1,6 @@
 from __future__ import division
 import numpy as np
-from tthAnalysis.bdtHyperparameterOptimization import gridSearch_main as gm
+from tthAnalysis.bdtHyperparameterOptimization import gridsearch_main as gm
 from tthAnalysis.bdtHyperparameterOptimization import xgb_tools as xt
 
 
@@ -17,7 +17,7 @@ def test_single_paramSet():
         'second': 6,
         'third': 8
     }
-    result = gm.single_paramSet(parameters, iterations, grid_size)
+    result = gm.single_paramset(parameters, iterations, grid_size)
     assert result == expected
 
 

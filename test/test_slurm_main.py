@@ -41,8 +41,9 @@ def test_create_result_lists():
     outputDir = os.path.join(resourcesDir)
     result = sm.create_result_lists(outputDir, 'pred_test')
     expected = np.array([
+        [[1, 2, 3], [4, 5, 6], [7, 8, 9]],
         [[9, 8, 7], [6, 5, 4], [3, 2, 1]],
-        [[1, 2, 3], [4, 5, 6], [7, 8, 9]]
+        [[1, 2, 3], [4, 5, 6], [7, 8, 9]],
     ], dtype=int)
     assert (result == expected).all()
 
@@ -56,10 +57,12 @@ def test_get_sample_nr():
 
 @timeout_decorator.timeout(10)
 def test_wait_iteration():
-    start = timeit.timeit()
-    sm.wait_iteration(resourcesDir, 2)
-    end = timeit.timeit()
-    assert end - start < 1
+    working = False
+    try:
+        sm.wait_iteration(resourcesDir, 2)
+    except SystemExit: 
+        working = True
+    assert working
 
 
 def test_delete_previous_files():
@@ -77,7 +80,7 @@ def test_delete_previous_files():
 
 def test_read_fitness():
     result = sm.read_fitness(resourcesDir)[0]
-    expected = 1
+    expected = {"foo": 1, "bar": 2, "baz": 3}
     assert result == expected
 
 
@@ -87,7 +90,7 @@ def test_check_error():
         sm.check_error(resourcesDir)
     except:
         error = True
-    assert error == True
+    assert error
 
 
 def test_prepare_job_file():
@@ -118,14 +121,15 @@ def test_dummy_delete_files():
 def test_save_info():
     pred_train = [[1, 2, 3], [4, 5, 6], [7, 8, 9]]
     pred_test = [[9, 8, 7], [6, 5, 4], [3, 2, 1]]
-    score = 2
+    score = {'f1_score': 0.8, 'g_score': 0.79}
+    feature_importances = {'f0': 12, 'f1': 0.5, 'f2': 50.2}
     saveDir = tmp_folder
     if not os.path.exists(saveDir):
         os.makedirs(saveDir)
-    sm.save_info(score, pred_train, pred_test, saveDir)
+    sm.save_info(score, pred_train, pred_test, saveDir, feature_importances)
     train_path = os.path.join(saveDir, 'pred_train.lst')
     test_path = os.path.join(saveDir, 'pred_test.lst')
-    score_path = os.path.join(saveDir, 'score.txt')
+    score_path = os.path.join(saveDir, 'score.json')
     count1 = len(open(train_path).readlines())
     count2 = len(open(test_path).readlines())
     count3 = len(open(score_path).readlines())
