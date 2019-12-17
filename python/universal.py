@@ -225,7 +225,7 @@ def calculate_f1_score(confusionmatrix):
         mean_f1 = np.mean(f1_scores)
         mean_g = np.mean(g_scores)
     elif nr_labels == 1:
-        true_positives = confusion_matrix[0][0]
+        true_positives = confusionmatrix[0][0]
         false_positives = 0
         false_negatives = 0
         precision = true_positives / (true_positives + false_positives)
