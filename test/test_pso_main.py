@@ -294,8 +294,8 @@ def test_weight_normalization():
 def test_check_numeric():
     variables1 = [0, 9, 0.99, 'a']
     variables2 = [0.99, 1/3, 0, 100, 1e3]
-    result1 = universal.check_numeric(variables1)
-    result2 = universal.check_numeric(variables2)
+    result1 = pm.check_numeric(variables1)
+    result2 = pm.check_numeric(variables2)
     assert result1
     assert not result2
 
@@ -305,7 +305,7 @@ def test_initialize_speeds():
         {'a': 1, 'b': 2, 'c': 3},
         {'a': 3, 'b': 2, 'c': 1}
     ]
-    speeds = universal.initialize_speeds(parameter_dicts)
+    speeds = pm.initialize_speeds(parameter_dicts)
     expected = [
         {'a': 0, 'b': 0, 'c': 0},
         {'a': 0, 'b': 0, 'c': 0}
@@ -315,7 +315,7 @@ def test_initialize_speeds():
 
 def test_get_weight_step():
     pso_settings = {'w_init': 1, 'w_fin': 0, 'iterations': 10}
-    inertial_weight, inertial_weight_step = universal.get_wright_step(
+    inertial_weight, inertial_weight_step = pm.get_wright_step(
         pso_settings)
     assert inertial_weight == 1
     assert inertial_weight_step == 0.1
@@ -366,7 +366,7 @@ def test_track_best_scores():
     compactness = 0.1
     pred_trains = [1, 2, 3, 4, 5]
     pred_tests = [1, 2, 3, 4, 5]
-    result_dict = universal.track_best_scores(
+    result_dict = pm.track_best_scores(
         feature_importances,
         parameter_dicts,
         keys,
@@ -438,7 +438,7 @@ def test_track_best_scores():
     compactness = 0.1
     pred_trains = [1, 2, 3, 4, 5]
     pred_tests = [1, 2, 3, 4, 5]
-    result_dict = universal.track_best_scores(
+    result_dict = pm.track_best_scores(
         feature_importances,
         parameter_dicts,
         keys,
