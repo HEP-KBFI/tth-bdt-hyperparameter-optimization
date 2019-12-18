@@ -108,6 +108,10 @@ def culling(population, fitnesses, settings, data, parameters, create_set, evalu
     # Set num as the number of members to destroy
     num = set_num(settings['culling'], population)
 
+    # If num = 0, then no culling takes place
+    if num == 0:
+        return population, fitnesses
+
     # Population size to be replaced
     size = num
 
