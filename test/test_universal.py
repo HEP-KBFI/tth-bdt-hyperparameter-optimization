@@ -381,6 +381,46 @@ def test_calculate_auc():
     assert train_auc == 1 and test_auc == 1
 
 
+def test_read_settings():
+    pso_settings = universal.read_settings('pso')
+    ga_settings = universal.read_settings('ga')
+    global_settings = universal.read_settings('global')
+    assert len(pso_settings.keys()) == 7
+    assert len(ga_settings.keys()) == 7
+    assert len(global_settings.keys()) == 10
+
+
+def test_to_one_dict():
+    list_of_dicts = [{'foo': 1}, {'bar': 2}, {'baz': 3}]
+    all_in_one_dict = universal.to_one_dict(list_of_dicts)
+    expected = {'foo': 1, 'bar': 2, 'baz': 3}
+    assert all_in_one_dict == expected
+
+
+def test_fitness_to_list():
+    score_dicts = [
+        {'f1_score': 1, 'g_score': 0.5, 'test_auc': 0.1},
+        {'f1_score': 0.2, 'g_score': 0.5, 'test_auc': 0.1},
+        {'f1_score': 0.3, 'g_score': 0.5, 'test_auc': 0.1}
+    ]
+    f1_scores = universal.fitness_to_list(score_dicts)
+    g_scores = universal.fitness_to_list(score_dicts, fitness_key='g_score')
+    assert f1_scores == [1, 0.2, 0.3]
+    assert g_scores == [0.5, 0.5, 0.5]
+
+
+def test_roc():
+    labels = [1, 0, 0, 1]
+    pred_vectors = [
+        [0, 1],
+        [1, 0],
+        [1, 0],
+        [0, 1]
+    ]
+    fp_rate, tp_rate = universal.roc(labels, pred_vectors)
+    assert fp_rate == [0]*100
+    assert tp_rate == [1]*100
+
 
 def test_dummy_delete_files():
     if os.path.exists(resources_dir):

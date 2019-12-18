@@ -936,7 +936,7 @@ def fitness_to_list(score_dicts, fitness_key='f1_score'):
     for score_dict in score_dicts:
         fitnesses.append(score_dict[fitness_key])
     return fitnesses
-    
+
 
 # One-vs-All ROC
 

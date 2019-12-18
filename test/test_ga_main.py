@@ -100,8 +100,8 @@ for file in file_list:
     with gzip.open(file_loc + '.gz', 'rb') as f_in:
         with open(file_loc, 'wb') as f_out:
             shutil.copyfileobj(f_in, f_out)
-DATA = mf.create_datasets(sample_dir, 16)
-
+DATA = mf.create_datasets(sample_dir, 16
+)
 
 def test_set_num():
     '''Testing the set_num function'''
