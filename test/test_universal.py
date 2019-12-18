@@ -429,7 +429,7 @@ def test_calculate_improvement_wAVG():
     improvements, improvement = universal.calculate_improvement_wAVG(
         avg_scores, improvements1, threshold)
     assert improvements == [1, 0.1, 0.1, 1]
-    assert improvement == 0.1
+    assert improvement == 1
 
 
 def test_plot_roc_curve():
@@ -457,6 +457,88 @@ def test_plot_single_evolution():
     title = 'foo_bar'
     universal.plot_single_evolution(keys, result_dict, title, plot_out)
     assert os.path.isfile(plot_out)
+
+
+def test_plotting():
+    auc_info = {
+        'x_train': [1,1,1,1,1],
+        'y_train': [0,0,0,0,0],
+        'x_test': [1,1,1,1,1,],
+        'y_test': [0,0,0,0,0]
+        }
+    avg_scores = [0.5, 0.6, 0.7, 0.8, 0.9]
+    universal.plotting(resources_dir, auc_info, avg_scores)
+    plot_out1 = os.path.join(resources_dir, 'test_single_evolution.png')
+    plot_out2 = os.path.join(resources_dir, 'costFunction.png')
+    assert os.path.isfile(plot_out1)
+    assert os.path.isfile(plot_out2)
+
+
+def test_create_extra_plots():
+    plot_out1 = os.path.join(resources_dir, 'scoring_metrics.png')
+    plot_out2 = os.path.join(resources_dir, 'stopping_criteria.png')
+    result_dict = {
+        'best_test_aucs': [1,1,1,1],
+        'best_train_aucs': [1,1,1,1],
+        'best_g_scores': [1,1,1,1],
+        'best_f1_scores': [1,1,1,1],
+        'best_d_scores': [1,1,1,1],
+        'compactesses': [1,1,1,1],
+        'avg_scores': [1,1,1,1]
+    }
+    universal.create_extra_plots(result_dict, resources_dir)
+    assert os.path.isfile(plot_out1)
+    assert os.path.isfile(plot_out2)
+
+
+def test_save_extra_results():
+    file_out1 = os.path.join(resources_dir, 'scoring_metrics.json')
+    file_out2 = os.path.join(resources_dir, 'stopping_criteria.json')
+    result_dict = {
+        'best_test_aucs': [1,1,1,1],
+        'best_train_aucs': [1,1,1,1],
+        'best_g_scores': [1,1,1,1],
+        'best_f1_scores': [1,1,1,1],
+        'best_d_scores': [1,1,1,1],
+        'compactesses': [1,1,1,1],
+        'avg_scores': [1,1,1,1]
+    }
+    universal.save_extra_results(result_dict, resources_dir)
+    assert os.path.isfile(file_out1)
+    assert os.path.isfile(file_out2)
+
+
+def test_save_fitness_improvement():
+    result_dict = {
+        'best_test_aucs': [1,1,1,1],
+        'best_train_aucs': [1,1,1,1],
+        'best_g_scores': [1,1,1,1],
+        'best_f1_scores': [1,1,1,1],
+        'best_d_scores': [1,1,1,1],
+        'compactesses': [1,1,1,1],
+        'avg_scores': [1,1,1,1]
+    }
+    keys = ['compactnesses', 'avg_scores']
+    output_path = os.path.join(output_dir, 'fitness_improvement.json')
+    universal.save_fitness_improvement(result_dict, keys, resources_dir)
+    assert os.path.isfile(output_path)
+
+
+def test_save_single_file():
+    result_dict = {
+        'best_test_aucs': [1,1,1,1],
+        'best_train_aucs': [1,1,1,1],
+        'best_g_scores': [1,1,1,1],
+        'best_f1_scores': [1,1,1,1],
+        'best_d_scores': [1,1,1,1],
+        'compactesses': [1,1,1,1],
+        'avg_scores': [1,1,1,1]
+    }
+    file_out = os.path.join(resources_dir, 'stopping_criteria.json')
+    keys = ['f1_scores', 'g_scores']
+    universal.save_single_file(keys, result_dict, file_out)
+    assert os.path.isfile(file_out)
+
 
 def test_dummy_delete_files():
     if os.path.exists(resources_dir):
