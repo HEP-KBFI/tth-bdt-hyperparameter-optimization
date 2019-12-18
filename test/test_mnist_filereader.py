@@ -35,14 +35,14 @@ def test_read_images():
     '''Testing read_images function'''
     image_file = os.path.join(sample_dir, 't10k-images-idx3-ubyte')
     result = mf.read_images(image_file)
-    assert len(result) == 10000
+    assert len(result) == 10000, 'test_read_images failed'
 
 
 def test_read_labels():
     '''Testing read_labels function'''
     label_file = os.path.join(sample_dir, 't10k-labels-idx1-ubyte')
     result = mf.read_labels(label_file)
-    assert len(result) == 10000
+    assert len(result) == 10000, 'test_read_labels failed'
 
 
 def test_read_dataset():
@@ -52,16 +52,16 @@ def test_read_dataset():
     result = mf.read_dataset(image_file, label_file)
     assert len(result) == 2
     for element in result:
-        assert len(element) == 10000
+        assert len(element) == 10000, 'test_read_dataset failed'
 
 
 def test_create_datasets():
     '''Testing create_datasets function'''
     result = mf.create_datasets(sample_dir, 16)
-    assert len(result['training_images'].data()) == 60000
-    assert len(result['training_labels']) == 60000
-    assert len(result['training_images'].data()) == 10000
-    assert len(result['testing_labels']) == 10000
+    assert result['dtrain'].num_row() == 60000, 'test_create_datasets failed'
+    assert len(result['training_labels']) == 60000, 'test_create_datasets failed'
+    assert result['dtest'].num_row() == 10000, 'test_create_datasets failed'
+    assert len(result['testing_labels']) == 10000, 'test_create_datasets failed'
 
 
 def test_dummy_delete_files():
