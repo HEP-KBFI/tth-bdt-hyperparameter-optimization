@@ -57,7 +57,14 @@ def test_read_dataset():
 
 def test_create_datasets():
     '''Testing create_datasets function'''
-    # INCOMPLETE
     result = mf.create_datasets(sample_dir, 16)
+    assert len(result['training_images'].data()) == 60000
     assert len(result['training_labels']) == 60000
+    assert len(result['training_images'].data()) == 10000
     assert len(result['testing_labels']) == 10000
+
+
+def test_dummy_delete_files():
+    '''Delete temporary files'''
+    if os.path.exists(tmp_folder):
+        shutil.rmtree(tmp_folder)
