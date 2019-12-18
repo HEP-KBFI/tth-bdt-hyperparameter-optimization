@@ -322,7 +322,11 @@ def test_get_weight_step():
 
 
 def test_track_best_scores():
-    feature_importances = {'foo': 1, 'bar': 2}
+    feature_importances = [
+        {'f1': 1, 'f2': 2},
+        {'f1': 2, 'f2': 3},
+        {'f1': 0.1, 'f2': 4}
+    ]
     score_dicts = [
         {
             'g_score': 1,
@@ -394,7 +398,11 @@ def test_track_best_scores():
 
 
 def test_track_best_scores():
-    feature_importances = {'foo': 1, 'bar': 2}
+    feature_importances = [
+        {'f1': 1, 'f2': 2},
+        {'f1': 2, 'f2': 3},
+        {'f1': 0.1, 'f2': 4}
+    ]
     score_dicts = [
         {
             'g_score': 1,
