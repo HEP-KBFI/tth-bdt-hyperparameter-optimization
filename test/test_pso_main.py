@@ -500,6 +500,40 @@ def test_track_best_scores2():
     }
     assert result_dict1 == expected
 
+
+def test_prepare_new_day():
+    personal_bests = [
+        {'foo': 1, 'bar': 2},
+        {'foo': 2, 'bar': 2}
+    ]
+    parameter_dicts = [
+        {'foo': 3, 'bar': 3},
+        {'foo': 4, 'bar': 4}
+    ]
+    best_parameters = {'foo': 1, 'bar': 2}
+    current_speeds = [
+        {'foo': 0, 'bar': 0},
+        {'foo': 0, 'bar': 0}
+    ]
+    value_dicts = [
+    {'p_name': 'foo', 'range_start': 1, 'range_end': 500},
+    {'p_name': 'bar', 'range_start': 0, 'range_end': 0.3}
+    ]
+    weight_dict = {'c1': 1, 'c2': 1, 'w': 1}
+    error = False
+    try:
+        new_parameters, current_speeds = pm.prepare_new_day(
+            personal_bests,
+            parameter_dicts,
+            best_parameters,
+            current_speeds,
+            value_dicts,
+            weight_dict
+        )
+    except:
+        error = True
+    assert not error
+
 def test_read_weights():
     result = pm.read_weights()
     assert len(result) == 7
