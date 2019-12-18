@@ -399,7 +399,7 @@ def test_track_best_scores():
         'best_test_auc': 1,
         'best_train_auc': 1,
         'best_avg_scores': [1, 2],
-        'best_compactnesses': [0.2, 0.3],
+        'best_compactnesses': [0.1],
         'best_fitnesses': [0.8, 0.9],
         'feature_importances': {'f1': 1, 'f2': 2},
         'best_parameters': {'foo': 1, 'bar': 2},
@@ -448,10 +448,7 @@ def test_track_best_scores2():
         'best_f1_score': 0.6,
         'best_d_score': 0.6,
         'best_test_auc': 0.6,
-        'best_train_auc': 0.6,
-        'best_avg_scores': [1, 2],
-        'compactnesses': [0.2, 0.3],
-        'best_fitnesses': [0.8, 0.9]
+        'best_train_auc': 0.6
     }
     fitnesses = [1, 0.5, 0.6]
     compactness = 0.1
@@ -486,7 +483,7 @@ def test_track_best_scores2():
         'best_test_auc': 1,
         'best_train_auc': 1,
         'best_avg_scores': [1, 2],
-        'compactnesses': [0.2, 0.3, 0.1],
+        'compactnesses': [0.1],
         'best_fitnesses': [0.8, 0.9],
         'feature_importances': {'f1': 1, 'f2': 2},
         'best_parameters': {'foo': 1, 'bar': 2},
