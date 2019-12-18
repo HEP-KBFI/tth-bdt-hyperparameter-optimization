@@ -368,8 +368,16 @@ def test_track_best_scores():
     }
     fitnesses = [1, 0.5, 0.6]
     compactness = 0.1
-    pred_trains = [1, 2, 3, 4, 5]
-    pred_tests = [1, 2, 3, 4, 5]
+    pred_trains = [
+        [1, 2, 3, 4, 5],
+        [2, 2, 3, 4, 5],
+        [3, 2, 3, 4, 5]
+    ]
+    pred_tests = [
+        [1, 2, 3, 4, 5],
+        [2, 2, 3, 4, 5],
+        [3, 2, 3, 4, 5]
+    ]
     result_dict1 = pm.track_best_scores(
         feature_importances,
         parameter_dicts,
@@ -392,7 +400,10 @@ def test_track_best_scores():
         'best_train_auc': 1,
         'best_avg_scores': [1, 2],
         'best_compactnesses': [0.2, 0.3],
-        'best_fitnesses': [0.8, 0.9]
+        'best_fitnesses': [0.8, 0.9],
+        'feature_importances': {'f1': 1, 'f2': 2},
+        'best_parameters': {'foo': 1, 'bar': 2},
+        'best_fitness': 1
     }
     assert result_dict1 == expected
 
@@ -444,8 +455,16 @@ def test_track_best_scores2():
     }
     fitnesses = [1, 0.5, 0.6]
     compactness = 0.1
-    pred_trains = [1, 2, 3, 4, 5]
-    pred_tests = [1, 2, 3, 4, 5]
+    pred_trains = [
+        [1, 2, 3, 4, 5],
+        [2, 2, 3, 4, 5],
+        [3, 2, 3, 4, 5]
+    ]
+    pred_tests = [
+        [1, 2, 3, 4, 5],
+        [2, 2, 3, 4, 5],
+        [3, 2, 3, 4, 5]
+    ]
     result_dict1 = pm.track_best_scores(
         feature_importances,
         parameter_dicts,
@@ -466,6 +485,17 @@ def test_track_best_scores2():
         'best_d_score': 1,
         'best_test_auc': 1,
         'best_train_auc': 1,
+        'best_avg_scores': [1, 2],
+        'best_compactnesses': [0.2, 0.3],
+        'best_fitnesses': [0.8, 0.9],
+        'feature_importances': {'f1': 1, 'f2': 2},
+        'best_parameters': {'foo': 1, 'bar': 2},
+        'best_fitness': 1,
+        'best_g_score': [1],
+        'best_f1_score': [1],
+        'best_d_score': [1],
+        'best_test_auc': [1],
+        'best_train_auc': [1]
     }
     assert result_dict1 == expected
 
