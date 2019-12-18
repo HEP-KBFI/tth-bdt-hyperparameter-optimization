@@ -422,6 +422,42 @@ def test_roc():
     assert tp_rate == [1]*100
 
 
+def test_calculate_improvement _wAWG():
+    avg_scores = [0.5, 0.6, 0.7, 0.8, 0.9]
+    improvements1 = [1, 0.1, 0.1, 0.1]
+    threshold = 0.01
+    imporovements, improvement = universal.calculate_improvement_wAVG(
+        avg, scores, improvements, threshold)
+    assert improvements = [1, 0.1, 0.1, 0.1, 0.1]
+    assert improvement = 0.1
+
+
+def test_plot_roc_curve():
+    auc_info = {
+        'x_train': [1,1,1,1,1],
+        'y_train': [0,0,0,0,0],
+        'x_test': [1,1,1,1,1,],
+        'y_test': [0,0,0,0,0]
+        }
+    universal.plot_roc_curve(resources_dir, auc_info)
+    assert os.path.isfile(os.path.join(resources_dir, 'roc.png'))
+
+
+def test_plot_costfunction():
+    avg_scores = [0.5, 0.6, 0.7, 0.8, 0.9]
+    universal.plot_costfunction(avg_scores, resources_dir)
+    plot_out = os.path.join(resources_dir, 'costFunction.png')
+    assert os.path.isfile(plot_out)
+
+
+def test_plot_single_evolution():
+    plot_out = os.path.join(resources_dir, 'test_single_evolution.png')
+    keys = ['f1_scores', 'g_scores']
+    result_dict = {'f1_scores': [0,1,2,3], 'g_scores': [1,2,3,4]}
+    title = 'foo_bar'
+    universal.plot_single_evolution(keys, result_dict, title, plot_out)
+    assert os.path.isfile(plot_out)
+
 def test_dummy_delete_files():
     if os.path.exists(resources_dir):
         shutil.rmtree(resources_dir)
