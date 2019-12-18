@@ -317,8 +317,8 @@ def test_get_weight_step():
     pso_settings = {'w_init': 1, 'w_fin': 0, 'iterations': 10}
     inertial_weight, inertial_weight_step = universal.get_wright_step(
         pso_settings)
-    assert inertial_weight = 1
-    assert inertial_weight_step = 0.1
+    assert inertial_weight == 1
+    assert inertial_weight_step == 0.1
 
 
 def test_track_best_scores():
