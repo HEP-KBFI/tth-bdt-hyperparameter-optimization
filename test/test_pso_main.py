@@ -357,13 +357,13 @@ def test_track_best_scores():
         {'foo': 2, 'bar': 1}
     ]
     result_dict = {
-        'g_score': 0.6,
-        'f1_score': 0.6,
-        'd_score': 0.6,
-        'test_auc': 0.6,
-        'train_auc': 0.6,
-        'avg_scores': [1, 2],
-        'compactnesses': [0.2, 0.3],
+        'best_g_score': 0.6,
+        'best_f1_score': 0.6,
+        'best_d_score': 0.6,
+        'best_test_auc': 0.6,
+        'best_train_auc': 0.6,
+        'best_avg_scores': [1, 2],
+        'best_compactnesses': [0.2, 0.3],
         'best_fitnesses': [0.8, 0.9]
     }
     fitnesses = [1, 0.5, 0.6]
@@ -385,13 +385,13 @@ def test_track_best_scores():
         append_lists=False
     )
     expected ={
-        'g_score': 1,
-        'f1_score': 1,
-        'd_score': 1,
-        'test_auc': 1,
-        'train_auc': 1,
-        'avg_scores': [1, 2],
-        'compactnesses': [0.2, 0.3],
+        'best_g_score': 1,
+        'best_f1_score': 1,
+        'best_d_score': 1,
+        'best_test_auc': 1,
+        'best_train_auc': 1,
+        'best_avg_scores': [1, 2],
+        'best_compactnesses': [0.2, 0.3],
         'best_fitnesses': [0.8, 0.9]
     }
     assert result_dict1 == expected
@@ -433,13 +433,13 @@ def test_track_best_scores2():
         {'foo': 2, 'bar': 1}
     ]
     result_dict = {
-        'g_score': 0.6,
-        'f1_score': 0.6,
-        'd_score': 0.6,
-        'test_auc': 0.6,
-        'train_auc': 0.6,
-        'avg_scores': [1, 2],
-        'compactnesses': [0.2, 0.3],
+        'best_g_score': 0.6,
+        'best_f1_score': 0.6,
+        'best_d_score': 0.6,
+        'best_test_auc': 0.6,
+        'best_train_auc': 0.6,
+        'best_avg_scores': [1, 2],
+        'best_compactnesses': [0.2, 0.3],
         'best_fitnesses': [0.8, 0.9]
     }
     fitnesses = [1, 0.5, 0.6]
@@ -461,11 +461,11 @@ def test_track_best_scores2():
         append_lists=True
     )
     expected ={
-        'g_score': 1,
-        'f1_score': 1,
-        'd_score': 1,
-        'test_auc': 1,
-        'train_auc': 1,
+        'best_g_score': 1,
+        'best_f1_score': 1,
+        'best_d_score': 1,
+        'best_test_auc': 1,
+        'best_train_auc': 1,
     }
     assert result_dict1 == expected
 
