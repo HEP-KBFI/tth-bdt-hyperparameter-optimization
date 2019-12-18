@@ -516,8 +516,8 @@ def test_prepare_new_day():
         {'foo': 0, 'bar': 0}
     ]
     value_dicts = [
-    {'p_name': 'foo', 'range_start': 1, 'range_end': 500},
-    {'p_name': 'bar', 'range_start': 0, 'range_end': 0.3}
+    {'p_name': 'foo', 'range_start': 1, 'range_end': 500, 'true_int': 0},
+    {'p_name': 'bar', 'range_start': 0, 'range_end': 0.3, 'true_int': 0}
     ]
     weight_dict = {'c1': 1, 'c2': 1, 'w': 1}
     error = False
