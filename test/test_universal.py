@@ -427,7 +427,7 @@ def test_calculate_improvement_wAWG():
     improvements1 = [1, 0.1, 0.1, 0.1]
     threshold = 0.01
     imporovements, improvement = universal.calculate_improvement_wAVG(
-        avg, scores, improvements, threshold)
+        avg_scores, improvements1, threshold)
     assert improvements == [1, 0.1, 0.1, 0.1, 0.1]
     assert improvement == 0.1
 
