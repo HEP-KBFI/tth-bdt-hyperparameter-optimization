@@ -422,7 +422,7 @@ def test_roc():
     assert tp_rate == [1]*100
 
 
-def test_calculate_improvement _wAWG():
+def test_calculate_improvement_wAWG():
     avg_scores = [0.5, 0.6, 0.7, 0.8, 0.9]
     improvements1 = [1, 0.1, 0.1, 0.1]
     threshold = 0.01
