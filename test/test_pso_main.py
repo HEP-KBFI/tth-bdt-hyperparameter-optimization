@@ -315,7 +315,7 @@ def test_initialize_speeds():
 
 def test_get_weight_step():
     pso_settings = {'w_init': 1, 'w_fin': 0, 'iterations': 10}
-    inertial_weight, inertial_weight_step = pm.get_wright_step(
+    inertial_weight, inertial_weight_step = pm.get_weight_step(
         pso_settings)
     assert inertial_weight == 1
     assert inertial_weight_step == 0.1
@@ -370,7 +370,7 @@ def test_track_best_scores():
     compactness = 0.1
     pred_trains = [1, 2, 3, 4, 5]
     pred_tests = [1, 2, 3, 4, 5]
-    result_dict = pm.track_best_scores(
+    result_dict1 = pm.track_best_scores(
         feature_importances,
         parameter_dicts,
         keys,
@@ -394,7 +394,7 @@ def test_track_best_scores():
         'compactnesses': [0.2, 0.3],
         'best_fitnesses': [0.8, 0.9]
     }
-    assert result_dict == expected
+    assert result_dict1 == expected
 
 
 def test_track_best_scores2():
@@ -432,7 +432,7 @@ def test_track_best_scores2():
         {'foo': 3, 'bar': 2},
         {'foo': 2, 'bar': 1}
     ]
-    result_dict = {
+    result_dict1 = {
         'g_score': 0.6,
         'f1_score': 0.6,
         'd_score': 0.6,
@@ -467,7 +467,7 @@ def test_track_best_scores2():
         'test_auc': 1,
         'train_auc': 1,
     }
-    assert result_dict == expected
+    assert result_dict1 == expected
 
 def test_read_weights():
     result = pm.read_weights()
