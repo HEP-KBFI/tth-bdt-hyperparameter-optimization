@@ -291,6 +291,176 @@ def test_weight_normalization():
     )
 
 
+def test_check_numeric():
+    variables1 = [0, 9, 0.99, 'a']
+    variables2 = [0.99, 1/3, 0, 100, 1e3]
+    result1 = universal.check_numeric(variables1)
+    result2 = universal.check_numeric(variables2)
+    assert result1
+    assert not result2
+
+
+def test_initialize_speeds():
+    parameter_dicts = [
+        {'a': 1, 'b': 2, 'c': 3},
+        {'a': 3, 'b': 2, 'c': 1}
+    ]
+    speeds = universal.initialize_speeds(parameter_dicts)
+    expected = [
+        {'a': 0, 'b': 0, 'c': 0},
+        {'a': 0, 'b': 0, 'c': 0}
+    ]
+    assert speeds == expected
+
+
+def test_get_weight_step():
+    pso_settings = {'w_init': 1, 'w_fin': 0, 'iterations': 10}
+    inertial_weight, inertial_weight_step = universal.get_wright_step(
+        pso_settings)
+    assert inertial_weight = 1
+    assert inertial_weight_step = 0.1
+
+
+def test_track_best_scores():
+    feature_importances = {'foo': 1, 'bar': 2}
+    score_dicts = [
+        {
+            'g_score': 1,
+            'f1_score': 1,
+            'd_score': 1,
+            'test_auc': 1,
+            'train_auc': 1
+        },
+        {
+            'g_score': 0.5,
+            'f1_score': 0.5,
+            'd_score': 0.5,
+            'test_auc': 0.5,
+            'train_auc': 0.5
+        },
+        {
+            'g_score': 0.6,
+            'f1_score': 0.6,
+            'd_score': 0.6,
+            'test_auc': 0.6,
+            'train_auc': 0.6
+        }
+    ]
+    keys = ['g_score', 'f1_score', 'd_score', 'test_auc', 'train_auc']
+    parameter_dicts = [
+        {'foo': 1, 'bar': 2},
+        {'foo': 3, 'bar': 2},
+        {'foo': 2, 'bar': 1}
+    ]
+    result_dict = {
+        'g_score': 0.6,
+        'f1_score': 0.6,
+        'd_score': 0.6,
+        'test_auc': 0.6,
+        'train_auc': 0.6,
+        'avg_scores': [1, 2],
+        'compactnesses': [0.2, 0.3],
+        'best_fitnesses': [0.8, 0.9]
+    }
+    fitnesses = [1, 0.5, 0.6]
+    compactness = 0.1
+    pred_trains = [1, 2, 3, 4, 5]
+    pred_tests = [1, 2, 3, 4, 5]
+    result_dict = universal.track_best_scores(
+        feature_importances,
+        parameter_dicts,
+        keys,
+        score_dicts,
+        result_dict,
+        fitnesses,
+        compactness,
+        pred_trains,
+        pred_tests,
+        new_bests=True,
+        initialize_lists=False,
+        append_lists=False
+    )
+    expected ={
+        'g_score': 1,
+        'f1_score': 1,
+        'd_score': 1,
+        'test_auc': 1,
+        'train_auc': 1,
+        'avg_scores': [1, 2],
+        'compactnesses': [0.2, 0.3],
+        'best_fitnesses': [0.8, 0.9]
+    }
+    assert result_dict == expected
+
+
+def test_track_best_scores():
+    feature_importances = {'foo': 1, 'bar': 2}
+    score_dicts = [
+        {
+            'g_score': 1,
+            'f1_score': 1,
+            'd_score': 1,
+            'test_auc': 1,
+            'train_auc': 1
+        },
+        {
+            'g_score': 0.5,
+            'f1_score': 0.5,
+            'd_score': 0.5,
+            'test_auc': 0.5,
+            'train_auc': 0.5
+        },
+        {
+            'g_score': 0.6,
+            'f1_score': 0.6,
+            'd_score': 0.6,
+            'test_auc': 0.6,
+            'train_auc': 0.6
+        }
+    ]
+    keys = ['g_score', 'f1_score', 'd_score', 'test_auc', 'train_auc']
+    parameter_dicts = [
+        {'foo': 1, 'bar': 2},
+        {'foo': 3, 'bar': 2},
+        {'foo': 2, 'bar': 1}
+    ]
+    result_dict = {
+        'g_score': 0.6,
+        'f1_score': 0.6,
+        'd_score': 0.6,
+        'test_auc': 0.6,
+        'train_auc': 0.6,
+        'avg_scores': [1, 2],
+        'compactnesses': [0.2, 0.3],
+        'best_fitnesses': [0.8, 0.9]
+    }
+    fitnesses = [1, 0.5, 0.6]
+    compactness = 0.1
+    pred_trains = [1, 2, 3, 4, 5]
+    pred_tests = [1, 2, 3, 4, 5]
+    result_dict = universal.track_best_scores(
+        feature_importances,
+        parameter_dicts,
+        keys,
+        score_dicts,
+        result_dict,
+        fitnesses,
+        compactness,
+        pred_trains,
+        pred_tests,
+        new_bests=True,
+        initialize_lists=True,
+        append_lists=True
+    )
+    expected ={
+        'g_score': 1,
+        'f1_score': 1,
+        'd_score': 1,
+        'test_auc': 1,
+        'train_auc': 1,
+    }
+    assert result_dict == expected
+
 def test_read_weights():
     result = pm.read_weights()
     assert len(result) == 7

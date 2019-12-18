@@ -203,3 +203,8 @@ def test_evolve():
         assert len(result[1][key]) == SETTINGS['iterations'] + 1, \
             'test_evolve failed'
     assert len(result[2]) == len(result[0]), 'test_evolve failed'
+
+
+def test_dummy_delete_files():
+    if os.path.exists(resources_dir):
+        shutil.rmtree(resources_dir)
