@@ -397,7 +397,7 @@ def test_track_best_scores():
     assert result_dict == expected
 
 
-def test_track_best_scores():
+def test_track_best_scores2():
     feature_importances = [
         {'f1': 1, 'f2': 2},
         {'f1': 2, 'f2': 3},
