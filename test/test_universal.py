@@ -539,7 +539,7 @@ def test_save_single_file():
         'best_fitnesses': [1,1,1,1]
     }
     file_out = os.path.join(resources_dir, 'stopping_criteria.json')
-    keys = ['f1_scores', 'g_scores']
+    keys = ['best_f1_scores', 'best_g_scores']
     universal.save_single_file(keys, result_dict, file_out)
     assert os.path.isfile(file_out)
 
