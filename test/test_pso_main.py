@@ -404,8 +404,8 @@ def test_track_best_scores():
         'feature_importances': {'f1': 1, 'f2': 2},
         'best_parameters': {'foo': 1, 'bar': 2},
         'best_fitness': 1,
-        'pred_trains': [1, 2, 3, 4, 5],
-        'pred_tests': [1, 2, 3, 4, 5]
+        'pred_train': [1, 2, 3, 4, 5],
+        'pred_test': [1, 2, 3, 4, 5]
     }
     assert result_dict1 == expected
 
@@ -484,7 +484,7 @@ def test_track_best_scores2():
         'best_d_score': 1,
         'best_test_auc': 1,
         'best_train_auc': 1,
-        'avg_scores': np.mean[1, 0.5, 0.5],
+        'avg_scores': np.mean(1, 0.5, 0.5),
         'compactnesses': [0.1],
         'feature_importances': {'f1': 1, 'f2': 2},
         'best_parameters': {'foo': 1, 'bar': 2},
@@ -494,8 +494,8 @@ def test_track_best_scores2():
         'best_d_scores': [1],
         'best_test_aucs': [1],
         'best_train_aucs': [1],
-        'pred_trains': [1, 2, 3, 4, 5],
-        'pred_tests': [1, 2, 3, 4, 5]
+        'pred_train': [1, 2, 3, 4, 5],
+        'pred_test': [1, 2, 3, 4, 5]
     }
     assert result_dict1 == expected
 
