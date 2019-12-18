@@ -362,8 +362,8 @@ def test_track_best_scores():
         'best_d_score': 0.6,
         'best_test_auc': 0.6,
         'best_train_auc': 0.6,
-        'best_avg_scores': [1, 2],
-        'best_compactnesses': [0.2, 0.3],
+        'avg_scores': [1, 2],
+        'compactnesses': [0.2, 0.3],
         'best_fitnesses': [0.8, 0.9]
     }
     fitnesses = [1, 0.5, 0.6]
@@ -484,7 +484,7 @@ def test_track_best_scores2():
         'best_d_score': 1,
         'best_test_auc': 1,
         'best_train_auc': 1,
-        'avg_scores': np.mean(1, 0.5, 0.5),
+        'avg_scores': np.mean([1, 0.5, 0.5]),
         'compactnesses': [0.1],
         'feature_importances': {'f1': 1, 'f2': 2},
         'best_parameters': {'foo': 1, 'bar': 2},
