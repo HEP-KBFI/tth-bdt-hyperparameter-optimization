@@ -483,8 +483,9 @@ def test_create_extra_plots():
         'best_g_scores': [1,1,1,1],
         'best_f1_scores': [1,1,1,1],
         'best_d_scores': [1,1,1,1],
-        'compactesses': [1,1,1,1],
-        'avg_scores': [1,1,1,1]
+        'compactnesses': [1,1,1,1],
+        'avg_scores': [1,1,1,1],
+        'best_fitnesses': [1,1,1,1]
     }
     universal.create_extra_plots(result_dict, resources_dir)
     assert os.path.isfile(plot_out1)
@@ -500,8 +501,9 @@ def test_save_extra_results():
         'best_g_scores': [1,1,1,1],
         'best_f1_scores': [1,1,1,1],
         'best_d_scores': [1,1,1,1],
-        'compactesses': [1,1,1,1],
-        'avg_scores': [1,1,1,1]
+        'compactnesses': [1,1,1,1],
+        'avg_scores': [1,1,1,1],
+        'best_fitnesses': [1,1,1,1]
     }
     universal.save_extra_results(result_dict, resources_dir)
     assert os.path.isfile(file_out1)
@@ -515,11 +517,12 @@ def test_save_fitness_improvement():
         'best_g_scores': [1,1,1,1],
         'best_f1_scores': [1,1,1,1],
         'best_d_scores': [1,1,1,1],
-        'compactesses': [1,1,1,1],
-        'avg_scores': [1,1,1,1]
+        'compactnesses': [1,1,1,1],
+        'avg_scores': [1,1,1,1],
+        'best_fitnesses': [1,1,1,1]
     }
     keys = ['compactnesses', 'avg_scores']
-    output_path = os.path.join(output_dir, 'fitness_improvement.json')
+    output_path = os.path.join(resources_dir, 'fitness_improvement.json')
     universal.save_fitness_improvement(result_dict, keys, resources_dir)
     assert os.path.isfile(output_path)
 
@@ -531,8 +534,9 @@ def test_save_single_file():
         'best_g_scores': [1,1,1,1],
         'best_f1_scores': [1,1,1,1],
         'best_d_scores': [1,1,1,1],
-        'compactesses': [1,1,1,1],
-        'avg_scores': [1,1,1,1]
+        'compactnesses': [1,1,1,1],
+        'avg_scores': [1,1,1,1],
+        'best_fitnesses': [1,1,1,1]
     }
     file_out = os.path.join(resources_dir, 'stopping_criteria.json')
     keys = ['f1_scores', 'g_scores']
