@@ -428,8 +428,8 @@ def test_calculate_improvement_wAWG():
     threshold = 0.01
     imporovements, improvement = universal.calculate_improvement_wAVG(
         avg, scores, improvements, threshold)
-    assert improvements = [1, 0.1, 0.1, 0.1, 0.1]
-    assert improvement = 0.1
+    assert improvements == [1, 0.1, 0.1, 0.1, 0.1]
+    assert improvement == 0.1
 
 
 def test_plot_roc_curve():
