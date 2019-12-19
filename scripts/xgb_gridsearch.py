@@ -17,8 +17,9 @@ import os
 def main():
     if not os.path.isdir(outputDir):
         os.makedirs(outputDir)
-    settings = universal.read_settings('global')
-    settings.update({'grid_size': 2})
+    grid_settings = universal.read_settings('global')
+    grid_settings.update({'grid_size': 2})
+    cmssw_base_path = os.path.expandvars('$CMSSW_BASE')
     param_file = os.path.join(
         cmssw_base_path,
         'src',

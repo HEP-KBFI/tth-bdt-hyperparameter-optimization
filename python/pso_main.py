@@ -365,7 +365,7 @@ def track_best_scores(
     if append_lists:
         result_dict['avg_scores'].append(np.mean(fitnesses))
         result_dict['compactnesses'].append(compactness)
-        best_fitness['best_fitnesses'].append(result_dict['best_fitness'])
+        result_dict['best_fitnesses'].append(result_dict['best_fitness'])
     return result_dict
 
 
