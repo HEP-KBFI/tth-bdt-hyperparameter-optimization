@@ -19,6 +19,7 @@ def main():
         os.makedirs(outputDir)
     grid_settings = universal.read_settings('global')
     grid_settings.update({'grid_size': 2})
+    cmssw_base_path = os.path.expandvars('$CMSSW_BASE')
     param_file = os.path.join(
         cmssw_base_path,
         'src',

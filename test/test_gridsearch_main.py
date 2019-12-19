@@ -114,6 +114,7 @@ def test_single_paramset():
 
 def test_perform_gridsearch():
     grid_settings = {'nthread': 2, 'grid_size': 2, 'num_classes': 10}
+    cmssw_base_path = os.path.expandvars('$CMSSW_BASE')
     param_file = os.path.join(
         cmssw_base_path,
         'src',
