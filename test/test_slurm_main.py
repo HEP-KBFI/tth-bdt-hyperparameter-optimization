@@ -140,7 +140,7 @@ def test_save_info():
 def test_clear_from_files():
     settings = {'output_dir': tmp_folder}
     for i in range(5):
-        path = os.path.join(tmp_folder, 'parameter_' + i +'.sh')
+        path = os.path.join(tmp_folder, 'parameter_' + str(i) +'.sh')
         open(path, 'w').close()
     sample_dir = os.path.join(tmp_folder, 'samples')
     os.makedirs(sample_dir)
