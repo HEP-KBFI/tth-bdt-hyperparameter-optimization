@@ -8,6 +8,11 @@ from tthAnalysis.bdtHyperparameterOptimization import gridsearch_main as gm
 from tthAnalysis.bdtHyperparameterOptimization import xgb_tools as xt
 from tthAnalysis.bdtHyperparameterOptimization import mnist_filereader as mf
 from tthAnalysis.bdtHyperparameterOptimization import universal
+dir_path = os.path.dirname(os.path.realpath(__file__))
+resourcesDir = os.path.join(dir_path, 'resources')
+tmp_folder = os.path.join(resourcesDir, 'tmp')
+if not os.path.exists(tmp_folder):
+    os.makedirs(tmp_folder)
 
 main_url = 'http://yann.lecun.com/exdb/mnist/'
 train_images = 'train-images-idx3-ubyte'
