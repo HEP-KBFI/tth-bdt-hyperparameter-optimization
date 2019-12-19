@@ -3,6 +3,8 @@ from tthAnalysis.bdtHyperparameterOptimization import slurm_main as sm
 import numpy as np
 import os 
 import shutil
+import urllib
+import gzip
 import glob
 import timeit
 import timeout_decorator
