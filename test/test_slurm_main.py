@@ -160,7 +160,7 @@ def test_read_feature_importances():
         {'f1': 1, 'f2': 2, 'f3': 3},
         {'f1': 1, 'f2': 2, 'f3': 3}
     ]
-    result = sm.read_feature_importances(tmp_folder)
+    result = sm.read_feature_importances(resources_dir)
     assert result == expected
 
 
@@ -187,7 +187,7 @@ def test_run_iteration():
         'nthread': 8,
         'sample_type': 'mnist',
         'output_dir': tmp_folder,
-        'optimization_algo': pso,
+        'optimization_algo': 'pso',
         'num_classes': 10}
     parameter_dicts = [
         {
@@ -209,8 +209,9 @@ def test_run_iteration():
             'colsample_bytree': 0.8
         }
         ]
-    score_dicts, pred_trains, pred_tests, feature_importances = run_iteration(
+    score_dicts, pred_trains, pred_tests, feature_importances = sm.run_iteration(
         parameter_dicts, data_dict, global_settings)
+    assert score_dicts != None
 
 
 def test_dummy_delete_files():
