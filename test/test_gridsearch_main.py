@@ -1,5 +1,9 @@
 from __future__ import division
 import numpy as np
+import os
+import gzip
+import urllib
+import shutil
 from tthAnalysis.bdtHyperparameterOptimization import gridsearch_main as gm
 from tthAnalysis.bdtHyperparameterOptimization import xgb_tools as xt
 from tthAnalysis.bdtHyperparameterOptimization import mnist_filereader as mf
