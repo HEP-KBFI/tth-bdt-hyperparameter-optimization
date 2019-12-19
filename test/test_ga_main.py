@@ -83,7 +83,6 @@ POPULATION = [
 
 FITNESSES = [0.4, 0.6, 0.8]
 
-# temporary solution for data during testing
 main_url = 'http://yann.lecun.com/exdb/mnist/'
 train_images = 'train-images-idx3-ubyte'
 train_labels = 'train-labels-idx1-ubyte'
@@ -101,7 +100,6 @@ for file in file_list:
         with open(file_loc, 'wb') as f_out:
             shutil.copyfileobj(f_in, f_out)
 DATA = mf.create_datasets(sample_dir, 16)
-
 
 def test_set_num():
     '''Testing the set_num function'''
@@ -203,3 +201,8 @@ def test_evolve():
         assert len(result[1][key]) == SETTINGS['iterations'] + 1, \
             'test_evolve failed'
     assert len(result[2]) == len(result[0]), 'test_evolve failed'
+
+
+def test_dummy_delete_files():
+    if os.path.exists(resources_dir):
+        shutil.rmtree(resources_dir)

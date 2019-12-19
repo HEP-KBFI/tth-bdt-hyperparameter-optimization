@@ -207,22 +207,41 @@ def calculate_f1_score(confusionmatrix):
     labels = np.arange(0, nr_labels)
     g_scores = []
     f1_scores = []
-    for label in labels:
-        false_positives = 0
-        false_negatives = 0
-        new_labels = np.delete(labels, label)
-        true_positives = confusionmatrix[label, label]
-        for new_label in new_labels:
-            false_negatives += confusionmatrix[label, new_label]
-            false_positives += confusionmatrix[new_label, label]
+    if nr_labels > 2:
+        for label in labels:
+            false_positives = 0
+            false_negatives = 0
+            new_labels = np.delete(labels, label)
+            true_positives = confusionmatrix[label, label]
+            for new_label in new_labels:
+                false_negatives += confusionmatrix[label, new_label]
+                false_positives += confusionmatrix[new_label, label]
         precision = true_positives / (true_positives + false_positives)
         recall = true_positives / (true_positives + false_negatives)
         f1_score = 2 * (precision * recall) / (precision + recall)
         g_score = np.sqrt(precision * recall)
         f1_scores.append(f1_score)
         g_scores.append(g_score)
-    mean_f1 = np.mean(f1_scores)
-    mean_g = np.mean(g_scores)
+        mean_f1 = np.mean(f1_scores)
+        mean_g = np.mean(g_scores)
+    elif nr_labels == 1:
+        true_positives = confusionmatrix[0][0]
+        false_positives = 0
+        false_negatives = 0
+        precision = true_positives / (true_positives + false_positives)
+        recall = true_positives / (true_positives + false_negatives)
+        mean_f1 = 2 * (precision * recall) / (precision + recall)
+        mean_g = np.sqrt(precision * recall)
+    elif nr_labels == 2:
+        true_positives = confusionmatrix[0][0]
+        false_negatives = confusionmatrix[1][0]
+        false_positives = confusionmatrix[0][1]
+        precision = true_positives / (true_positives + false_positives)
+        recall = true_positives / (true_positives + false_negatives)
+        mean_f1 = 2 * (precision * recall) / (precision + recall)
+        mean_g = np.sqrt(precision * recall)
+    else:
+        raise ValueError('The passed confusionmatrix is not correct')
     return mean_f1, mean_g
 
 
@@ -917,7 +936,7 @@ def fitness_to_list(score_dicts, fitness_key='f1_score'):
     for score_dict in score_dicts:
         fitnesses.append(score_dict[fitness_key])
     return fitnesses
-    
+
 
 # One-vs-All ROC
 

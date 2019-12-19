@@ -291,6 +291,251 @@ def test_weight_normalization():
     )
 
 
+def test_check_numeric():
+    variables1 = [0, 9, 0.99, 'a']
+    variables2 = [0.99, 1/3, 0, 100, 1e3]
+    result1 = pm.check_numeric(variables1)
+    result2 = pm.check_numeric(variables2)
+    assert result1
+    assert not result2
+
+
+def test_initialize_speeds():
+    parameter_dicts = [
+        {'a': 1, 'b': 2, 'c': 3},
+        {'a': 3, 'b': 2, 'c': 1}
+    ]
+    speeds = pm.initialize_speeds(parameter_dicts)
+    expected = [
+        {'a': 0, 'b': 0, 'c': 0},
+        {'a': 0, 'b': 0, 'c': 0}
+    ]
+    assert speeds == expected
+
+
+def test_get_weight_step():
+    pso_settings = {'w_init': 1, 'w_fin': 0, 'iterations': 10}
+    inertial_weight, inertial_weight_step = pm.get_weight_step(
+        pso_settings)
+    assert inertial_weight == 1
+    assert inertial_weight_step == -0.1
+
+
+def test_track_best_scores():
+    feature_importances = [
+        {'f1': 1, 'f2': 2},
+        {'f1': 2, 'f2': 3},
+        {'f1': 0.1, 'f2': 4}
+    ]
+    score_dicts = [
+        {
+            'g_score': 1,
+            'f1_score': 1,
+            'd_score': 1,
+            'test_auc': 1,
+            'train_auc': 1
+        },
+        {
+            'g_score': 0.5,
+            'f1_score': 0.5,
+            'd_score': 0.5,
+            'test_auc': 0.5,
+            'train_auc': 0.5
+        },
+        {
+            'g_score': 0.6,
+            'f1_score': 0.6,
+            'd_score': 0.6,
+            'test_auc': 0.6,
+            'train_auc': 0.6
+        }
+    ]
+    keys = ['g_score', 'f1_score', 'd_score', 'test_auc', 'train_auc']
+    parameter_dicts = [
+        {'foo': 1, 'bar': 2},
+        {'foo': 3, 'bar': 2},
+        {'foo': 2, 'bar': 1}
+    ]
+    result_dict = {
+        'best_g_score': 0.6,
+        'best_f1_score': 0.6,
+        'best_d_score': 0.6,
+        'best_test_auc': 0.6,
+        'best_train_auc': 0.6,
+        'avg_scores': [1, 2],
+        'compactnesses': [0.2, 0.3],
+        'best_fitnesses': [0.8, 0.9]
+    }
+    fitnesses = [1, 0.5, 0.6]
+    compactness = 0.1
+    pred_trains = [
+        [1, 2, 3, 4, 5],
+        [2, 2, 3, 4, 5],
+        [3, 2, 3, 4, 5]
+    ]
+    pred_tests = [
+        [1, 2, 3, 4, 5],
+        [2, 2, 3, 4, 5],
+        [3, 2, 3, 4, 5]
+    ]
+    result_dict1 = pm.track_best_scores(
+        feature_importances,
+        parameter_dicts,
+        keys,
+        score_dicts,
+        result_dict,
+        fitnesses,
+        compactness,
+        pred_trains,
+        pred_tests,
+        new_bests=True,
+        initialize_lists=False,
+        append_lists=False
+    )
+    expected ={
+        'best_g_score': 1,
+        'best_f1_score': 1,
+        'best_d_score': 1,
+        'best_test_auc': 1,
+        'best_train_auc': 1,
+        'avg_scores': [1, 2],
+        'compactnesses': [0.2, 0.3],
+        'best_fitnesses': [0.8, 0.9],
+        'feature_importances': {'f1': 1, 'f2': 2},
+        'best_parameters': {'foo': 1, 'bar': 2},
+        'best_fitness': 1,
+        'pred_train': [1, 2, 3, 4, 5],
+        'pred_test': [1, 2, 3, 4, 5]
+    }
+    assert result_dict1 == expected
+
+
+def test_track_best_scores2():
+    feature_importances = [
+        {'f1': 1, 'f2': 2},
+        {'f1': 2, 'f2': 3},
+        {'f1': 0.1, 'f2': 4}
+    ]
+    score_dicts = [
+        {
+            'g_score': 1,
+            'f1_score': 1,
+            'd_score': 1,
+            'test_auc': 1,
+            'train_auc': 1
+        },
+        {
+            'g_score': 0.5,
+            'f1_score': 0.5,
+            'd_score': 0.5,
+            'test_auc': 0.5,
+            'train_auc': 0.5
+        },
+        {
+            'g_score': 0.6,
+            'f1_score': 0.6,
+            'd_score': 0.6,
+            'test_auc': 0.6,
+            'train_auc': 0.6
+        }
+    ]
+    keys = ['g_score', 'f1_score', 'd_score', 'test_auc', 'train_auc']
+    parameter_dicts = [
+        {'foo': 1, 'bar': 2},
+        {'foo': 3, 'bar': 2},
+        {'foo': 2, 'bar': 1}
+    ]
+    result_dict = {
+        'best_g_score': 0.6,
+        'best_f1_score': 0.6,
+        'best_d_score': 0.6,
+        'best_test_auc': 0.6,
+        'best_train_auc': 0.6
+    }
+    fitnesses = [1, 0.5, 0.6]
+    compactness = 0.1
+    pred_trains = [
+        [1, 2, 3, 4, 5],
+        [2, 2, 3, 4, 5],
+        [3, 2, 3, 4, 5]
+    ]
+    pred_tests = [
+        [1, 2, 3, 4, 5],
+        [2, 2, 3, 4, 5],
+        [3, 2, 3, 4, 5]
+    ]
+    result_dict1 = pm.track_best_scores(
+        feature_importances,
+        parameter_dicts,
+        keys,
+        score_dicts,
+        result_dict,
+        fitnesses,
+        compactness,
+        pred_trains,
+        pred_tests,
+        new_bests=True,
+        initialize_lists=True,
+        append_lists=True
+    )
+    expected ={
+        'best_g_score': 1,
+        'best_f1_score': 1,
+        'best_d_score': 1,
+        'best_test_auc': 1,
+        'best_train_auc': 1,
+        'avg_scores': np.mean([1, 0.5, 0.6]),
+        'compactnesses': [0.1],
+        'feature_importances': {'f1': 1, 'f2': 2},
+        'best_parameters': {'foo': 1, 'bar': 2},
+        'best_fitnesses': [1],
+        'best_g_scores': [1],
+        'best_f1_scores': [1],
+        'best_d_scores': [1],
+        'best_test_aucs': [1],
+        'best_train_aucs': [1],
+        'pred_train': [1, 2, 3, 4, 5],
+        'pred_test': [1, 2, 3, 4, 5],
+        'best_fitness': 1
+    }
+    assert result_dict1 == expected
+
+
+def test_prepare_new_day():
+    personal_bests = [
+        {'foo': 1, 'bar': 2},
+        {'foo': 2, 'bar': 2}
+    ]
+    parameter_dicts = [
+        {'foo': 3, 'bar': 3},
+        {'foo': 4, 'bar': 4}
+    ]
+    best_parameters = {'foo': 1, 'bar': 2}
+    current_speeds = [
+        {'foo': 0, 'bar': 0},
+        {'foo': 0, 'bar': 0}
+    ]
+    value_dicts = [
+    {'p_name': 'foo', 'range_start': 1, 'range_end': 500, 'true_int': 0},
+    {'p_name': 'bar', 'range_start': 0, 'range_end': 0.3, 'true_int': 0}
+    ]
+    weight_dict = {'c1': 1, 'c2': 1, 'w': 1}
+    error = False
+    try:
+        new_parameters, current_speeds = pm.prepare_new_day(
+            personal_bests,
+            parameter_dicts,
+            best_parameters,
+            current_speeds,
+            value_dicts,
+            weight_dict
+        )
+    except:
+        error = True
+    assert not error
+
+
+
 def test_read_weights():
     result = pm.read_weights()
     assert len(result) == 7
