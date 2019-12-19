@@ -158,6 +158,57 @@ def test_read_feature_importances():
         {'f1': 1, 'f2': 2, 'f3': 3}
     ]
     result = sm.read_feature_importances(tmp_folder)
+    assert result == expected
+
+
+def test_run_iteration():
+    main_url = 'http://yann.lecun.com/exdb/mnist/'
+    train_images = 'train-images-idx3-ubyte'
+    train_labels = 'train-labels-idx1-ubyte'
+    test_images = 't10k-images-idx3-ubyte'
+    test_labels = 't10k-labels-idx1-ubyte'
+    file_list = [train_labels, train_images, test_labels, test_images]
+    sample_dir = os.path.join(tmp_folder, 'samples_mnist')
+    nthread = 2
+    os.makedirs(sample_dir)
+    for file in file_list:
+        file_loc = os.path.join(sample_dir, file)
+        file_url = os.path.join(main_url, file + '.gz')
+        urllib.urlretrieve(file_url, file_loc + '.gz')
+        with gzip.open(file_loc + '.gz', 'rb') as f_in:
+            with open(file_loc, 'wb') as f_out:
+                shutil.copyfileobj(f_in, f_out)
+    data_dict = mf.create_datasets(sample_dir, 16)
+    global_settings = {
+        'sample_dir': sample_dir,
+        'nthread': 8,
+        'sample_type': 'mnist',
+        'output_dir': tmp_folder,
+        'optimization_algo': pso,
+        'num_classes': 10}
+    parameter_dicts = [
+        {
+            'num_boost_round': 71,
+            'learning_rate': 0.07,
+            'max_depth': 2,
+            'gamma': 1.9,
+            'min_child_weight': 18,
+            'subsample': 0.9,
+            'colsample_bytree': 0.8
+        },
+        {
+            'num_boost_round': 72,
+            'learning_rate': 0.17,
+            'max_depth': 3,
+            'gamma': 1.9,
+            'min_child_weight': 18,
+            'subsample': 0.9,
+            'colsample_bytree': 0.8
+        }
+        ]
+    score_dicts, pred_trains, pred_tests, feature_importances = run_iteration(
+        parameter_dicts, data_dict, global_settings)
+
 
 def test_dummy_delete_files():
     if os.path.exists(tmp_folder):
