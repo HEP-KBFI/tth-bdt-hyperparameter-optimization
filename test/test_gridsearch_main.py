@@ -10,7 +10,7 @@ from tthAnalysis.bdtHyperparameterOptimization import mnist_filereader as mf
 from tthAnalysis.bdtHyperparameterOptimization import universal
 dir_path = os.path.dirname(os.path.realpath(__file__))
 resources_dir = os.path.join(dir_path, 'resources')
-tmp_folder = os.path.join(resourcesDir, 'tmp')
+tmp_folder = os.path.join(resources_dir, 'tmp')
 if not os.path.exists(tmp_folder):
     os.makedirs(tmp_folder)
 
