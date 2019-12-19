@@ -107,7 +107,7 @@ def test_single_paramset():
     ]
     iterations = [0, 1]
     grid_size = 2
-    parameter_dict = gm.sindle_paramset(parameters, iterations, grid_size)
+    parameter_dict = gm.single_paramset(parameters, iterations, grid_size)
     expected = {'foo': 1, 'bar': 5}
     assert parameter_dict == expected
 

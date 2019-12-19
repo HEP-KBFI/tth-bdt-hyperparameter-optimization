@@ -75,7 +75,7 @@ def single_paramset(parameters, iterations, grid_size):
             step_size = range_size / (grid_size - 1)
             value = param['range_start'] + (iteration * step_size)
         parameter_dict[key] = value
-        if param['true_int'] == 'True':
+        if bool(int(param['true_int'])):
             parameter_dict[key] = int(np.ceil(value))
     return parameter_dict
 
