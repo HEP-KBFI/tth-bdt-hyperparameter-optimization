@@ -9,7 +9,7 @@ from tthAnalysis.bdtHyperparameterOptimization import xgb_tools as xt
 from tthAnalysis.bdtHyperparameterOptimization import mnist_filereader as mf
 from tthAnalysis.bdtHyperparameterOptimization import universal
 dir_path = os.path.dirname(os.path.realpath(__file__))
-resourcesDir = os.path.join(dir_path, 'resources')
+resources_dir = os.path.join(dir_path, 'resources')
 tmp_folder = os.path.join(resourcesDir, 'tmp')
 if not os.path.exists(tmp_folder):
     os.makedirs(tmp_folder)
@@ -130,5 +130,5 @@ def test_perform_gridsearch():
 
 
 def test_dummy_delete_files():
-    if os.path.exists(resources_dir):
-        shutil.rmtree(resources_dir)
+    if os.path.exists(tmp_folder):
+        shutil.rmtree(tmp_folder)

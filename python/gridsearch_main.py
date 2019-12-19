@@ -111,8 +111,7 @@ def perform_gridsearch(
     print(':::::: Calculating fitnesses ::::::')
     fitnesses, pred_trains, pred_tests = calculate_fitness(
         parameter_dicts, data_dict,
-        grid_settings['nthread'],
-        grid_settings['num_classes']
+        grid_settings
     )
     index = np.argmax(fitnesses)
     result_dict = {
