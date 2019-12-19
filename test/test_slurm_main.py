@@ -143,7 +143,8 @@ def test_clear_from_files():
         path = os.path.join(tmp_folder, 'parameter_' + str(i) +'.sh')
         open(path, 'w').close()
     sample_dir = os.path.join(tmp_folder, 'samples')
-    os.makedirs(sample_dir)
+    if not os.path.exists(sample_dir):
+        os.makedirs(sample_dir)
     sm.clear_from_files(settings)
     wild_card_path = os.path.join(tmp_folder, 'parameter_*.sh')
     assert len(glob.glob(wild_card_path)) == 0
