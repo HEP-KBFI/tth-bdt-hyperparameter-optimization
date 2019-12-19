@@ -9,6 +9,7 @@ import glob
 import timeit
 import timeout_decorator
 import subprocess
+from tthAnalysis.bdtHyperparameterOptimization import mnist_filereader as mf
 dir_path = os.path.dirname(os.path.realpath(__file__))
 resources_dir = os.path.join(dir_path, 'resources')
 tmp_folder = os.path.join(resources_dir, 'tmp')
