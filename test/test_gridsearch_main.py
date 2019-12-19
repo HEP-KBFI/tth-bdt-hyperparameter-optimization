@@ -93,7 +93,7 @@ def test_create_all_combinations():
 
 def test_single_paramset():
     parameters = [
-        {'p_name': 'foo', 'range_end': 10, 'range_start': 1}
+        {'p_name': 'foo', 'range_end': 10, 'range_start': 1},
         {'p_name': 'bar', 'range_end': 5, 'range_start': 1}
     ]
     iterations = [0, 1]
