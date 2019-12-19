@@ -208,9 +208,23 @@ def test_run_iteration():
             'subsample': 0.9,
             'colsample_bytree': 0.8
         }
-        ]
+    ]
+    main_dir = os.path.join(
+        cmssw_base_path,
+        'src',
+        'tthAnalysis',
+        'bdtHyperparameterOptimization'
+    )
+    global_settings_path = os.path.join(
+        main_dir, 'data', 'global_settings.json')
+    test_global_settings_path = os.path.join(
+        main_dir, 'test', 'resources', 'global_settings.json')
+    os.rename(global_settings_path, global_settings_path + '_')
+    os.rename(test_global_settings_path, global_settings_path)
     score_dicts, pred_trains, pred_tests, feature_importances = sm.run_iteration(
         parameter_dicts, data_dict, global_settings)
+    os.rename(global_settings_path, test_global_settings_path)
+    os.rename(global_settings_path + '_', global_settings_path)
     assert score_dicts != None
 
 
