@@ -2,6 +2,26 @@ from __future__ import division
 import numpy as np
 from tthAnalysis.bdtHyperparameterOptimization import gridsearch_main as gm
 from tthAnalysis.bdtHyperparameterOptimization import xgb_tools as xt
+from tthAnalysis.bdtHyperparameterOptimization import mnist_filereader as mf
+from tthAnalysis.bdtHyperparameterOptimization import universal
+
+main_url = 'http://yann.lecun.com/exdb/mnist/'
+train_images = 'train-images-idx3-ubyte'
+train_labels = 'train-labels-idx1-ubyte'
+test_images = 't10k-images-idx3-ubyte'
+test_labels = 't10k-labels-idx1-ubyte'
+file_list = [train_labels, train_images, test_labels, test_images]
+sample_dir = os.path.join(tmp_folder, 'samples_mnist')
+nthread = 2
+os.makedirs(sample_dir)
+for file in file_list:
+    file_loc = os.path.join(sample_dir, file)
+    file_url = os.path.join(main_url, file + '.gz')
+    urllib.urlretrieve(file_url, file_loc + '.gz')
+    with gzip.open(file_loc + '.gz', 'rb') as f_in:
+        with open(file_loc, 'wb') as f_out:
+            shutil.copyfileobj(f_in, f_out)
+data_dict = mf.create_datasets(sample_dir, 16)
 
 
 def test_single_paramSet():
@@ -21,7 +41,7 @@ def test_single_paramSet():
     assert result == expected
 
 
-def test_initialize_values1():
+def test_initialize_values():
     grid_size = 1
     parameters = [
         {'p_name': 'first', 'range_start': 1, 'range_end': 3, 'true_int': 'True'},
@@ -69,3 +89,31 @@ def test_create_all_combinations():
     grid_size = 3
     result = gm.create_all_combinations(nr_parameters, grid_size)
     assert len(result) == 27
+
+
+def test_single_paramset():
+    parameters = [
+        {'p_name': 'foo', 'range_end': 10, 'range_start': 1}
+        {'p_name': 'bar', 'range_end': 5, 'range_start': 1}
+    ]
+    iterations = [0, 1]
+    grid_size = 2
+    parameter_dict = gm.sindle_paramset(parameters, iterations, grid_size)
+    expected = {'foo': 1, 'bar': 5}
+    assert parameter_dict == expected
+
+
+def test_perform_gridsearch():
+    grid_settings = {'nthread': 2, 'grid_size': 2, 'num_classes': 10}
+    param_file = os.path.join(
+        cmssw_base_path,
+        'src',
+        'tthAnalysis',
+        'bdtHyperparameterOptimization',
+        'data',
+        'xgb_parameters.json'
+    )
+    parameters = universal.read_parameters(param_file)
+    result_dict = gm.perform_gridsearch(
+        parameters, xt.ensemble_fitnesses, data_dict, grid_settings)
+    assert result_dict != None

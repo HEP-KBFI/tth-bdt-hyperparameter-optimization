@@ -83,7 +83,6 @@ POPULATION = [
 
 FITNESSES = [0.4, 0.6, 0.8]
 
-# temporary solution for data during testing
 main_url = 'http://yann.lecun.com/exdb/mnist/'
 train_images = 'train-images-idx3-ubyte'
 train_labels = 'train-labels-idx1-ubyte'
@@ -100,8 +99,7 @@ for file in file_list:
     with gzip.open(file_loc + '.gz', 'rb') as f_in:
         with open(file_loc, 'wb') as f_out:
             shutil.copyfileobj(f_in, f_out)
-DATA = mf.create_datasets(sample_dir, 16
-)
+DATA = mf.create_datasets(sample_dir, 16)
 
 def test_set_num():
     '''Testing the set_num function'''

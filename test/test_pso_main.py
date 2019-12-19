@@ -534,6 +534,8 @@ def test_prepare_new_day():
         error = True
     assert not error
 
+
+
 def test_read_weights():
     result = pm.read_weights()
     assert len(result) == 7
