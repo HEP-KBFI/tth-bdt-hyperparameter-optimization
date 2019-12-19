@@ -33,7 +33,7 @@ for file in file_list:
 data_dict = mf.create_datasets(sample_dir, 16)
 
 
-def test_single_paramSet():
+def test_single_paramset():
     grid_size = 3
     parameters = [
         {'p_name': 'first', 'range_start': 1, 'range_end': 3, 'true_int': 'True'},
@@ -127,3 +127,8 @@ def test_perform_gridsearch():
     result_dict = gm.perform_gridsearch(
         parameters, xt.ensemble_fitnesses, data_dict, grid_settings)
     assert result_dict != None
+
+
+def test_dummy_delete_files():
+    if os.path.exists(resources_dir):
+        shutil.rmtree(resources_dir)
