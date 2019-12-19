@@ -1,18 +1,19 @@
 '''Testing the main functions of the genetic algorithm.'''
 import os
-import pytest
-import shutil
 import gzip
 import shutil
 import urllib
+import pytest
 from tthAnalysis.bdtHyperparameterOptimization import ga_main as gm
 from tthAnalysis.bdtHyperparameterOptimization import xgb_tools as xt
 from tthAnalysis.bdtHyperparameterOptimization import mnist_filereader as mf
+
 dir_path = os.path.dirname(os.path.realpath(__file__))
-resourcesDir = os.path.join(dir_path, 'resources')
-tmp_folder = os.path.join(resourcesDir, 'tmp')
+resources_dir = os.path.join(dir_path, 'resources')
+tmp_folder = os.path.join(resources_dir, 'tmp')
 if not os.path.exists(tmp_folder):
     os.makedirs(tmp_folder)
+
 # parameters and settings for testing
 PARAMETERS = [
     {
@@ -83,6 +84,7 @@ POPULATION = [
 
 FITNESSES = [0.4, 0.6, 0.8]
 
+# downloading data for testing
 main_url = 'http://yann.lecun.com/exdb/mnist/'
 train_images = 'train-images-idx3-ubyte'
 train_labels = 'train-labels-idx1-ubyte'
@@ -100,6 +102,7 @@ for file in file_list:
         with open(file_loc, 'wb') as f_out:
             shutil.copyfileobj(f_in, f_out)
 DATA = mf.create_datasets(sample_dir, 16)
+
 
 def test_set_num():
     '''Testing the set_num function'''
@@ -203,6 +206,23 @@ def test_evolve():
     assert len(result[2]) == len(result[0]), 'test_evolve failed'
 
 
+def test_evolution():
+    '''Testing the evolution function'''
+    SETTINGS.update({'culling': 0, 'elitism': 0, 'sub_pops': 1})
+    result = gm.evolution(
+        SETTINGS,
+        DATA,
+        PARAMETERS,
+        xt.prepare_run_params,
+        xt.ensemble_fitnesses
+    )
+    assert len(result['best_parameters']) == len(PARAMETERS)
+    assert len(result['best_scores']) == SETTINGS['iterations'] + 1
+    assert len(result['avg_scores']) == len(result['best_scores'])
+    assert len(result['worst_scores']) == len(result['avg_scores'])
+
+
 def test_dummy_delete_files():
+    '''Delete temporary files'''
     if os.path.exists(resources_dir):
         shutil.rmtree(resources_dir)
