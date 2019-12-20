@@ -206,6 +206,7 @@ def test_evolve():
     assert len(result[2]) == len(result[0]), 'test_evolve failed'
 
 
+@pytest.mark.skip(reason="Runs too long")
 def test_evolution():
     '''Testing the evolution function'''
     SETTINGS.update({'culling': 0, 'elitism': 0, 'sub_pops': 1})
@@ -216,10 +217,14 @@ def test_evolution():
         xt.prepare_run_params,
         xt.ensemble_fitnesses
     )
-    assert len(result['best_parameters']) == len(PARAMETERS)
-    assert len(result['best_scores']) == SETTINGS['iterations'] + 1
-    assert len(result['avg_scores']) == len(result['best_scores'])
-    assert len(result['worst_scores']) == len(result['avg_scores'])
+    assert len(result['best_parameters']) == len(PARAMETERS), \
+        'test_evolution failed'
+    assert len(result['best_scores']) == SETTINGS['iterations'] + 1, \
+        'test_evolution failed'
+    assert len(result['avg_scores']) == len(result['best_scores']), \
+        'test_evolution failed'
+    assert len(result['worst_scores']) == len(result['avg_scores']), \
+        'test_evolution failed'
 
 
 def test_dummy_delete_files():
