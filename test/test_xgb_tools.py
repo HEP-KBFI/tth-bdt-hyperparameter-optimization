@@ -1,6 +1,6 @@
 from __future__ import division
 from tthAnalysis.bdtHyperparameterOptimization import xgb_tools as xt
-import os 
+import os
 import shutil
 import urllib
 import gzip
@@ -88,7 +88,7 @@ def test_parameter_evaluation():
             'subsample': 0.9,
             'colsample_bytree': 0.8
     }
-    nthread = 8
+    nthread = 28
     num_class = 10
     results = xt.parameter_evaluation(
         parameter_dict, data_dict, nthread, num_class)
@@ -116,7 +116,7 @@ def test_ensemble_fitnesses():
             'colsample_bytree': 0.8
         }
     ]
-    global_settings = {'num_classes': 10, 'nthread': 8}
+    global_settings = {'num_classes': 10, 'nthread': 28}
     results = xt. ensemble_fitnesses(
         parameter_dicts, data_dict, global_settings)
     assert results != None

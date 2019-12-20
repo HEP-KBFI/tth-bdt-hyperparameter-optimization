@@ -3,9 +3,37 @@ import numpy as np
 import sys
 from tthAnalysis.bdtHyperparameterOptimization import pso_main as pm
 import os
+import shutil
+import urllib
+import gzip
 from pathlib import Path
+from tthAnalysis.bdtHyperparameterOptimization import mnist_filereader as mf
+from tthAnalysis.bdtHyperparameterOptimization import xgb_tools as xt
 dir_path = os.path.dirname(os.path.realpath(__file__))
 hyper_path = str(Path(dir_path).parent)
+resources_dir = os.path.join(dir_path, 'resources')
+tmp_folder = os.path.join(resources_dir, 'tmp')
+if not os.path.exists(tmp_folder):
+    os.makedirs(tmp_folder)
+
+
+main_url = 'http://yann.lecun.com/exdb/mnist/'
+train_images = 'train-images-idx3-ubyte'
+train_labels = 'train-labels-idx1-ubyte'
+test_images = 't10k-images-idx3-ubyte'
+test_labels = 't10k-labels-idx1-ubyte'
+file_list = [train_labels, train_images, test_labels, test_images]
+sample_dir = os.path.join(tmp_folder, 'samples_mnist')
+nthread = 2
+os.makedirs(sample_dir)
+for file in file_list:
+    file_loc = os.path.join(sample_dir, file)
+    file_url = os.path.join(main_url, file + '.gz')
+    urllib.urlretrieve(file_url, file_loc + '.gz')
+    with gzip.open(file_loc + '.gz', 'rb') as f_in:
+        with open(file_loc, 'wb') as f_out:
+            shutil.copyfileobj(f_in, f_out)
+data_dict = mf.create_datasets(sample_dir, 16)
 
 
 value_dicts = [
@@ -535,7 +563,52 @@ def test_prepare_new_day():
     assert not error
 
 
+def test_pso_main():
+    value_dicts = universal.read_parameters(param_file)
+    parameter_dicts = [
+        {
+            'num_boost_round': 71,
+            'learning_rate': 0.07,
+            'max_depth': 2,
+            'gamma': 1.9,
+            'min_child_weight': 18,
+            'subsample': 0.9,
+            'colsample_bytree': 0.8
+        },
+        {
+            'num_boost_round': 72,
+            'learning_rate': 0.17,
+            'max_depth': 3,
+            'gamma': 1.9,
+            'min_child_weight': 18,
+            'subsample': 0.9,
+            'colsample_bytree': 0.8
+        }
+    ]
+    global_settings_path = os.path.join(
+        main_dir, 'data', 'global_settings.json')
+    test_global_settings_path = os.path.join(
+        main_dir, 'test', 'resources', 'global_settings.json')
+    pso_settings_path = os.path.join(
+        main_dir, 'data', 'pso_settings.json')
+    test_pso_settings_path = os.path.join(
+        main_dir, 'test', 'resources', 'pso_settings.json')
+    os.rename(global_settings_path, global_settings_path + '_')
+    os.rename(pso_settings_path, pso_settings_path + '_')
+    shutil.copy(test_global_settings_path, global_settings_path)
+    shutil.copy(test_pso_settings_path, pso_settings_path)
+    result_dict = pm.run_pso(
+        data_dict, value_dicts, xt.ensemble_fitnesses, parameter_dicts)
+    os.rename(global_settings_path + '_', global_settings_path)
+    os.rename(pso_settings_path + '_', pso_settings_path)
+    assert result_dict != None
+
 
 def test_read_weights():
     result = pm.read_weights()
     assert len(result) == 7
+
+
+def test_dummy_delete_files():
+    if os.path.exists(tmp_folder):
+        shutil.rmtree(tmp_folder)
