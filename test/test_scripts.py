@@ -126,7 +126,7 @@ def test_slurm_fitness_tth():
         'slurm_fitness_tth.py')
     fail = False
     try:
-        call("python " + str(script) + str(param_file), shell=True)
+        call("python " + str(script) + '-p' + str(param_file), shell=True)
     except:
         fail = True
     assert not fail
@@ -147,7 +147,7 @@ def test_slurm_fitness_mnist():
         'slurm_fitness_mnist.py')
     fail = False
     try:
-        call("python " + str(script) + str(param_file), shell=True)
+        call("python " + str(script) + '-p' + str(param_file), shell=True)
     except:
         fail = True
     assert not fail
