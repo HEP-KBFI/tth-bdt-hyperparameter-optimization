@@ -9,6 +9,7 @@ import gzip
 from pathlib import Path
 from tthAnalysis.bdtHyperparameterOptimization import mnist_filereader as mf
 from tthAnalysis.bdtHyperparameterOptimization import xgb_tools as xt
+from tthAnalysis.bdtHyperparameterOptimization import universal
 dir_path = os.path.dirname(os.path.realpath(__file__))
 hyper_path = str(Path(dir_path).parent)
 resources_dir = os.path.join(dir_path, 'resources')
