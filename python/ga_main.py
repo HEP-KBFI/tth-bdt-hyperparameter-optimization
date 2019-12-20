@@ -1,5 +1,6 @@
 '''Main functions for the genetic algorithm'''
 from __future__ import division
+import inspect
 import numpy as np
 from tthAnalysis.bdtHyperparameterOptimization import universal
 from tthAnalysis.bdtHyperparameterOptimization import ga_selection as select
@@ -108,6 +109,10 @@ def culling(population, fitnesses, settings, data, parameters, create_set, evalu
     # Set num as the number of members to destroy
     num = set_num(settings['culling'], population)
 
+    # If num = 0, then no culling takes place
+    if num == 0:
+        return population, fitnesses
+
     # Population size to be replaced
     size = num
 
@@ -121,8 +126,13 @@ def culling(population, fitnesses, settings, data, parameters, create_set, evalu
     # Replace destroyed members
     new_members = create_set(parameters, size)
     population += new_members
-    fitnesses += universal.fitness_to_list(
-        evaluate(new_members, data, settings)[0])
+    args = inspect.getargspec(evaluate)
+    if len(args[0]) == 3:
+        fitnesses += universal.fitness_to_list(
+            evaluate(new_members, data, settings)[0])
+    elif len(args[0]) == 4:
+        fitnesses += universal.fitness_to_list(
+            evaluate(new_members, data, settings, size)[0])
 
     return population, fitnesses
 
@@ -308,8 +318,13 @@ def evolve(population, settings, data, parameters, create_set, evaluate, final=F
                 population, fitnesses, settings, parameters)
 
         # Calculate fitness of the population
-        fitnesses, pred_trains, pred_tests, feature_importances = evaluate(
-            population, data, settings)
+        args = inspect.getargspec(evaluate)
+        if len(args[0]) == 3:
+            fitnesses, pred_trains, pred_tests, feature_importances = evaluate(
+                population, data, settings)
+        elif len(args[0]) == 4:
+            fitnesses, pred_trains, pred_tests, feature_importances = evaluate(
+                population, data, settings, len(population))
         fitnesses = universal.fitness_to_list(fitnesses)
 
         # Save results
