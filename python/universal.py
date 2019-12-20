@@ -916,7 +916,7 @@ def read_settings(group):
     return settings_dict
 
 
-def fitness_to_list(score_dicts, fitness_key='f1_score'):
+def fitness_to_list(score_dicts, fitness_key='d_roc'):
     '''Puts the fitness values according to the chosen fitness_key from
     the dictionary to a list
 

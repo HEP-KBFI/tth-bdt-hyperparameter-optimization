@@ -131,6 +131,7 @@ def create_datasets(sample_dir, nthread): # MNIST & XGBoost
     data_dict : dict
         Dictionary containing the dataset
     '''
+    sample_dir = os.path.expandvars(sample_dir)
     image_file = os.path.join(sample_dir, 'train-images-idx3-ubyte')
     label_file = os.path.join(sample_dir, 'train-labels-idx1-ubyte')
     training_images, training_labels = read_dataset(image_file, label_file)

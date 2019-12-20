@@ -1,0 +1,10 @@
+{"sample_dir": "$CMSSW_BASE/src/tthAnalysis/bdtHyperparameterOptimization/test/resources/tmp/samples_mnist"}
+{"optimization_algo": "pso"}
+{"nthread": 8}
+{"output_dir": "$CMSSW_BASE/src/tthAnalysis/bdtHyperparameterOptimization/test/resources/tmp/"}
+{"sample_type": "mnist"}
+{"num_classes": 10}
+{"bdtType": "evtLevelTT_TTH"}
+{"trainvar": "noHTT"}
+{"channel": "3l_1tau"}
+{"fitness_fn": "test_auc"}
