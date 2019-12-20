@@ -566,11 +566,14 @@ def test_prepare_new_day():
 
 def test_run_pso():
     cmssw_base_path = os.path.expandvars('$CMSSW_BASE')
-    param_file = os.path.join(
+    main_dir = os.path.join(
         cmssw_base_path,
         'src',
         'tthAnalysis',
-        'bdtHyperparameterOptimization',
+        'bdtHyperparameterOptimization'
+    )
+    param_file = os.path.join(
+        main_dir,
         'data',
         'xgb_parameters.json'
     )
