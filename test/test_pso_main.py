@@ -564,7 +564,16 @@ def test_prepare_new_day():
     assert not error
 
 
-def test_pso_main():
+def test_run_pso():
+    cmssw_base_path = os.path.expandvars('$CMSSW_BASE')
+    param_file = os.path.join(
+        cmssw_base_path,
+        'src',
+        'tthAnalysis',
+        'bdtHyperparameterOptimization',
+        'data',
+        'xgb_parameters.json'
+    )
     value_dicts = universal.read_parameters(param_file)
     parameter_dicts = [
         {
