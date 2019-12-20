@@ -51,6 +51,8 @@ os.rename(global_settings_path, global_settings_path + '_')
 os.rename(pso_settings_path, pso_settings_path + '_')
 shutil.copy(test_global_settings_path, global_settings_path)
 shutil.copy(test_pso_settings_path, pso_settings_path)
+param_file = os.path.join(
+    main_dir, 'test', 'resources', 'parameter_0.sh')
 
 
 def test_slurm_pso_mnist():
