@@ -220,11 +220,18 @@ def test_run_iteration():
         main_dir, 'data', 'global_settings.json')
     test_global_settings_path = os.path.join(
         main_dir, 'test', 'resources', 'global_settings.json')
+    pso_settings_path = os.path.join(
+        main_dir, 'data', 'pso_settings.json')
+    test_pso_settings_path = os.path.join(
+        main_dir, 'test', 'resources', 'pso_settings.json')
     os.rename(global_settings_path, global_settings_path + '_')
+    os.rename(pso_settings_path, pso_settings_path + '_')
     shutil.copy(test_global_settings_path, global_settings_path)
+    shutil.copy(test_pso_settings_path, pso_settings_path)
     score_dicts, pred_trains, pred_tests, feature_importances = sm.run_iteration(
         parameter_dicts, data_dict, global_settings)
     os.rename(global_settings_path + '_', global_settings_path)
+    os.rename(pso_settings_path + '_', pso_settings_path)
     assert score_dicts != None
 
 
