@@ -20,7 +20,8 @@ test_labels = 't10k-labels-idx1-ubyte'
 file_list = [train_labels, train_images, test_labels, test_images]
 sampleDir = os.path.join(tmp_folder, 'samples_mnist')
 nthread = 2
-os.makedirs(sampleDir)
+if not os.path.exists(sampleDir):
+    os.makedirs(sampleDir)
 parameterFile = os.path.join(resourcesDir, "xgbParameters.json")
 parameterFile_newLoc = os.path.join(
     tmp_folder, 'xgbParameters.json')

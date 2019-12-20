@@ -22,7 +22,8 @@ test_labels = 't10k-labels-idx1-ubyte'
 file_list = [train_labels, train_images, test_labels, test_images]
 sample_dir = os.path.join(tmp_folder, 'samples_mnist')
 nthread = 2
-os.makedirs(sample_dir)
+if not os.path.exists(sample_dir):
+    os.makedirs(sample_dir)
 for file in file_list:
     file_loc = os.path.join(sample_dir, file)
     file_url = os.path.join(main_url, file + '.gz')
