@@ -61,6 +61,7 @@ def test_slurm_pso_mnist():
         'bdtHyperparameterOptimization',
         'scripts',
         'slurm_pso_mnist.py')
+    fail = False
     try:
         call("python " + str(script), shell=True)
     except:
