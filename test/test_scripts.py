@@ -34,7 +34,7 @@ for file in file_list:
             shutil.copyfileobj(f_in, f_out)
 cmssw_base = os.path.expandvars('$CMSSW_BASE')
 main_dir = os.path.join(
-    cmssw_base_path,
+    cmssw_base,
     'src',
     'tthAnalysis',
     'bdtHyperparameterOptimization'
