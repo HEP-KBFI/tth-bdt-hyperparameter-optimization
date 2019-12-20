@@ -5,6 +5,11 @@ import shutil
 import urllib
 import gzip
 from tthAnalysis.bdtHyperparameterOptimization import mnist_filereader as mf
+dir_path = os.path.dirname(os.path.realpath(__file__))
+resources_dir = os.path.join(dir_path, 'resources')
+tmp_folder = os.path.join(resources_dir, 'tmp')
+if not os.path.exists(tmp_folder):
+    os.makedirs(tmp_folder)
 
 
 main_url = 'http://yann.lecun.com/exdb/mnist/'
@@ -90,7 +95,7 @@ def test_parameter_evaluation():
     assert results != None
 
 
-def test_ensemble_fitness():
+def test_ensemble_fitnesses():
     parameter_dicts = [
         {
             'num_boost_round': 71,
@@ -115,3 +120,8 @@ def test_ensemble_fitness():
     results = xt. ensemble_fitnesses(
         parameter_dicts, data_dict, global_settings)
     assert results != None
+
+
+def test_dummy_delete_files():
+    if os.path.exists(tmp_folder):
+        shutil.rmtree(tmp_folder)
