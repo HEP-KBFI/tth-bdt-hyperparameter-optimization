@@ -209,6 +209,7 @@ def test_run_iteration():
             'colsample_bytree': 0.8
         }
     ]
+    cmssw_base_path = os.path.expandvars('$CMSSW_BASE')
     main_dir = os.path.join(
         cmssw_base_path,
         'src',
