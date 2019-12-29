@@ -12,6 +12,7 @@ import numpy as np
 from tthAnalysis.bdtHyperparameterOptimization import universal
 from tthAnalysis.bdtHyperparameterOptimization import xgb_tools as xt
 from tthAnalysis.bdtHyperparameterOptimization import slurm_main as sm
+from tthAnalysis.bdtTraining import trainvar_choice as tc
 from tthAnalysis.bdtTraining import xgb_tth as ttHxt
 import docopt
 import json
@@ -33,7 +34,10 @@ def main(parameter_file):
     output_dir = os.path.expandvars(global_settings['output_dir'])
     fnFile = '_'.join(['fn', channel])
     importString = "".join(['tthAnalysis.bdtTraining.', fnFile])
-    cf = __import__(importString, fromlist=[''])
+    if bool(int(global_settings['trainvar_opt'])):
+        cf = tc
+    else:
+        cf = __import__(importString, fromlist=[''])
     nthread = global_settings['nthread']
     sample_dir = global_settings['sample_dir']
     data, trainVars = ttHxt.tth_analysis_main(
@@ -44,10 +48,10 @@ def main(parameter_file):
         data, trainVars, nthread)
     parameter_dict = universal.read_parameters(parameter_file)[0]
     path = Path(parameter_file)
-    saveDir = str(path.parent)
+    save_dir = str(path.parent)
     score, pred_train, pred_test, feature_importance = xt.parameter_evaluation(
         parameter_dict, data_dict, nthread, num_classes)
-    sm.save_info(score, pred_train, pred_test, saveDir, feature_importance)
+    sm.save_info(score, pred_train, pred_test, save_dir, feature_importance)
 
 
 if __name__ == '__main__':

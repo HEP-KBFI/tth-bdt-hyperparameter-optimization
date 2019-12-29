@@ -8,3 +8,4 @@
 {"trainvar": "noHTT"}
 {"channel": "3l_1tau"}
 {"fitness_fn": "test_auc"}
+{"trainvar_opt": 1}
