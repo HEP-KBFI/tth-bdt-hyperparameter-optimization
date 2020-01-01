@@ -397,9 +397,29 @@ def save_results(result_dict, output_dir, plot_roc=True, plot_extras=False):
     if plot_extras:
         create_extra_plots(result_dict, output_dir)
         save_extra_results(result_dict, output_dir)
+        save_feature_importances(result_dict, output_dir)
     best_to_file(
         result_dict['best_parameters'], output_dir, assessment)
     save_run_settings(output_dir)
+
+
+def save_feature_importances(result_dict, output_dir):
+    '''Saves the feature importances into a feature_importances.json file
+
+    Parameters:
+    ----------
+    result_dict : dict
+        Dicotionay containing the results of the optimization
+    output_dir : str
+        Path to the output_dir
+
+    Returns:
+    -------
+    Nothing
+    '''
+    output_path = os.path.join(output_dir, 'feature_importances.json')
+    with open(output_path, 'w') as file:
+        json.dump(result_dict['feature_importances'], file)
 
 
 def save_run_settings(output_dir):
