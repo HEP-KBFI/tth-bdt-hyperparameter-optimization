@@ -12,6 +12,7 @@ import os
 from tthAnalysis.bdtHyperparameterOptimization import mnist_filereader  as mf
 from tthAnalysis.bdtHyperparameterOptimization import universal
 from tthAnalysis.bdtHyperparameterOptimization import pso_main as pm
+from tthAnalysis.bdtHyperparameterOptimization import slurm_main as sm
 from tthAnalysis.bdtHyperparameterOptimization import xgb_tools as xt
 from tthAnalysis.bdtHyperparameterOptimization import stability_check_tools as sct
 
@@ -46,7 +47,7 @@ def main():
         parameter_dicts = xt.prepare_run_params(
             value_dicts, pso_settings['sample_size'])
         result_dict = pm.run_pso(
-            data_dict, value_dicts, xt.ensemble_fitnesses, parameter_dicts
+            data_dict, value_dicts, sm.run_iteration, parameter_dicts
         )
         universal.save_results(result_dict, output_dir_single)
         print(
