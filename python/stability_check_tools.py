@@ -12,9 +12,8 @@ def plot_candlebar_covs(keys, covs, output_dir):
         x_values, np.zeros(len(keys)), xerr=0.4, yerr=errors, linestyle='')
     ax.set_xticks(x_values)
     ax.set_xticklabels(keys)
-    # plt.savefig(output_path)
     plt.title('Stability of parameters using COV')
-    plt.show()
+    plt.savefig(output_path)
 
 
 def plot_individual(key, mean, stdev, parameter_values, output_dir):
