@@ -130,11 +130,11 @@ def culling(population, fitnesses, settings, data, parameters, create_set, evalu
     if len(args[0]) == 3:
         fitnesses += universal.fitness_to_list(
             evaluate(new_members, data, settings)[0],
-            fitness_key=global_settings['fitness_fn'])
+            fitness_key=settings['fitness_fn'])
     elif len(args[0]) == 4:
         fitnesses += universal.fitness_to_list(
             evaluate(new_members, data, settings, size)[0],
-            fitness_key=global_settings['fitness_fn'])
+            fitness_key=settings['fitness_fn'])
 
     return population, fitnesses
 
@@ -328,7 +328,7 @@ def evolve(population, settings, data, parameters, create_set, evaluate, final=F
             fitnesses, pred_trains, pred_tests, feature_importances = evaluate(
                 population, data, settings, len(population))
         fitnesses = universal.fitness_to_list(
-            fitnesses, fitness_key=global_settings['fitness_fn'])
+            fitnesses, fitness_key=settings['fitness_fn'])
 
         # Save results
         best_scores.append(max(fitnesses))
