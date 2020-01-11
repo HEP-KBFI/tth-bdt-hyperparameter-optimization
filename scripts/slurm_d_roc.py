@@ -62,7 +62,7 @@ def main():
         main_dir, 'data', 'd_roc_settings', 'global_settings')
     os.rename(global_settings_path, global_settings_path + '_')
     for i in range(5):
-        new_settings = new_global_settings_path + '_' + str(i) + '.json'
+        new_settings = new_global_settings_path + '' + str(i) + '.json'
         shutil.copy(new_settings, global_settings_path)
         global_settings = universal.read_settings('global')
         output_dir = os.path.expandvars(global_settings['output_dir'])
