@@ -58,7 +58,7 @@ def main():
     global_settings_path = os.path.join(
         main_dir, 'data', 'global_settings.json')
     new_global_settings_path = os.path.join(
-        main_dir, 'test', 'resources', 'global_settings')
+        main_dir, 'data', 'd_roc_settings', 'global_settings')
     os.rename(global_settings_path, global_settings_path + '_')
     for i in range(5):
         new_settings = new_global_settings_path + '_' + str(i) + '.json'
