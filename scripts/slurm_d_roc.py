@@ -9,6 +9,7 @@ Usage: slurm_tth_analysis.py
 import importlib
 import numpy as np
 import os
+import shutil
 from tthAnalysis.bdtTraining import xgb_tth as ttHxt
 from tthAnalysis.bdtHyperparameterOptimization import universal
 from tthAnalysis.bdtHyperparameterOptimization import pso_main as pm
