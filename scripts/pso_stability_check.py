@@ -42,7 +42,7 @@ def main():
     pso_settings = pm.read_weights()
     result_dicts = []
     for i in range(NUMBER_REPETITIONS):
-        output_dir_single = os.path.join(output_dir, '_' + str(i))
+        output_dir_single = os.path.join(output_dir, 'iteration_' + str(i))
         np.random.seed(i)
         parameter_dicts = xt.prepare_run_params(
             value_dicts, pso_settings['sample_size'])
