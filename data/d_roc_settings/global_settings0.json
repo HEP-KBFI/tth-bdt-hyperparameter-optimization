@@ -1,0 +1,11 @@
+{"sample_dir": "/foo/bar"}
+{"optimization_algo": "pso"}
+{"nthread": 28}
+{"output_dir": "$HOME/d_roc/d_roc0"}
+{"sample_type": "tth"}
+{"num_classes": 2}
+{"bdtType": "evtLevelTT_TTH"}
+{"trainvar": "noHTT"}
+{"channel": "3l_1tau"}
+{"fitness_fn": "d_roc_0.0"}
+{"trainvar_opt": 1}
