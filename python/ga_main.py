@@ -349,9 +349,36 @@ def evolve(population, settings, data, parameters, create_set, evaluate, final=F
     }
 
     if final:
-        return population, scores_dict, fitnesses, pred_trains, pred_tests
+        output = {
+            'population': population,
+            'scores': scores_dict,
+            'fitnesses': fitnesses,
+            'pred_trains': pred_trains,
+            'pred_tests': pred_tests
+        }
+        return output
 
     return population, scores_dict
+
+
+def finalize_results(output):
+    '''Creates a dictionary of results'''
+
+    # Initialization
+    # scoring_keys = ['g_score', 'f1_score', 'd_score', 'test_auc', 'train_auc']
+    index = np.argmax(output['fitnesses'])
+
+    # Create the dictionary
+    result = {
+        'best_parameters': output['population'][index],
+        'best_scores': output['scores']['best_scores'],
+        'avg_scores': output['scores']['avg_scores'],
+        'worst_scores': output['scores']['worst_scores'],
+        'pred_train': output['pred_trains'][index],
+        'pred_test': output['pred_tests'][index],
+        'data_dict': data
+    }
+    return result
 
 
 def evolution(settings, data, parameters, create_set, evaluate):
@@ -407,15 +434,4 @@ def evolution(settings, data, parameters, create_set, evaluate):
         # Evolve population
         output = evolve(population, settings, data, parameters, create_set, evaluate, True)
 
-    # Finalize results
-    index = np.argmax(output[2])
-    result = {
-        'best_parameters': output[0][index],
-        'best_scores': output[1]['best_scores'],
-        'avg_scores': output[1]['avg_scores'],
-        'worst_scores': output[1]['worst_scores'],
-        'pred_train': output[3][index],
-        'pred_test': output[4][index],
-        'data_dict': data
-    }
-    return result
+    return finalize_results(output)
