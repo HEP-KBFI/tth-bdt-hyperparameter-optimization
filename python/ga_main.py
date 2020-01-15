@@ -327,6 +327,14 @@ def evolve(population, settings, data, parameters, create_set, evaluate, final=F
         elif len(args[0]) == 4:
             fitnesses, pred_trains, pred_tests, feature_importances = evaluate(
                 population, data, settings, len(population))
+
+        ### WORK IN PROGRESS
+        if iteration = 0:
+            tracked_scores = score_tracker(initialize=True)
+        else:
+            tracked_scores = score_tracker(tracked_scores, fitnesses)
+        ###
+
         fitnesses = universal.fitness_to_list(
             fitnesses, fitness_key=settings['fitness_fn'])
 
@@ -359,6 +367,47 @@ def evolve(population, settings, data, parameters, create_set, evaluate, final=F
         return output
 
     return population, scores_dict
+
+### WORK IN PROGRESS
+
+def score_tracker(scores_dict={}, curr_scores={}, initialize=False, append=True):
+    '''Tracks best scores of each iteration
+
+    Parameters
+    ----------
+    scores_dict : dictionary
+        dictionary of best scores
+    curr_scores : dictionary
+        dictionary of scores of current population
+    initialize : bool
+        whether to initialize the dictionary
+    append : bool
+        whether to append new results
+
+    Returns
+    -------
+    scores_dict : dictionary
+        dictionary of best scores
+    '''
+    scoring_keys = ['g_score', 'f1_score', 'd_score', 'test_auc', 'train_auc']
+
+    for key in keys:
+
+        # Initialization
+        key_name = 'best_' + key
+        list_key = key_name + 's'
+
+        # Create empty lists
+        if initialize:
+            scores_dict[list_key] = []
+
+        # Add scores to existing lists
+        if append:
+            scores_dict[list_key].append(curr_scores[key])
+
+    return scores_dict
+
+###
 
 
 def finalize_results(output):
