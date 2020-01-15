@@ -54,6 +54,7 @@ def main():
             'Results of stability iteration '
             + str(i) + ' are saved to ' + str(output_dir)
         )
+        sm.clear_from_files(global_settings)
         result_dicts.append(result_dict)
     keys = result_dicts[0].keys()
     dict_of_parameter_lists = universal.values_to_list_dict(
