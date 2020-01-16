@@ -300,9 +300,9 @@ def evolve(population, settings, data, parameters, create_set, evaluate, final=F
 
     # Initialization
     fitnesses = []
-    best_scores = []
-    avg_scores = []
-    worst_scores = []
+    # best_scores = []
+    # avg_scores = []
+    # worst_scores = []
     improvement = 1
     improvements = []
     iteration = 0
@@ -341,36 +341,36 @@ def evolve(population, settings, data, parameters, create_set, evaluate, final=F
             tracker = score_tracker(tracker, scores, fitnesses)
         ###
 
-        best_scores.append(max(fitnesses))
-        avg_scores.append(np.mean(fitnesses))
-        worst_scores.append(min(fitnesses))
+        # best_scores.append(max(fitnesses))
+        # avg_scores.append(np.mean(fitnesses))
+        # worst_scores.append(min(fitnesses))
 
         # Calculate improvement
         improvements, improvement = universal.calculate_improvement_wAVG(
-            avg_scores, improvements, settings['threshold'])
+            tracker['avg_scores'], improvements, settings['threshold'])
 
         iteration += 1
 
     # Collect results
-    scores_dict = {
-        'best_scores': best_scores,
-        'avg_scores': avg_scores,
-        'worst_scores': worst_scores
-    }
+    # scores_dict = {
+    #     'best_scores': best_scores,
+    #     'avg_scores': avg_scores,
+    #     'worst_scores': worst_scores
+    # }
 
     if final:
         print("Tracker: ")
         print(tracker)
         output = {
             'population': population,
-            'scores': scores_dict,
+            'scores': tracker,
             'fitnesses': fitnesses,
             'pred_trains': pred_trains,
             'pred_tests': pred_tests
         }
         return output
 
-    return population, scores_dict
+    return population, tracker
 
 ### WORK IN PROGRESS
 
@@ -379,19 +379,21 @@ def score_tracker(tracker, scores, fitnesses, initialize=False, append=True):
 
     Parameters
     ----------
-    tracker : dictionary
-        dictionary of best scores
-    curr_scores : dictionary
-        dictionary of scores of current population
+    tracker : dic
+        Dictionary of best scores
+    scores : dict
+        Dictionary of scores of the current population
+    fitnesses : list
+        List of fitness scores of the current population
     initialize : bool
-        whether to initialize the dictionary
+        Whether to initialize the dictionary
     append : bool
-        whether to append new results
+        Whether to append new results
 
     Returns
     -------
-    tracker : dictionary
-        dictionary of best scores
+    tracker : dict
+        Dictionary of best scores from each iteration
     '''
     keys = ['g_score', 'f1_score', 'd_score', 'test_auc', 'train_auc']
     index = np.argmax(fitnesses)
@@ -406,36 +408,53 @@ def score_tracker(tracker, scores, fitnesses, initialize=False, append=True):
     if initialize:
         tracker['avg_scores'] = []
         # tracker['compactness'] = []
-        # tracker['best_fitnesses'] = []
 
     if append:
         tracker['avg_scores'].append(np.mean(fitnesses))
         # tracker['compactness'] = []
-        # tracker['best_fitnesses'] = []
 
     return tracker
 
-###
 
+def finalize_results(output, data):
+    '''Creates a dictionary of results
 
-def finalize_results(output):
-    '''Creates a dictionary of results'''
+    Parameters
+    ----------
+    output : dict
+        Output from the final run of evolve function
+    data : dict
+        Data sets for testing and training
+
+    Returns
+    -------
+    result : dict
+        Result of the run of the genetic algorithm
+    '''
 
     # Initialization
-    # scoring_keys = ['g_score', 'f1_score', 'd_score', 'test_auc', 'train_auc']
+    keys = ['g_score', 'f1_score', 'd_score', 'test_auc', 'train_auc']
     index = np.argmax(output['fitnesses'])
 
     # Create the dictionary
     result = {
         'best_parameters': output['population'][index],
-        'best_scores': output['scores']['best_scores'],
+        #'best_scores': output['scores']['best_scores'],
         'avg_scores': output['scores']['avg_scores'],
-        'worst_scores': output['scores']['worst_scores'],
+        #'worst_scores': output['scores']['worst_scores'],
         'pred_train': output['pred_trains'][index],
         'pred_test': output['pred_tests'][index],
         'data_dict': data
     }
+
+    # Add tracked scores to result dictionary
+    for key in keys:
+        key_name = 'best_' + key + 's'
+        result[key_name] = output['scores'][key_name]
+
     return result
+
+###
 
 
 def evolution(settings, data, parameters, create_set, evaluate):
@@ -491,4 +510,4 @@ def evolution(settings, data, parameters, create_set, evaluate):
         # Evolve population
         output = evolve(population, settings, data, parameters, create_set, evaluate, True)
 
-    return finalize_results(output)
+    return finalize_results(output, data)
