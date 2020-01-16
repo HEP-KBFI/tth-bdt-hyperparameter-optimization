@@ -305,6 +305,7 @@ def evolve(population, settings, data, parameters, create_set, evaluate, final=F
     # worst_scores = []
     improvement = 1
     improvements = []
+    compactnesses = []
     iteration = 0
     tracker = {}
 
@@ -345,9 +346,11 @@ def evolve(population, settings, data, parameters, create_set, evaluate, final=F
         # avg_scores.append(np.mean(fitnesses))
         # worst_scores.append(min(fitnesses))
 
-        # Calculate improvement
+        # Calculate stopping criteria
         improvements, improvement = universal.calculate_improvement_wAVG(
             tracker['avg_scores'], improvements, settings['threshold'])
+        compactness = universal.calculate_compactness(population)
+        compactnesses.append(compactness)
 
         iteration += 1
 
@@ -365,6 +368,7 @@ def evolve(population, settings, data, parameters, create_set, evaluate, final=F
             'population': population,
             'scores': tracker,
             'fitnesses': fitnesses,
+            'compactnesses': compactnesses,
             'pred_trains': pred_trains,
             'pred_tests': pred_tests
         }
@@ -442,6 +446,7 @@ def finalize_results(output, data):
         #'best_scores': output['scores']['best_scores'],
         'avg_scores': output['scores']['avg_scores'],
         #'worst_scores': output['scores']['worst_scores'],
+        'compactnesses': output['compactnesses'],
         'pred_train': output['pred_trains'][index],
         'pred_test': output['pred_tests'][index],
         'data_dict': data
