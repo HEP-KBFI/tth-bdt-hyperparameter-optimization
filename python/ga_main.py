@@ -242,31 +242,39 @@ def sub_evolution(subpopulations, settings, data, parameters, create_set, evalua
     worst_scores = {}
     merged_population = []
     sub_iteration = 1
+    tracker = {}
 
     # Evolution for each subpopulation
     for population in subpopulations:
         print('\n::::: Subpopulation: ' + str(sub_iteration) + ' :::::')
-        final_population, scores_dict = evolve(
+        final_population, sub_tracker = evolve(
             population, settings, data, parameters, create_set, evaluate)
 
         # Saving results in dictionaries
         # (key indicates the subpopulation)
-        best_scores[sub_iteration] = scores_dict['best_scores']
-        avg_scores[sub_iteration] = scores_dict['avg_scores']
-        worst_scores[sub_iteration] = scores_dict['worst_scores']
+        # best_scores[sub_iteration] = scores_dict['best_scores']
+        # avg_scores[sub_iteration] = scores_dict['avg_scores']
+        # worst_scores[sub_iteration] = scores_dict['worst_scores']
+
+        for key in sub_tracker:
+            # try:
+            tracker[key].update({sub_iteration: sub_tracker[key]})
+            # except:
+            #     tracker[key] = {}
+            #     tracker[key].update({sub_iteration: sub_tracker[key]})
 
         # Gather final generations of each subpopulation
         merged_population += final_population
         sub_iteration += 1
 
     # Collect results
-    scores_dict = {
-        'best_scores': best_scores,
-        'avg_scores': avg_scores,
-        'worst_scores': worst_scores
-    }
+    # scores_dict = {
+    #     'best_scores': best_scores,
+    #     'avg_scores': avg_scores,
+    #     'worst_scores': worst_scores
+    # }
 
-    return merged_population, scores_dict
+    return merged_population, tracker
 
 
 def evolve(population, settings, data, parameters, create_set, evaluate, final=False):
@@ -496,20 +504,27 @@ def evolution(settings, data, parameters, create_set, evaluate):
         subpopulations = create_subpopulations(settings, parameters, create_set)
 
         # Evolve subpopulations
-        merged_population, scores_dict = sub_evolution(
+        merged_population, tracker = sub_evolution(
             subpopulations, settings, data, parameters, create_set, evaluate)
 
         # Evolve merged population
         print(('\n::::: Merged population:::::'))
         output = evolve(merged_population, settings, data, parameters, create_set, evaluate, True)
 
-        scores_dict['best_scores'].update(
-            {'final': output[1]['best_scores']})
-        scores_dict['avg_scores'].update(
-            {'final': output[1]['avg_scores']})
-        scores_dict['worst_scores'].update(
-            {'final': output[1]['worst_scores']})
-        output[1] = scores_dict
+        for key in tracker:
+            tracker[key].update({'final': output['scores']})
+
+        print(tracker)
+
+        output['scores'] = tracker
+
+        # scores_dict['best_scores'].update(
+        #     {'final': output[1]['best_scores']})
+        # scores_dict['avg_scores'].update(
+        #     {'final': output[1]['avg_scores']})
+        # scores_dict['worst_scores'].update(
+        #     {'final': output[1]['worst_scores']})
+        # output[1] = scores_dict
 
     else:
 
