@@ -306,6 +306,7 @@ def evolve(population, settings, data, parameters, create_set, evaluate, final=F
     improvement = 1
     improvements = []
     iteration = 0
+    tracker = {}
 
     # Evolution loop
     while (improvement > settings['threshold']
@@ -322,23 +323,24 @@ def evolve(population, settings, data, parameters, create_set, evaluate, final=F
         # Calculate fitness of the population
         args = inspect.getargspec(evaluate)
         if len(args[0]) == 3:
-            fitnesses, pred_trains, pred_tests, feature_importances = evaluate(
+            scores, pred_trains, pred_tests, feature_importances = evaluate(
                 population, data, settings)
         elif len(args[0]) == 4:
-            fitnesses, pred_trains, pred_tests, feature_importances = evaluate(
+            scores, pred_trains, pred_tests, feature_importances = evaluate(
                 population, data, settings, len(population))
+
+        fitnesses = universal.fitness_to_list(
+            scores, fitness_key=settings['fitness_fn'])
+
+        # Save results
 
         ### WORK IN PROGRESS
         if iteration = 0:
-            tracked_scores = score_tracker(initialize=True)
+            tracker = score_tracker(tracker, scores, fitnesses, initialize=True)
         else:
-            tracked_scores = score_tracker(tracked_scores, fitnesses)
+            tracker = score_tracker(tracker, scores, fitnesses)
         ###
 
-        fitnesses = universal.fitness_to_list(
-            fitnesses, fitness_key=settings['fitness_fn'])
-
-        # Save results
         best_scores.append(max(fitnesses))
         avg_scores.append(np.mean(fitnesses))
         worst_scores.append(min(fitnesses))
@@ -357,6 +359,8 @@ def evolve(population, settings, data, parameters, create_set, evaluate, final=F
     }
 
     if final:
+        print("Tracker: ")
+        print(tracker)
         output = {
             'population': population,
             'scores': scores_dict,
@@ -370,12 +374,12 @@ def evolve(population, settings, data, parameters, create_set, evaluate, final=F
 
 ### WORK IN PROGRESS
 
-def score_tracker(scores_dict={}, curr_scores={}, initialize=False, append=True):
+def score_tracker(tracker, scores, fitnesses, initialize=False, append=True):
     '''Tracks best scores of each iteration
 
     Parameters
     ----------
-    scores_dict : dictionary
+    tracker : dictionary
         dictionary of best scores
     curr_scores : dictionary
         dictionary of scores of current population
@@ -386,26 +390,30 @@ def score_tracker(scores_dict={}, curr_scores={}, initialize=False, append=True)
 
     Returns
     -------
-    scores_dict : dictionary
+    tracker : dictionary
         dictionary of best scores
     '''
     scoring_keys = ['g_score', 'f1_score', 'd_score', 'test_auc', 'train_auc']
 
     for key in keys:
-
-        # Initialization
         key_name = 'best_' + key
         list_key = key_name + 's'
-
-        # Create empty lists
         if initialize:
-            scores_dict[list_key] = []
-
-        # Add scores to existing lists
+            tracker[list_key] = []
         if append:
-            scores_dict[list_key].append(curr_scores[key])
+            tracker[list_key].append(curr_scores[key])
 
-    return scores_dict
+    if initialize:
+        tracker['avg_scores'] = []
+        # tracker['compactness'] = []
+        # tracker['best_fitnesses'] = []
+
+    if append:
+        tracker['avg_scores'].append(np.mean(fitnesses))
+        # tracker['compactness'] = []
+        # tracker['best_fitnesses'] = []
+
+    return tracker
 
 ###
 
