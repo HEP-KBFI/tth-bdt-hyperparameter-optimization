@@ -362,15 +362,16 @@ def evolve(population, settings, data, parameters, create_set, evaluate, final=F
     # }
 
     if final:
-        print("Tracker: ")
-        print(tracker)
+        # print("Tracker: ")
+        # print(tracker)
         output = {
             'population': population,
             'scores': tracker,
             'fitnesses': fitnesses,
             'compactnesses': compactnesses,
             'pred_trains': pred_trains,
-            'pred_tests': pred_tests
+            'pred_tests': pred_tests,
+            'feature_importances': feature_importances
         }
         return output
 
@@ -383,7 +384,7 @@ def score_tracker(tracker, scores, fitnesses, initialize=False, append=True):
 
     Parameters
     ----------
-    tracker : dic
+    tracker : dict
         Dictionary of best scores
     scores : dict
         Dictionary of scores of the current population
@@ -411,10 +412,12 @@ def score_tracker(tracker, scores, fitnesses, initialize=False, append=True):
 
     if initialize:
         tracker['avg_scores'] = []
+        tracker['best_fitnesses'] = []
         # tracker['compactness'] = []
 
     if append:
         tracker['avg_scores'].append(np.mean(fitnesses))
+        tracker['best_fitnesses'].append(max(fitnesses))
         # tracker['compactness'] = []
 
     return tracker
@@ -444,11 +447,13 @@ def finalize_results(output, data):
     result = {
         'best_parameters': output['population'][index],
         #'best_scores': output['scores']['best_scores'],
+        'best_fitnesses': output['scores']['best_fitnesses'],
         'avg_scores': output['scores']['avg_scores'],
         #'worst_scores': output['scores']['worst_scores'],
         'compactnesses': output['compactnesses'],
         'pred_train': output['pred_trains'][index],
         'pred_test': output['pred_tests'][index],
+        'feature_importances': output['feature_importances'][index],
         'data_dict': data
     }
 
