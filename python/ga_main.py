@@ -335,7 +335,7 @@ def evolve(population, settings, data, parameters, create_set, evaluate, final=F
         # Save results
 
         ### WORK IN PROGRESS
-        if iteration = 0:
+        if iteration == 0:
             tracker = score_tracker(tracker, scores, fitnesses, initialize=True)
         else:
             tracker = score_tracker(tracker, scores, fitnesses)
