@@ -393,15 +393,15 @@ def score_tracker(tracker, scores, fitnesses, initialize=False, append=True):
     tracker : dictionary
         dictionary of best scores
     '''
-    scoring_keys = ['g_score', 'f1_score', 'd_score', 'test_auc', 'train_auc']
+    keys = ['g_score', 'f1_score', 'd_score', 'test_auc', 'train_auc']
+    index = np.argmax(fitnesses)
 
     for key in keys:
-        key_name = 'best_' + key
-        list_key = key_name + 's'
+        key_name = 'best_' + key + 's'
         if initialize:
-            tracker[list_key] = []
+            tracker[key_name] = []
         if append:
-            tracker[list_key].append(curr_scores[key])
+            tracker[key_name].append(scores[index][key])
 
     if initialize:
         tracker['avg_scores'] = []
