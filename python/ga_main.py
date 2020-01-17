@@ -81,7 +81,15 @@ def elitism(population, fitnesses, elites):
     return elite
 
 
-def culling(population, fitnesses, settings, data, parameters, create_set, evaluate):
+def culling(
+        population,
+        fitnesses,
+        settings,
+        data,
+        parameters,
+        create_set,
+        evaluate
+):
     '''Cull worst performing members
     and replace them with random new ones
 
@@ -214,7 +222,14 @@ def create_subpopulations(settings, parameters, create_set):
     return subpopulations
 
 
-def sub_evolution(subpopulations, settings, data, parameters, create_set, evaluate):
+def sub_evolution(
+        subpopulations,
+        settings,
+        data,
+        parameters,
+        create_set,
+        evaluate
+):
     '''Evolve subpopulations separately and then merge them into one
 
     Parameters
@@ -223,23 +238,24 @@ def sub_evolution(subpopulations, settings, data, parameters, create_set, evalua
         Initial subpopulations
     settings : dict
         Settings of the genetic algorithm
-    data: dict
+    data : dict
         Data sets for testing and training
-    parameters: dict
+    parameters : dict
         Descriptions of the xgboost parameters
+    create_set : function
+        Function used to generate a population
+    evaluate : function
+        Function used to calculate scores
 
     Returns
     -------
     merged_population : list
         Final subpopulations merged into one
-    scores_dict : dict
-        History of score improvements
+    tracker : dict
+        History of best scores from all iterations
+    compactness : dict
+        History of compactness scores from all iterations
     '''
-
-    # Initialization
-    # best_scores = {}
-    # avg_scores = {}
-    # worst_scores = {}
     compactnesses = {}
     merged_population = []
     sub_iteration = 1
@@ -252,11 +268,6 @@ def sub_evolution(subpopulations, settings, data, parameters, create_set, evalua
             population, settings, data, parameters, create_set, evaluate)
 
         # Saving results in dictionaries
-        # (key indicates the subpopulation)
-        # best_scores[sub_iteration] = scores_dict['best_scores']
-        # avg_scores[sub_iteration] = scores_dict['avg_scores']
-        # worst_scores[sub_iteration] = scores_dict['worst_scores']
-
         for key in output['scores']:
             try:
                 tracker[key].update({sub_iteration: output['scores'][key]})
@@ -270,17 +281,10 @@ def sub_evolution(subpopulations, settings, data, parameters, create_set, evalua
         merged_population += output['population']
         sub_iteration += 1
 
-    # Collect results
-    # scores_dict = {
-    #     'best_scores': best_scores,
-    #     'avg_scores': avg_scores,
-    #     'worst_scores': worst_scores
-    # }
-
     return merged_population, tracker, compactnesses
 
 
-def evolve(population, settings, data, parameters, create_set, evaluate, final=False):
+def evolve(population, settings, data, parameters, create_set, evaluate):
     '''Evolve a population until reaching the threshold
     or maximum number of iterations
 
@@ -294,26 +298,17 @@ def evolve(population, settings, data, parameters, create_set, evaluate, final=F
         Data sets for testing and training
     parameters: dict
         Descriptions of the xgboost parameters
-    final : bool
-        Whether the evolution is the last one
+    create_set : function
+        Function used to generate a population
+    evaluate : function
+        Function used to calculate scores
 
     Returns
     -------
-    population : list
-        Final population
-    scores_dict : dict
-        History of score improvements
-    fitnesses : list
-        Fitness scores corresponding to the final population
-    pred_trains : list
-    pred_tests : list
+    output : dict
+        All gathered information about the final population
     '''
-
-    # Initialization
     fitnesses = []
-    # best_scores = []
-    # avg_scores = []
-    # worst_scores = []
     improvement = 1
     improvements = []
     compactnesses = []
@@ -328,7 +323,14 @@ def evolve(population, settings, data, parameters, create_set, evaluate, final=F
         if iteration != 0:
             print('::::: Iteration:     ' + str(iteration) + ' :::::')
             population, fitnesses = culling(
-                population, fitnesses, settings, data, parameters, create_set, evaluate)
+                population,
+                fitnesses,
+                settings,
+                data,
+                parameters,
+                create_set,
+                evaluate
+            )
             population = new_population(
                 population, fitnesses, settings, parameters)
 
@@ -345,17 +347,11 @@ def evolve(population, settings, data, parameters, create_set, evaluate, final=F
             scores, fitness_key=settings['fitness_fn'])
 
         # Save results
-
-        ### WORK IN PROGRESS
         if iteration == 0:
-            tracker = score_tracker(tracker, scores, fitnesses, initialize=True)
+            tracker = score_tracker(
+                tracker, scores, fitnesses, initialize=True)
         else:
             tracker = score_tracker(tracker, scores, fitnesses)
-        ###
-
-        # best_scores.append(max(fitnesses))
-        # avg_scores.append(np.mean(fitnesses))
-        # worst_scores.append(min(fitnesses))
 
         # Calculate stopping criteria
         improvements, improvement = universal.calculate_improvement_wAVG(
@@ -365,16 +361,6 @@ def evolve(population, settings, data, parameters, create_set, evaluate, final=F
 
         iteration += 1
 
-    # Collect results
-    # scores_dict = {
-    #     'best_scores': best_scores,
-    #     'avg_scores': avg_scores,
-    #     'worst_scores': worst_scores
-    # }
-
-    # if final:
-        # print("Tracker: ")
-        # print(tracker)
     output = {
         'population': population,
         'scores': tracker,
@@ -386,11 +372,8 @@ def evolve(population, settings, data, parameters, create_set, evaluate, final=F
     }
     return output
 
-    # return population, tracker
 
-### WORK IN PROGRESS
-
-def score_tracker(tracker, scores, fitnesses, initialize=False, append=True):
+def score_tracker(tracker, scores, fitnesses, initialize=False):
     '''Tracks best scores of each iteration
 
     Parameters
@@ -403,8 +386,6 @@ def score_tracker(tracker, scores, fitnesses, initialize=False, append=True):
         List of fitness scores of the current population
     initialize : bool
         Whether to initialize the dictionary
-    append : bool
-        Whether to append new results
 
     Returns
     -------
@@ -418,18 +399,14 @@ def score_tracker(tracker, scores, fitnesses, initialize=False, append=True):
         key_name = 'best_' + key + 's'
         if initialize:
             tracker[key_name] = []
-        if append:
-            tracker[key_name].append(scores[index][key])
+        tracker[key_name].append(scores[index][key])
 
     if initialize:
         tracker['avg_scores'] = []
         tracker['best_fitnesses'] = []
-        # tracker['compactness'] = []
 
-    if append:
-        tracker['avg_scores'].append(np.mean(fitnesses))
-        tracker['best_fitnesses'].append(max(fitnesses))
-        # tracker['compactness'] = []
+    tracker['avg_scores'].append(np.mean(fitnesses))
+    tracker['best_fitnesses'].append(max(fitnesses))
 
     return tracker
 
@@ -449,18 +426,14 @@ def finalize_results(output, data):
     result : dict
         Result of the run of the genetic algorithm
     '''
-
-    # Initialization
     keys = ['g_score', 'f1_score', 'd_score', 'test_auc', 'train_auc']
     index = np.argmax(output['fitnesses'])
 
     # Create the dictionary
     result = {
         'best_parameters': output['population'][index],
-        #'best_scores': output['scores']['best_scores'],
         'best_fitnesses': output['scores']['best_fitnesses'],
         'avg_scores': output['scores']['avg_scores'],
-        #'worst_scores': output['scores']['worst_scores'],
         'compactnesses': output['compactnesses'],
         'pred_train': output['pred_trains'][index],
         'pred_test': output['pred_tests'][index],
@@ -475,8 +448,6 @@ def finalize_results(output, data):
 
     return result
 
-###
-
 
 def evolution(settings, data, parameters, create_set, evaluate):
     '''Evolution of the parameter values
@@ -489,13 +460,16 @@ def evolution(settings, data, parameters, create_set, evaluate):
         Data sets for testing and training
     parameters: dict
         Descriptions of the xgboost parameters
+    create_set : function
+        Function used to generate a population
+    evaluate : function
+        Function used to calculate scores
 
     Returns
     -------
     result : dict
         Result of the run of the genetic algorithm
     '''
-
     if settings['sub_pops'] > 1:
 
         # Checking settings for validity
@@ -504,7 +478,8 @@ def evolution(settings, data, parameters, create_set, evaluate):
 
         # Create subpopulations
         print('::::::: Creating subpopulations ::::::::')
-        subpopulations = create_subpopulations(settings, parameters, create_set)
+        subpopulations = create_subpopulations(
+            settings, parameters, create_set)
 
         # Evolve subpopulations
         merged_population, tracker, compactnesses = sub_evolution(
@@ -512,25 +487,22 @@ def evolution(settings, data, parameters, create_set, evaluate):
 
         # Evolve merged population
         print(('\n::::: Merged population:::::'))
-        output = evolve(merged_population, settings, data, parameters, create_set, evaluate, True)
+        output = evolve(
+            merged_population,
+            settings,
+            data,
+            parameters,
+            create_set,
+            evaluate
+        )
 
         for key in tracker:
             tracker[key].update({'final': output['scores'][key]})
 
         compactnesses.update({'final': output['compactnesses']})
 
-        # print(tracker)
-
         output['scores'] = tracker
         output['compactnesses'] = compactnesses
-
-        # scores_dict['best_scores'].update(
-        #     {'final': output[1]['best_scores']})
-        # scores_dict['avg_scores'].update(
-        #     {'final': output[1]['avg_scores']})
-        # scores_dict['worst_scores'].update(
-        #     {'final': output[1]['worst_scores']})
-        # output[1] = scores_dict
 
     else:
 
@@ -539,6 +511,7 @@ def evolution(settings, data, parameters, create_set, evaluate):
         population = create_set(parameters, settings['sample_size'])
 
         # Evolve population
-        output = evolve(population, settings, data, parameters, create_set, evaluate, True)
+        output = evolve(
+            population, settings, data, parameters, create_set, evaluate)
 
     return finalize_results(output, data)
