@@ -781,24 +781,37 @@ def plot_single_evolution(keys, result_dict, title, plot_out):
     -------
     Nothing
     '''
-    n_gens = len(result_dict[keys[0]])
-    iteration_nr = np.arange(n_gens)
-    for key in keys:
-        plt.plot(iteration_nr, result_dict[key], label=key)
-    plt.xlabel('Iteration number / #')
-    plt.ylabel('scoring_metric')
-    plt.xlim(0, n_gens - 1)
-    plt.xticks(np.arange(n_gens - 1))
-    axis = plt.gca()
-    axis.set_aspect('auto', adjustable='box')
-    axis.xaxis.set_major_locator(ticker.AutoLocator())
-    plt.grid(True)
-    plt.legend(loc='lower right')
-    plt.title(title)
-    plt.tick_params(top=True, right=True, direction='in')
-    plt.savefig(plot_out)
-    plt.close('all')
-
+    try:
+        n_gens = len(result_dict[keys[0]])
+        iteration_nr = np.arange(n_gens)
+        for key in keys:
+            plt.plot(iteration_nr, result_dict[key], label=key)
+        plt.xlim(0, n_gens - 1)
+        plt.xticks(np.arange(n_gens - 1))
+    except: # in case of a genetic algorithm with multiple subpopulations
+        for i in result_dict[keys[0]].keys():
+            n_gens = len(result_dict[keys[0]][i])
+            if i != 'final':
+                iteration_nr = np.arange(n_gens)
+            if i == 'final':
+                n_gens_final = 2 * n_gens - 1
+                iteration_nr = np.arange(n_gens - 1, n_gens_final)
+            for key in keys:
+                plt.plot(iteration_nr, result_dict[key][i], label=key)
+        plt.xlim(0, n_gens_final - 1)
+        plt.xticks(np.arange(n_gens_final - 1))
+    finally:
+        plt.xlabel('Iteration number / #')
+        plt.ylabel('scoring_metric')
+        axis = plt.gca()
+        axis.set_aspect('auto', adjustable='box')
+        axis.xaxis.set_major_locator(ticker.AutoLocator())
+        plt.grid(True)
+        plt.legend(loc='lower right')
+        plt.title(title)
+        plt.tick_params(top=True, right=True, direction='in')
+        plt.savefig(plot_out)
+        plt.close('all')
 
 
 def plot_roc_curve(
@@ -860,7 +873,7 @@ def plot_costfunction(avg_scores, output_dir):
         os.makedirs(output_dir)
     try:
         n_gens = len(avg_scores)
-        gen_numbers = np.arange(0, n_gens)
+        gen_numbers = np.arange(n_gens)
         plt.plot(gen_numbers, avg_scores, color='k')
         plt.xlim(0, n_gens - 1)
         plt.xticks(np.arange(n_gens - 1))
@@ -868,10 +881,10 @@ def plot_costfunction(avg_scores, output_dir):
         for i in avg_scores.keys():
             n_gens = len(avg_scores[i])
             if i != 'final':
-                gen_numbers = np.arange(0, n_gens)
+                gen_numbers = np.arange(n_gens)
                 plt.plot(gen_numbers, avg_scores[i], color='b')
             if i == 'final':
-                n_gens_final = n_gens + len(avg_scores[i]) - 1
+                n_gens_final = 2 * n_gens - 1
                 gen_numbers = np.arange(n_gens - 1, n_gens_final)
                 plt.plot(gen_numbers, avg_scores[i], color='k')
         plt.xlim(0, n_gens_final - 1)
@@ -883,7 +896,7 @@ def plot_costfunction(avg_scores, output_dir):
         axis.set_aspect('auto', adjustable='box')
         axis.xaxis.set_major_locator(ticker.AutoLocator())
         plt.grid(True)
-        plt.title('Avarage fitness over iterations')
+        plt.title('Average fitness over iterations')
         plt.tick_params(top=True, right=True, direction='in')
         plt.savefig(plot_out)
         plt.close('all')
