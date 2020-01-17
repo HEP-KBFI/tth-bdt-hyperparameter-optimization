@@ -237,9 +237,10 @@ def sub_evolution(subpopulations, settings, data, parameters, create_set, evalua
     '''
 
     # Initialization
-    best_scores = {}
-    avg_scores = {}
-    worst_scores = {}
+    # best_scores = {}
+    # avg_scores = {}
+    # worst_scores = {}
+    compactnesses = {}
     merged_population = []
     sub_iteration = 1
     tracker = {}
@@ -247,7 +248,7 @@ def sub_evolution(subpopulations, settings, data, parameters, create_set, evalua
     # Evolution for each subpopulation
     for population in subpopulations:
         print('\n::::: Subpopulation: ' + str(sub_iteration) + ' :::::')
-        final_population, sub_tracker = evolve(
+        output = evolve(
             population, settings, data, parameters, create_set, evaluate)
 
         # Saving results in dictionaries
@@ -256,15 +257,17 @@ def sub_evolution(subpopulations, settings, data, parameters, create_set, evalua
         # avg_scores[sub_iteration] = scores_dict['avg_scores']
         # worst_scores[sub_iteration] = scores_dict['worst_scores']
 
-        for key in sub_tracker:
+        for key in output['scores']:
             try:
-                tracker[key].update({sub_iteration: sub_tracker[key]})
+                tracker[key].update({sub_iteration: output['scores'][key]})
             except:
                 tracker[key] = {}
-                tracker[key].update({sub_iteration: sub_tracker[key]})
+                tracker[key].update({sub_iteration: output['scores'][key]})
+
+        compactnesses.update({sub_iteration: output['compactnesses']})
 
         # Gather final generations of each subpopulation
-        merged_population += final_population
+        merged_population += output['population']
         sub_iteration += 1
 
     # Collect results
@@ -274,7 +277,7 @@ def sub_evolution(subpopulations, settings, data, parameters, create_set, evalua
     #     'worst_scores': worst_scores
     # }
 
-    return merged_population, tracker
+    return merged_population, tracker, compactnesses
 
 
 def evolve(population, settings, data, parameters, create_set, evaluate, final=False):
@@ -369,21 +372,21 @@ def evolve(population, settings, data, parameters, create_set, evaluate, final=F
     #     'worst_scores': worst_scores
     # }
 
-    if final:
+    # if final:
         # print("Tracker: ")
         # print(tracker)
-        output = {
-            'population': population,
-            'scores': tracker,
-            'fitnesses': fitnesses,
-            'compactnesses': compactnesses,
-            'pred_trains': pred_trains,
-            'pred_tests': pred_tests,
-            'feature_importances': feature_importances
-        }
-        return output
+    output = {
+        'population': population,
+        'scores': tracker,
+        'fitnesses': fitnesses,
+        'compactnesses': compactnesses,
+        'pred_trains': pred_trains,
+        'pred_tests': pred_tests,
+        'feature_importances': feature_importances
+    }
+    return output
 
-    return population, tracker
+    # return population, tracker
 
 ### WORK IN PROGRESS
 
@@ -504,7 +507,7 @@ def evolution(settings, data, parameters, create_set, evaluate):
         subpopulations = create_subpopulations(settings, parameters, create_set)
 
         # Evolve subpopulations
-        merged_population, tracker = sub_evolution(
+        merged_population, tracker, compactnesses = sub_evolution(
             subpopulations, settings, data, parameters, create_set, evaluate)
 
         # Evolve merged population
@@ -514,9 +517,12 @@ def evolution(settings, data, parameters, create_set, evaluate):
         for key in tracker:
             tracker[key].update({'final': output['scores'][key]})
 
-        print(tracker)
+        compactnesses.update({'final': output['compactnesses']})
+
+        # print(tracker)
 
         output['scores'] = tracker
+        output['compactnesses'] = compactnesses
 
         # scores_dict['best_scores'].update(
         #     {'final': output[1]['best_scores']})
