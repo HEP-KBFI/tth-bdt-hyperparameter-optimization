@@ -257,11 +257,11 @@ def sub_evolution(subpopulations, settings, data, parameters, create_set, evalua
         # worst_scores[sub_iteration] = scores_dict['worst_scores']
 
         for key in sub_tracker:
-            # try:
-            tracker[key].update({sub_iteration: sub_tracker[key]})
-            # except:
-            #     tracker[key] = {}
-            #     tracker[key].update({sub_iteration: sub_tracker[key]})
+            try:
+                tracker[key].update({sub_iteration: sub_tracker[key]})
+            except:
+                tracker[key] = {}
+                tracker[key].update({sub_iteration: sub_tracker[key]})
 
         # Gather final generations of each subpopulation
         merged_population += final_population
@@ -512,7 +512,7 @@ def evolution(settings, data, parameters, create_set, evaluate):
         output = evolve(merged_population, settings, data, parameters, create_set, evaluate, True)
 
         for key in tracker:
-            tracker[key].update({'final': output['scores']})
+            tracker[key].update({'final': output['scores'][key]})
 
         print(tracker)
 
