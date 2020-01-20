@@ -15,6 +15,7 @@ def plot_candlebar_covs(keys, covs, output_dir):
     ax.set_xticklabels(keys)
     plt.title('Stability of parameters using COV')
     plt.savefig(output_path)
+    plt.close('all')
 
 
 def plot_individual(key, mean, stdev, parameter_values, output_dir):
@@ -40,6 +41,7 @@ def plot_individual(key, mean, stdev, parameter_values, output_dir):
     plt.xticks(x_values)
     plt.legend()
     plt.savefig(out_path)
+    plt.close('all')
 
 
 def stability_check_main(dict_of_parameter_lists, output_dir):
@@ -59,6 +61,7 @@ def stability_check_main(dict_of_parameter_lists, output_dir):
         covs.append(cov)
     covs = np.array(covs)
     plot_candlebar_covs(keys, covs, output_dir)
+    plt.close('all')
 
 
 def plot_radar_chart(parameter_set, ax):
@@ -85,6 +88,7 @@ def plot_all_radar_charts(dict_of_parameter_lists, output_dir):
     ax.spines['polar'].set_visible(False)
     output_path = os.path.join(output_dir, 'radar_chart.png')
     plt.savefig(output_path)
+    plt.close('all')
 
 
 def normalize_values(parameter_set):
