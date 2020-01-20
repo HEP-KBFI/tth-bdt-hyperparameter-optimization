@@ -104,7 +104,7 @@ def plot_all_radar_charts(dict_of_parameter_lists, output_dir):
     ax.set_yticklabels([])
     ax.spines['polar'].set_visible(False)
     output_path = os.path.join(output_dir, 'radar_chart.png')
-    plt.savefig(output_path)
+    plt.savefig(output_path, bbox_inches='tight')
     plt.close('all')
 
 
@@ -155,4 +155,4 @@ def plot_score_stability(score_dicts, output_dir, key='best_test_auc'):
         bbox=props
     )
     output_path = os.path.join(output_dir, 'score_stability.png')
-    plt.savefig(output_path)
+    plt.savefig(output_path, bbox_inches='tight')
