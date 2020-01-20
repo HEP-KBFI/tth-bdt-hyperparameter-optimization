@@ -380,8 +380,8 @@ def score_tracker(tracker, scores, fitnesses, initialize=False):
     ----------
     tracker : dict
         Dictionary of best scores
-    scores : dict
-        Dictionary of scores of the current population
+    scores : list
+        List of dictionaries with scores of the current population
     fitnesses : list
         List of fitness scores of the current population
     initialize : bool

@@ -172,7 +172,7 @@ def test_create_subpopulations():
         i += 1
 
 
-# @pytest.mark.skip(reason='Runs too long')
+@pytest.mark.skip(reason='Runs too long')
 def test_sub_evolution():
     '''Testing the sub_evolution function'''
     SETTINGS.update({'culling': 0})
@@ -212,9 +212,6 @@ def test_evolve():
             'test_evolve failed'
     assert len(result['fitnesses']) == len(result['population']), \
         'test_evolve failed'
-    assert len(result['pred_trains']) == 60000, 'test_evolve failed'
-    assert len(result['pred_tests']) == 10000, 'test_evolve failed'
-    assert len(result['feature_importances']) == 10, 'test_evolve failed'
 
 
 def test_score_tracker():
@@ -310,12 +307,6 @@ def test_evolution():
     assert len(result['avg_scores']) == len(result['best_fitnesses']), \
         'test_evolution failed'
     assert len(result['compactnesses']) == len(result['avg_scores']), \
-        'test_evolution failed'
-    assert len(result['pred_train']) == 60000, \
-        'test_evolution failed'
-    assert len(result['pred_test']) == 10000, \
-        'test_evolution failed'
-    assert len(result['feature_importances']) == 10, \
         'test_evolution failed'
     assert result[data_dict] == DATA, \
         'test_evolution failed'
