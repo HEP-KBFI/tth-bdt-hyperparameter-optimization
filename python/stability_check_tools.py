@@ -9,9 +9,13 @@ def plot_candlebar_covs(keys, covs, output_dir):
     output_path = os.path.join(output_dir, 'stability_check.png')
     fig, ax = plt.subplots()
     x_values = range(len(keys))
+    x_range = x_values.insert(0, -1)
+    x_range.append(max(x_values)+1)
+    new_labels = keys.insert(0, "")
+    new_labels.append("")
     ax.errorbar(
         x_values, np.zeros(len(keys)), xerr=0, yerr=errors, linestyle='')
-    ax.set_xticks(x_values)
+    ax.set_xticks(x_range)
     ax.set_xticklabels(keys)
     plt.title('Stability of parameters using COV')
     plt.savefig(output_path)
@@ -36,9 +40,21 @@ def plot_individual(key, mean, stdev, parameter_values, output_dir):
         mean + stdev,
         mean - stdev,
         color='b',
-        label='values')
+        label='values',
+        alpha=0.1)
     plt.title(key + '_variation')
-    plt.xticks(x_values)
+    plt.xticks(x_values, rotation=45)
+    ax = plt.gca()
+    textstr = '\n'.join([
+        r'$\mu=%.3f$' %(mean,),
+        r'$\sigma=%.3f$' %(stdev,)
+    ])
+    props = dict(boxstyle='round', facecolor='wheat', alpha=1)
+    ax.text(
+        0.9*x_values[-1], 1.0*y_max,
+        textstr,
+        bbox=props
+    )
     plt.legend()
     plt.savefig(out_path)
     plt.close('all')
@@ -128,8 +144,8 @@ def plot_score_stability(score_dicts, output_dir, key='best_test_auc'):
     plt.xlim(0, len(score_list)-1)
     ax = plt.gca()
     textstr = '\n'.join([
-        r'$\mu=%.2f$' %(mean,),
-        r'$\sigma=%.2f$' %(stdev,)
+        r'$\mu=%.3f$' %(mean,),
+        r'$\sigma=%.3f$' %(stdev,)
     ])
     props = dict(boxstyle='round', facecolor='wheat', alpha=1)
     ax.text(
