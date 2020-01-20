@@ -51,7 +51,7 @@ def plot_individual(key, mean, stdev, parameter_values, output_dir):
     ])
     props = dict(boxstyle='round', facecolor='wheat', alpha=1)
     ax.text(
-        0.9*x_values[-1], 1.0*y_max,
+        0.9*x_values[-1], 1.0*ymax,
         textstr,
         bbox=props
     )
