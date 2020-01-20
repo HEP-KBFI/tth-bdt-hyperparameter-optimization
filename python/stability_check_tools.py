@@ -15,8 +15,8 @@ def plot_candlebar_covs(keys, covs, output_dir):
     new_labels.insert(0, "")
     ax.errorbar(
         x_values, np.zeros(len(keys)), xerr=0, yerr=errors, linestyle='')
-    ax.set_xticks(x_range)
-    ax.set_xticklabels(keys)
+    ax.set_xticks(x_range, rotation=-45)
+    ax.set_xticklabels(new_labels)
     plt.title('Stability of parameters using COV')
     plt.savefig(output_path)
     plt.close('all')
@@ -43,7 +43,7 @@ def plot_individual(key, mean, stdev, parameter_values, output_dir):
         label='values',
         alpha=0.1)
     plt.title(key + '_variation')
-    plt.xticks(x_values, rotation=45)
+    plt.xticks(x_values)
     ax = plt.gca()
     textstr = '\n'.join([
         r'$\mu=%.3f$' %(mean,),
