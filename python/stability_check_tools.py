@@ -112,7 +112,7 @@ def normalize_values(parameter_set):
 def plot_score_stability(score_dicts, output_dir, key='best_test_auc'):
     score_list = []
     for score_dict in score_dicts:
-        value = score_dict['key']
+        value = score_dict[key]
         score_list.append(value)
     stdev = np.std(score_list)
     mean = np.mean(score_list)
