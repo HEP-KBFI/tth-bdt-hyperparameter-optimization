@@ -19,7 +19,7 @@ def plot_candlebar_covs(keys, covs, output_dir):
     ax.set_xticklabels(new_labels)
     plt.xticks(rotation=-45)
     plt.title('Stability of parameters using COV')
-    plt.savefig(output_path)
+    plt.savefig(output_path, bbox_inches='tight')
     plt.close('all')
 
 
@@ -57,7 +57,7 @@ def plot_individual(key, mean, stdev, parameter_values, output_dir):
         bbox=props
     )
     plt.legend()
-    plt.savefig(out_path)
+    plt.savefig(out_path, bbox_inches='tight')
     plt.close('all')
 
 
