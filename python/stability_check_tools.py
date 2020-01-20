@@ -9,10 +9,10 @@ def plot_candlebar_covs(keys, covs, output_dir):
     output_path = os.path.join(output_dir, 'stability_check.png')
     fig, ax = plt.subplots()
     x_values = range(len(keys))
-    x_range = x_values.insert(0, -1)
-    x_range.append(max(x_values)+1)
-    new_labels = keys.insert(0, "")
-    new_labels.append("")
+    x_range + [max(x_values)+1]
+    x_range.insert(0, -1)
+    new_labels + [""]
+    new_labels.insert(0, "")
     ax.errorbar(
         x_values, np.zeros(len(keys)), xerr=0, yerr=errors, linestyle='')
     ax.set_xticks(x_range)
