@@ -730,8 +730,15 @@ def save_fitness_improvement(result_dict, keys, output_dir):
     output_path = os.path.join(output_dir, 'fitness_improvement.json')
     relative_improvement = {}
     for key in keys:
-        improvement = result_dict[key][-1] - result_dict[key][0]
-        relative_improvement[key] = improvement/result_dict[key][0]
+        try:
+            improvement = result_dict[key][-1] - result_dict[key][0]
+            relative_improvement[key] = improvement/result_dict[key][0]
+        except:
+            improvements = []
+            for i in result_dict[key].keys():
+                improvements.append(result_dict[key][i][-1] - result_dict[key][i][0])
+            improvement = max(improvements)
+            relative_improvement[key] = improvement/result_dict[key]['final'][0]
     with open(output_path, 'w') as file:
         json.dump(relative_improvement, file)
 
