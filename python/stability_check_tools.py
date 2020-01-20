@@ -15,8 +15,9 @@ def plot_candlebar_covs(keys, covs, output_dir):
     new_labels.insert(0, "")
     ax.errorbar(
         x_values, np.zeros(len(keys)), xerr=0, yerr=errors, linestyle='')
-    ax.set_xticks(x_range, rotation=-45)
+    ax.set_xticks(x_range)
     ax.set_xticklabels(new_labels)
+    ax.tick_params(axis='x', rotation=-45)
     plt.title('Stability of parameters using COV')
     plt.savefig(output_path)
     plt.close('all')
