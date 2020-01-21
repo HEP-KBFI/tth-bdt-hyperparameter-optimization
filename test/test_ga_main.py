@@ -186,14 +186,12 @@ def test_sub_evolution():
     )
     assert len(result[0]) == len(POPULATION), 'test_sub_evolution failed'
     for key in result[1]:
-        print key
         for i in result[1][key]:
-            print i
             assert len(result[1][key][i]) == len(result[2][i]), \
                 'test_sub_evolution failed'
 
 
-# @pytest.mark.skip(reason='Runs too long')
+@pytest.mark.skip(reason='Runs too long')
 def test_evolve():
     '''Testing the evolve function'''
     initial = POPULATION[:1]
@@ -215,6 +213,7 @@ def test_evolve():
 
 
 def test_score_tracker():
+    '''Testing the score tracker function'''
     initial = [
         {
             'g_score': 0.984,
@@ -253,6 +252,7 @@ def test_score_tracker():
 
 
 def test_finalize_results():
+    '''Testing the finalize results function'''
     initial = {
         'population': POPULATION,
         'scores': {
@@ -266,7 +266,7 @@ def test_finalize_results():
         },
         'fitnesses': FITNESSES,
         'compactnesses': [0.953],
-        'pred_trains': [[0.990],[0.993],[0.503]],
+        'pred_trains': [[0.990], [0.993], [0.503]],
         'pred_tests': [[0.609], [0.529], [0.882]],
         'feature_importances': [[0.041], [0.269], [0.996]]
     }
@@ -284,14 +284,12 @@ def test_finalize_results():
         'best_f1_scores': [0.240],
         'best_d_scores': [0.851],
         'best_test_aucs': [0.646],
-        'best_train_aucs': [0.752],
-        'avg_scores': [0.4],
-        'best_fitnesses': [0.8]
+        'best_train_aucs': [0.752]
     }
     assert result == expected
 
 
-# @pytest.mark.skip(reason='Runs too long')
+@pytest.mark.skip(reason='Runs too long')
 def test_evolution():
     '''Testing the evolution function'''
     SETTINGS.update({'culling': 0, 'elitism': 0, 'sub_pops': 1})
@@ -308,7 +306,7 @@ def test_evolution():
         'test_evolution failed'
     assert len(result['compactnesses']) == len(result['avg_scores']), \
         'test_evolution failed'
-    assert result[data_dict] == DATA, \
+    assert result['data_dict'] == DATA, \
         'test_evolution failed'
 
 
