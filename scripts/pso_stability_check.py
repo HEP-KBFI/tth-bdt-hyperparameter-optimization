@@ -9,7 +9,7 @@ Usage: quasar_pso_mnist.py
 from __future__ import division
 import numpy as np
 import os
-from tthAnalysis.bdtHyperparameterOptimization import mnist_filereader  as mf
+from tthAnalysis.bdtTraining import xgb_tth as ttHxt
 from tthAnalysis.bdtHyperparameterOptimization import universal
 from tthAnalysis.bdtHyperparameterOptimization import pso_main as pm
 from tthAnalysis.bdtHyperparameterOptimization import slurm_main as sm
@@ -20,14 +20,24 @@ from tthAnalysis.bdtHyperparameterOptimization import stability_check_tools as s
 NUMBER_REPETITIONS = 50
 
 def main():
+    print("::::::: Loading data ::::::::")
     global_settings = universal.read_settings('global')
+    channel = global_settings['channel']
+    bdtType = global_settings['bdtType']
+    trainvar = global_settings['trainvar']
+    fnFile = '_'.join(['fn', channel])
+    importString = "".join(['tthAnalysis.bdtTraining.', fnFile])
+    cf = __import__(importString, fromlist=[''])
+    nthread = global_settings['nthread']
     output_dir = os.path.expandvars(global_settings['output_dir'])
     if not os.path.isdir(output_dir):
         os.makedirs(output_dir)
-    print("::::::: Loading data ::::::::")
-    data_dict = mf.create_datasets(
-        global_settings['sample_dir'],
-        global_settings['nthread'])
+    data, trainVars = ttHxt.tth_analysis_main(
+        channel, bdtType, nthread,
+        output_dir, trainvar, cf
+    )
+    data = ttHxt.convert_data_to_correct_format(data)
+    data_dict = ttHxt.createDataSet(data, trainVars, nthread)
     print("::::::: Reading parameters :::::::")
     cmssw_base_path = os.path.expandvars('$CMSSW_BASE')
     param_file = os.path.join(
