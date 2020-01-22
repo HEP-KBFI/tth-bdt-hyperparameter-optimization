@@ -7,5 +7,5 @@
 {"bdtType": "evtLevelTT_TTH"}
 {"trainvar": "noHTT"}
 {"channel": "3l_1tau"}
-{"fitness_fn": "test_auc"}
-{"trainvar_opt": 1}
+{"fitness_fn": "d_roc_1.5"}
+{"trainvar_opt": 0}
