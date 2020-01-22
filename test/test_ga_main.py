@@ -117,6 +117,14 @@ def test_set_num():
     assert result == expected, 'test_set_num failed'
 
 
+def test_fitness_calculation():
+    '''Testing the fitness calculation function'''
+    results = gm.fitness_calculation(
+        POPULATION, SETTINGS, DATA, xt.ensemble_fitnesses)
+    for result in results:
+        assert len(result) == len(results), 'test_fitness_calculation failed'
+
+
 def test_elitism():
     '''Testing the elitism function'''
     initial = [1, 2, 3]
@@ -124,7 +132,7 @@ def test_elitism():
     expected = [[3, 2], [3], [3, 2], [3, 2, 1]]
     result = []
     for num in nums:
-        result.append(gm.elitism(initial, FITNESSES, num))
+        result.append(gm.elitism(initial, FITNESSES, num)[0])
     assert result == expected, 'test_elitism failed'
 
 
@@ -148,7 +156,7 @@ def test_culling():
 def test_new_population():
     '''Testing the new_population function'''
     result = gm.new_population(
-        POPULATION, FITNESSES, SETTINGS, PARAMETERS)
+        POPULATION, FITNESSES, SETTINGS, PARAMETERS)[0]
     assert len(result) == len(POPULATION), \
         'test_new_population failed'
 
