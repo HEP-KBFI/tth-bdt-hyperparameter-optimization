@@ -1,5 +1,6 @@
 '''Main functions for the genetic algorithm'''
 from __future__ import division
+import copy
 import inspect
 import numpy as np
 from tthAnalysis.bdtHyperparameterOptimization import universal
@@ -43,15 +44,15 @@ def set_num(amount, population):
     return num
 
 
-def elitism(population, fitnesses, elites):
+def elitism(population, pop_data, elites):
     '''Preserve best performing members of the previous generation
 
     Parameters
     ----------
     population : list
         A group of individuals
-    fitnesses : list
-        Fitness scores corresponding to the given population
+    pop_data : dict
+        Data about the given population
     elites : float
         Amount of elite members to select
 
@@ -63,10 +64,14 @@ def elitism(population, fitnesses, elites):
 
     # Create copies of data
     population = population[:]
-    fitnesses = fitnesses[:]
+    fitnesses = pop_data['fitnesses'][:]
+    pop_data = copy.deepcopy(pop_data)
 
     # Initialization
     elite = []
+    elite_data = {}
+    for key in pop_data:
+        elite_data[key] = []
 
     # Set num as the number of elite members to perserve
     num = set_num(elites, population)
@@ -75,10 +80,12 @@ def elitism(population, fitnesses, elites):
     while num > 0:
         index = np.argmax(fitnesses)
         del fitnesses[index]
+        for key in pop_data:
+            elite_data[key].append(pop_data[key].pop(index))
         elite.append(population.pop(index))
         num -= 1
 
-    return elite
+    return elite, elite_data
 
 
 def culling(
@@ -147,15 +154,15 @@ def culling(
     return population, fitnesses
 
 
-def new_population(population, fitnesses, settings, parameters):
+def new_population(population, pop_data, settings, parameters):
     '''Create the next generation population.
 
     Parameters
     ----------
     population : list
         Current set of individuals
-    fitnesses : list
-        Fitness scores corresponding to the given population
+    pop_data : dict
+        Data about the given population
     settings : dict
         Settings of the genetic algorithm
     parameters: dict
@@ -168,11 +175,11 @@ def new_population(population, fitnesses, settings, parameters):
     '''
 
     # Add best members of previous population into the new population
-    next_population = elitism(population, fitnesses, settings['elites'])
+    next_population, next_pop_data = elitism(population, pop_data, settings['elites'])
 
     # Generate offspring to fill the new generation
     while len(next_population) < len(population):
-        parents = select.tournament(population, fitnesses)
+        parents = select.tournament(population, pop_data['fitnesses'])
         offspring = gc.kpoint_crossover(
             parents, parameters, settings['mut_chance'])
 
@@ -180,7 +187,7 @@ def new_population(population, fitnesses, settings, parameters):
         if offspring not in next_population:
             next_population.append(offspring)
 
-    return next_population
+    return next_population, next_pop_data
 
 
 def create_subpopulations(settings, parameters, create_set):
@@ -271,7 +278,7 @@ def sub_evolution(
         for key in output['scores']:
             try:
                 tracker[key].update({sub_iteration: output['scores'][key]})
-            except:
+            except Exception:
                 tracker[key] = {}
                 tracker[key].update({sub_iteration: output['scores'][key]})
 
@@ -314,6 +321,7 @@ def evolve(population, settings, data, parameters, create_set, evaluate):
     compactnesses = []
     iteration = 0
     tracker = {}
+    pop_data = {}
 
     # Evolution loop
     while (improvement > settings['threshold']
@@ -331,22 +339,48 @@ def evolve(population, settings, data, parameters, create_set, evaluate):
                 create_set,
                 evaluate
             )
-            population = new_population(
-                population, fitnesses, settings, parameters)
+            population, pop_data = new_population(
+                population, pop_data, settings, parameters)
+
+        # Separate population into two parts for time efficiency
+        try:
+            if pop_data['fitnesses']:
+                eval_pop = [] # population members to be evaluated
+                rest_pop = [] # population members already evaluated
+                for i, member in enumerate(population):
+                    if i in range(len(pop_data['fitnesses'])):
+                        rest_pop.append(member)
+                    else:
+                        eval_pop.append(member)
+            else:
+                eval_pop = population
+        except KeyError:
+            eval_pop = population
 
         # Calculate fitness of the population
         args = inspect.getargspec(evaluate)
         if len(args[0]) == 3:
             scores, pred_trains, pred_tests, feature_importances = evaluate(
-                population, data, settings)
+                eval_pop, data, settings)
         elif len(args[0]) == 4:
             scores, pred_trains, pred_tests, feature_importances = evaluate(
-                population, data, settings, len(population))
+                eval_pop, data, settings, len(eval_pop))
 
         fitnesses = universal.fitness_to_list(
             scores, fitness_key=settings['fitness_fn'])
 
-        # Save results
+        # Gather results
+        try:
+            if rest_pop:
+                scores = pop_data['scores'] + scores
+                pred_trains = pop_data['pred_trains'] + pred_trains
+                pred_tests = pop_data['pred_tests'] + pred_tests
+                feature_importances = pop_data['feature_importances'] + feature_importances
+                fitnesses = pop_data['fitnesses'] + fitnesses
+        except UnboundLocalError:
+            pass
+
+        # Save results into tracker
         if iteration == 0:
             tracker = score_tracker(
                 tracker, scores, fitnesses, initialize=True)
@@ -360,6 +394,15 @@ def evolve(population, settings, data, parameters, create_set, evaluate):
         compactnesses.append(compactness)
 
         iteration += 1
+
+        # Save data from current iteration
+        pop_data = {
+            'scores': scores,
+            'pred_trains': pred_trains,
+            'pred_tests': pred_tests,
+            'feature_importances': feature_importances,
+            'fitnesses': fitnesses
+        }
 
     output = {
         'population': population,
