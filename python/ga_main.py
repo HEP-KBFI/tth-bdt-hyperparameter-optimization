@@ -43,6 +43,47 @@ def set_num(amount, population):
 
     return num
 
+def fitness_calculation(population, settings, data, evaluate):
+    '''Calculate the fitness scores of the given generation
+
+    Parameters
+    ----------
+    population : list
+        A group of individuals to be evaluated
+    settings : dict
+        Settings of the genetic algorithm
+    data : dict
+        Training and testing data sets
+    evaluate : function
+        Function used to calculate scores
+
+    Returns
+    -------
+    fitnesses : list
+        Fitness scores corresponding to the given population
+    score_dicts : list
+        List of score_dicts of each individual
+    pred_trains : list
+        List of pred_trains corresponding to each individual
+    pred_tests : list
+        List of pred_tests corresponding to each individual
+    feature_importances : list
+        List of feature importances corresponding to each individual
+    '''
+    args = inspect.getargspec(evaluate)
+
+    if len(args[0]) == 3:
+        scores, pred_trains, pred_tests, feature_importances = evaluate(
+            population, data, settings)
+    elif len(args[0]) == 4:
+        scores, pred_trains, pred_tests, feature_importances = evaluate(
+            population, data, settings, len(population))
+
+    fitnesses = universal.fitness_to_list(
+        scores, fitness_key=settings['fitness_fn'])
+
+    return fitnesses, scores, pred_trains, pred_tests, feature_importances
+
 
 def elitism(population, pop_data, elites):
     '''Preserve best performing members of the previous generation
@@ -112,6 +153,10 @@ def culling(
         Training and testing data sets
     parameters : dict
         Descriptions of the xgboost parameters
+    create_set : function
+        Function used to generate a population
+    evaluate : function
+        Function used to calculate scores
 
     Returns
     -------
@@ -141,15 +186,17 @@ def culling(
     # Replace destroyed members
     new_members = create_set(parameters, size)
     population += new_members
-    args = inspect.getargspec(evaluate)
-    if len(args[0]) == 3:
-        fitnesses += universal.fitness_to_list(
-            evaluate(new_members, data, settings)[0],
-            fitness_key=settings['fitness_fn'])
-    elif len(args[0]) == 4:
-        fitnesses += universal.fitness_to_list(
-            evaluate(new_members, data, settings, size)[0],
-            fitness_key=settings['fitness_fn'])
+    fitnesses += fitness_calculation(
+        new_members, settings, data, evaluate)[0]
+    # args = inspect.getargspec(evaluate)
+    # if len(args[0]) == 3:
+    #     fitnesses += universal.fitness_to_list(
+    #         evaluate(new_members, data, settings)[0],
+    #         fitness_key=settings['fitness_fn'])
+    # elif len(args[0]) == 4:
+    #     fitnesses += universal.fitness_to_list(
+    #         evaluate(new_members, data, settings, size)[0],
+    #         fitness_key=settings['fitness_fn'])
 
     return population, fitnesses
 
@@ -175,7 +222,8 @@ def new_population(population, pop_data, settings, parameters):
     '''
 
     # Add best members of previous population into the new population
-    next_population, next_pop_data = elitism(population, pop_data, settings['elites'])
+    next_population, next_pop_data = elitism(
+        population, pop_data, settings['elites'])
 
     # Generate offspring to fill the new generation
     while len(next_population) < len(population):
@@ -341,6 +389,9 @@ def evolve(population, settings, data, parameters, create_set, evaluate):
             )
             population, pop_data = new_population(
                 population, pop_data, settings, parameters)
+            print('Population: ')
+            for member in population:
+                print(member)
 
         # Separate population into two parts for time efficiency
         try:
@@ -357,17 +408,27 @@ def evolve(population, settings, data, parameters, create_set, evaluate):
         except KeyError:
             eval_pop = population
 
-        # Calculate fitness of the population
-        args = inspect.getargspec(evaluate)
-        if len(args[0]) == 3:
-            scores, pred_trains, pred_tests, feature_importances = evaluate(
-                eval_pop, data, settings)
-        elif len(args[0]) == 4:
-            scores, pred_trains, pred_tests, feature_importances = evaluate(
-                eval_pop, data, settings, len(eval_pop))
+        print('To be evaluated: ')
+        print(eval_pop)
+        print('Already evaluated: ')
+        try:
+            print(rest_pop)
+        except:
+            pass
 
-        fitnesses = universal.fitness_to_list(
-            scores, fitness_key=settings['fitness_fn'])
+        # Calculate fitness of the population
+        fitnesses, scores, pred_trains, pred_tests, feature_importances = \
+            fitness_calculation(eval_pop, settings, data, evaluate)
+        # args = inspect.getargspec(evaluate)
+        # if len(args[0]) == 3:
+        #     scores, pred_trains, pred_tests, feature_importances = evaluate(
+        #         eval_pop, data, settings)
+        # elif len(args[0]) == 4:
+        #     scores, pred_trains, pred_tests, feature_importances = evaluate(
+        #         eval_pop, data, settings, len(eval_pop))
+
+        # fitnesses = universal.fitness_to_list(
+        #     scores, fitness_key=settings['fitness_fn'])
 
         # Gather results
         try:
@@ -375,10 +436,14 @@ def evolve(population, settings, data, parameters, create_set, evaluate):
                 scores = pop_data['scores'] + scores
                 pred_trains = pop_data['pred_trains'] + pred_trains
                 pred_tests = pop_data['pred_tests'] + pred_tests
-                feature_importances = pop_data['feature_importances'] + feature_importances
+                feature_importances = (pop_data['feature_importances']
+                                       + feature_importances)
                 fitnesses = pop_data['fitnesses'] + fitnesses
         except UnboundLocalError:
             pass
+
+        print('Evaluation results: ')
+        print(fitnesses)
 
         # Save results into tracker
         if iteration == 0:
