@@ -28,7 +28,6 @@ def set_num(amount, population):
         Number of members of the population indicated
         by the amount given.
     '''
-
     # Given is a number
     if amount >= 1 and isinstance(amount, int):
         num = amount
@@ -42,6 +41,7 @@ def set_num(amount, population):
         num = 0
 
     return num
+
 
 def fitness_calculation(population, settings, data, evaluate):
     '''Calculate the fitness scores of the given generation
@@ -102,7 +102,6 @@ def elitism(population, pop_data, elites):
     elite : list
         Best performing members of the given population
     '''
-
     # Create copies of data
     population = population[:]
     fitnesses = pop_data['fitnesses'][:]
@@ -165,7 +164,6 @@ def culling(
     fitnesses : list
         Fitness scores corresponding to the new population
     '''
-
     # Set num as the number of members to destroy
     num = set_num(settings['culling'], population)
 
@@ -188,15 +186,6 @@ def culling(
     population += new_members
     fitnesses += fitness_calculation(
         new_members, settings, data, evaluate)[0]
-    # args = inspect.getargspec(evaluate)
-    # if len(args[0]) == 3:
-    #     fitnesses += universal.fitness_to_list(
-    #         evaluate(new_members, data, settings)[0],
-    #         fitness_key=settings['fitness_fn'])
-    # elif len(args[0]) == 4:
-    #     fitnesses += universal.fitness_to_list(
-    #         evaluate(new_members, data, settings, size)[0],
-    #         fitness_key=settings['fitness_fn'])
 
     return population, fitnesses
 
@@ -220,7 +209,6 @@ def new_population(population, pop_data, settings, parameters):
     next_population : list
         Newly generated set of individuals
     '''
-
     # Add best members of previous population into the new population
     next_population, next_pop_data = elitism(
         population, pop_data, settings['elites'])
@@ -253,8 +241,6 @@ def create_subpopulations(settings, parameters, create_set):
     subpopulations : list
         Randomly generated subpopulations
     '''
-
-    # Initialization
     subpopulations = []
     size = settings['sample_size']
     num = settings['sub_pops']
@@ -326,10 +312,9 @@ def sub_evolution(
         for key in output['scores']:
             try:
                 tracker[key].update({sub_iteration: output['scores'][key]})
-            except Exception:
+            except KeyError:
                 tracker[key] = {}
                 tracker[key].update({sub_iteration: output['scores'][key]})
-
         compactnesses.update({sub_iteration: output['compactnesses']})
 
         # Gather final generations of each subpopulation
@@ -389,9 +374,6 @@ def evolve(population, settings, data, parameters, create_set, evaluate):
             )
             population, pop_data = new_population(
                 population, pop_data, settings, parameters)
-            print('Population: ')
-            for member in population:
-                print(member)
 
         # Separate population into two parts for time efficiency
         try:
@@ -408,29 +390,11 @@ def evolve(population, settings, data, parameters, create_set, evaluate):
         except KeyError:
             eval_pop = population
 
-        print('To be evaluated: ')
-        print(eval_pop)
-        print('Already evaluated: ')
-        try:
-            print(rest_pop)
-        except:
-            pass
-
-        # Calculate fitness of the population
+        # Calculate fitness scores of the population
         fitnesses, scores, pred_trains, pred_tests, feature_importances = \
             fitness_calculation(eval_pop, settings, data, evaluate)
-        # args = inspect.getargspec(evaluate)
-        # if len(args[0]) == 3:
-        #     scores, pred_trains, pred_tests, feature_importances = evaluate(
-        #         eval_pop, data, settings)
-        # elif len(args[0]) == 4:
-        #     scores, pred_trains, pred_tests, feature_importances = evaluate(
-        #         eval_pop, data, settings, len(eval_pop))
 
-        # fitnesses = universal.fitness_to_list(
-        #     scores, fitness_key=settings['fitness_fn'])
-
-        # Gather results
+        # Gather and save results
         try:
             if rest_pop:
                 scores = pop_data['scores'] + scores
@@ -442,15 +406,19 @@ def evolve(population, settings, data, parameters, create_set, evaluate):
         except UnboundLocalError:
             pass
 
-        print('Evaluation results: ')
-        print(fitnesses)
-
-        # Save results into tracker
         if iteration == 0:
             tracker = score_tracker(
                 tracker, scores, fitnesses, initialize=True)
         else:
             tracker = score_tracker(tracker, scores, fitnesses)
+
+        pop_data = {
+            'scores': scores,
+            'pred_trains': pred_trains,
+            'pred_tests': pred_tests,
+            'feature_importances': feature_importances,
+            'fitnesses': fitnesses
+        }
 
         # Calculate stopping criteria
         improvements, improvement = universal.calculate_improvement_wAVG(
@@ -459,15 +427,6 @@ def evolve(population, settings, data, parameters, create_set, evaluate):
         compactnesses.append(compactness)
 
         iteration += 1
-
-        # Save data from current iteration
-        pop_data = {
-            'scores': scores,
-            'pred_trains': pred_trains,
-            'pred_tests': pred_tests,
-            'feature_importances': feature_importances,
-            'fitnesses': fitnesses
-        }
 
     output = {
         'population': population,

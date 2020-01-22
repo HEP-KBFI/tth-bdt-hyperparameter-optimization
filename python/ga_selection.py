@@ -5,7 +5,7 @@ import random
 import numpy as np
 
 
-def tournament(population, fitnesses, t_size=2, t_prob=0.8):
+def tournament(population, fitnesses, t_size=2, t_prob=0.7):
     '''Tournament selection
 
     Parameters
@@ -20,11 +20,10 @@ def tournament(population, fitnesses, t_size=2, t_prob=0.8):
         Probability of the fittest member winning
 
     Returns
+    -------
     parents : list
         Two individuals chosen via two tournaments
     '''
-
-    # Initialization
     parents = []
     while len(parents) < 2:
         curr_tournament = []
@@ -72,7 +71,6 @@ def roulette(population, fitnesses):
     -------
     parents : list
         Two individuals chosen via roulette wheel
-
     '''
     norm_fitnesses = normalize(fitnesses)
     parents = wheel_parents(population, norm_fitnesses)
@@ -94,8 +92,6 @@ def rank(population, fitnesses):
     parents : list
         Two individuals chosen via ranked roulette wheel
     '''
-
-    # Initialization
     temp_population = population[:]
     temp_fitnesses = fitnesses[:]
     ranked_population = []
@@ -160,8 +156,6 @@ def wheel_parents(population, probabilities):
         with assigned probabilities
 
     '''
-
-    # Initialization
     wheel = []
     parents = []
     value = 0
