@@ -110,7 +110,7 @@ def parameter_evaluation(nn_hyperparameters, data_dict, nthread, num_class):
             )
         )
     )
-    nr_trainvars = len(data_dict['train'].columns)
+    nr_trainvars = len(data_dict['training_labels'])
     number_samples = len(data_dict['train'])
     nn_model = create_nn_model(
         nn_hyperparameters, nr_trainvars, num_class, number_samples)
