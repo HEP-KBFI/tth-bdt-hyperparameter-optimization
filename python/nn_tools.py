@@ -45,16 +45,18 @@ from keras.layers import Conv2D, Flatten, Dropout
 
 from sklearn.model_selection import train_test_split
 from keras.layers import Dense
+from keras.layers import Dropout
 from keras.layers import BatchNormalization
 from keras.activations import elu
 from keras.layers import ELU
 from keras.optimizers import Nadam
 # from keras.layers import Activation
-from eli5.sklearn import PermutationImportance
+# from eli5.sklearn import PermutationImportance
 import numpy as np
 from keras import backend as K
 import tensorflow as tf
 import keras
+from keras.wrappers.scikit_learn import KerasClassifier
 
 
 # eli5.show_weights(perm, feature_names = X.columns.tolist())
@@ -78,6 +80,7 @@ def create_nn_model(
         nn_hyperparameters,
         nr_trainvars,
         num_class,
+        number_samples,
         metrics=['accuracy'],
 ):
     ''' Creates the neural network model. The normalization used is 
@@ -95,6 +98,8 @@ def create_nn_model(
         input layer of the model
     num_class : int
         Default: 3 Number of categories one wants the data to be classified.
+    number_samples : int
+        Number of samples in the training data
     metrics : ['str']
         What metrics to use for model compilation
 
@@ -114,7 +119,7 @@ def create_nn_model(
     model.add(BatchNormalization())
     model.add(ELU())
     model.add(Dropout(nn_hyperparameters['visible_layer_dropout_rate']))
-    layers = create_hidden_net_structure(
+    hidden_layers = create_hidden_net_structure(
         nn_hyperparameters['nr_hidden_layers'],
         num_class,
         nr_trainvars,
@@ -122,7 +127,7 @@ def create_nn_model(
         nn_hyperparameters['alpha']
     )
     for hidden_layer in hidden_layers: # TO BE OPTIMIZED
-        model.add(Dense(Nnodes, kernel_initializer='he_uniform'))
+        model.add(Dense(hidden_layer, kernel_initializer='he_uniform'))
         model.add(BatchNormalization())
         model.add(ELU())
         model.add(Dropout(nn_hyperparameters['hidden_layer_dropout_rate']))
@@ -146,10 +151,10 @@ def parameter_evaluation(nn_hyperparameters, data_dict, nthread, num_class):
                 intra_op_parallelism_threads=nthread,
                 inter_op_parallelism_threads=nthread,
                 allow_soft_placement=True,
-                device_count={'CPU': nthread}
             )
         )
     )
+    nr_trainvars = len(data_dict['train'].columns)
     model = create_nn_model(nn_hyperparameters, nr_trainvars, num_class)
     k_model  = KerasClassifier(
         build_fn=nn_model,
@@ -157,7 +162,14 @@ def parameter_evaluation(nn_hyperparameters, data_dict, nthread, num_class):
         batch_size=nn_hyperparameters['batch_size'],
         verbose=2
     )
-    fit_result = k_model.fit()
+    fit_result = k_model.fit(
+        data_dict['train'].values,
+        data_dict['training_labels'].values,
+        validation_data=(
+            data_dict['test'].values,
+            data_dict['testing_labels'].values
+        )
+    )
 
 
 
@@ -270,8 +282,8 @@ def create_data_dict(data, trainvars):
     traindataset = np.array(train[trainvars].values)
     testdataset = np.array(test[trainvars].values)
     data_dict = {
-        'dtrain': train,
-        'dtest': test,
+        'train': train,
+        'test': test,
         'training_labels': training_labels,
         'testing_labels': testing_labels,
         'training_processes': training_processes,
