@@ -112,7 +112,7 @@ def parameter_evaluation(nn_hyperparameters, data_dict, nthread, num_class):
     )
     nr_trainvars = len(data_dict['train'].columns)
     number_samples = len(data_dict['train'])
-    model = create_nn_model(
+    nn_model = create_nn_model(
         nn_hyperparameters, nr_trainvars, num_class, number_samples)
     k_model  = KerasClassifier(
         build_fn=nn_model,
@@ -240,8 +240,8 @@ def create_data_dict(data, trainvars):
     traindataset = np.array(train[trainvars].values)
     testdataset = np.array(test[trainvars].values)
     data_dict = {
-        'train': train,
-        'test': test,
+        'train': traindataset,
+        'test': testdataset,
         'training_labels': training_labels,
         'testing_labels': testing_labels,
         'training_processes': training_processes,
