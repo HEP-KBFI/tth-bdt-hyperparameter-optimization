@@ -12,6 +12,7 @@ from keras import backend as K
 import tensorflow as tf
 import keras
 from keras.wrappers.scikit_learn import KerasClassifier
+import json
 
 
 # eli5.show_weights(perm, feature_names = X.columns.tolist())
@@ -110,7 +111,9 @@ def parameter_evaluation(nn_hyperparameters, data_dict, nthread, num_class):
         )
     )
     nr_trainvars = len(data_dict['train'].columns)
-    model = create_nn_model(nn_hyperparameters, nr_trainvars, num_class)
+    number_samples = len(data_dict['train'])
+    model = create_nn_model(
+        nn_hyperparameters, nr_trainvars, num_class, number_samples)
     k_model  = KerasClassifier(
         build_fn=nn_model,
         epochs=nn_hyperparameters['epochs'],
