@@ -3,7 +3,7 @@ Genetic algorithm for the hyperparameters optimization of XGBoost.
 (MNIST numbers).
 Call with 'python'
 
-Usage: ga_quasar_mnist.py
+Usage: quasar_ga_mnist.py
 '''
 from __future__ import division
 import os

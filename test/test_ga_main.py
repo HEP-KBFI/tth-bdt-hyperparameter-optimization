@@ -58,7 +58,8 @@ SETTINGS = {
     'mut_chance': 0.03,
     'elites': 1,
     'culling': 1,
-    'nthread': 16
+    'nthread': 28,
+    'fitness_fn': 'test_auc'
 }
 
 POPULATION = [
@@ -109,25 +110,34 @@ def test_set_num():
     '''Testing the set_num function'''
     initial = [1, 2, 3]
     nums = [0.5, 1, 2, 3]
-    excpected = [2, 1, 2, 3]
+    expected = [2, 1, 2, 3]
     result = []
     for num in nums:
         result.append(gm.set_num(num, initial))
-    assert result == excpected, 'test_set_num failed'
+    assert result == expected, 'test_set_num failed'
+
+
+def test_fitness_calculation():
+    '''Testing the fitness calculation function'''
+    results = gm.fitness_calculation(
+        POPULATION, SETTINGS, DATA, xt.ensemble_fitnesses)
+    for result in results:
+        assert len(result) == len(POPULATION), 'test_fitness_calculation failed'
 
 
 def test_elitism():
     '''Testing the elitism function'''
     initial = [1, 2, 3]
     nums = [0.5, 1, 2, 3]
-    excpected = [[3, 2], [3], [3, 2], [3, 2, 1]]
+    expected = [[3, 2], [3], [3, 2], [3, 2, 1]]
     result = []
+    pop_data = {'fitnesses': FITNESSES}
     for num in nums:
-        result.append(gm.elitism(initial, FITNESSES, num))
-    assert result == excpected, 'test_elitism failed'
+        result.append(gm.elitism(initial, pop_data, num)[0])
+    assert result == expected, 'test_elitism failed'
 
 
-@pytest.mark.skip(reason="Runs too long")
+@pytest.mark.skip(reason='Runs too long')
 def test_culling():
     '''Testing the culling function'''
     result = gm.culling(
@@ -146,8 +156,9 @@ def test_culling():
 
 def test_new_population():
     '''Testing the new_population function'''
+    pop_data = {'fitnesses': FITNESSES}
     result = gm.new_population(
-        POPULATION, FITNESSES, SETTINGS, PARAMETERS)
+        POPULATION, pop_data, SETTINGS, PARAMETERS)[0]
     assert len(result) == len(POPULATION), \
         'test_new_population failed'
 
@@ -155,23 +166,23 @@ def test_new_population():
 def test_create_subpopulations():
     '''Testing the create_subpopulations function'''
     nums = [1, 2, 3]
-    excpected = [[3], [2, 1], [1, 1, 1]]
+    expected = [[3], [2, 1], [1, 1, 1]]
     i = 0
     for num in nums:
         j = 0
         SETTINGS.update({'sub_pops': num})
         result = gm.create_subpopulations(
             SETTINGS, PARAMETERS, xt.prepare_run_params)
-        assert len(result) == len(excpected[i]), \
+        assert len(result) == len(expected[i]), \
             'test_create_subpopulations failed'
         for element in result:
-            assert len(element) == excpected[i][j], \
+            assert len(element) == expected[i][j], \
                 'test_create_subpopulations failed'
             j += 1
         i += 1
 
 
-@pytest.mark.skip(reason="Runs too long")
+@pytest.mark.skip(reason='Runs too long')
 def test_sub_evolution():
     '''Testing the sub_evolution function'''
     SETTINGS.update({'culling': 0})
@@ -184,9 +195,13 @@ def test_sub_evolution():
         xt.ensemble_fitnesses
     )
     assert len(result[0]) == len(POPULATION), 'test_sub_evolution failed'
+    for key in result[1]:
+        for i in result[1][key]:
+            assert len(result[1][key][i]) == len(result[2][i]), \
+                'test_sub_evolution failed'
 
 
-@pytest.mark.skip(reason="Runs too long")
+@pytest.mark.skip(reason='Runs too long')
 def test_evolve():
     '''Testing the evolve function'''
     initial = POPULATION[:1]
@@ -197,17 +212,94 @@ def test_evolve():
         DATA,
         PARAMETERS,
         xt.prepare_run_params,
-        xt.ensemble_fitnesses,
-        True
+        xt.ensemble_fitnesses
         )
-    assert len(result[0]) == len(initial), 'test_evolve failed'
-    for key in result[1]:
-        assert len(result[1][key]) == SETTINGS['iterations'] + 1, \
+    assert len(result['population']) == len(initial), 'test_evolve failed'
+    for key in result['scores']:
+        assert len(result['scores'][key]) == len(result['compactnesses']), \
             'test_evolve failed'
-    assert len(result[2]) == len(result[0]), 'test_evolve failed'
+    assert len(result['fitnesses']) == len(result['population']), \
+        'test_evolve failed'
 
 
-@pytest.mark.skip(reason="Runs too long")
+def test_score_tracker():
+    '''Testing the score tracker function'''
+    initial = [
+        {
+            'g_score': 0.984,
+            'f1_score': 0.947,
+            'd_score': 0.701,
+            'test_auc': 0.690,
+            'train_auc': 0.115
+        },
+        {
+            'g_score': 0.582,
+            'f1_score': 0.651,
+            'd_score': 0.123,
+            'test_auc': 0.476,
+            'train_auc': 0.540
+        },
+        {
+            'g_score': 0.869,
+            'f1_score': 0.240,
+            'd_score': 0.851,
+            'test_auc': 0.646,
+            'train_auc': 0.752
+        }
+    ]
+    result = {}
+    result = gm.score_tracker(result, initial, FITNESSES, True)
+    expected = {
+        'best_g_scores': [0.869],
+        'best_f1_scores': [0.240],
+        'best_d_scores': [0.851],
+        'best_test_aucs': [0.646],
+        'best_train_aucs': [0.752],
+        'avg_scores': [0.6],
+        'best_fitnesses': [0.8]
+    }
+    assert result == expected, 'test_score_tracker failed'
+
+
+def test_finalize_results():
+    '''Testing the finalize results function'''
+    initial = {
+        'population': POPULATION,
+        'scores': {
+            'best_g_scores': [0.869],
+            'best_f1_scores': [0.240],
+            'best_d_scores': [0.851],
+            'best_test_aucs': [0.646],
+            'best_train_aucs': [0.752],
+            'avg_scores': [0.6],
+            'best_fitnesses': [0.8]
+        },
+        'fitnesses': FITNESSES,
+        'compactnesses': [0.953],
+        'pred_trains': [[0.990], [0.993], [0.503]],
+        'pred_tests': [[0.609], [0.529], [0.882]],
+        'feature_importances': [[0.041], [0.269], [0.996]]
+    }
+    result = gm.finalize_results(initial, DATA)
+    expected = {
+        'best_parameters': POPULATION[2],
+        'best_fitnesses': [0.8],
+        'avg_scores': [0.6],
+        'compactnesses': [0.953],
+        'pred_train': [0.503],
+        'pred_test': [0.882],
+        'feature_importances': [0.996],
+        'data_dict': DATA,
+        'best_g_scores': [0.869],
+        'best_f1_scores': [0.240],
+        'best_d_scores': [0.851],
+        'best_test_aucs': [0.646],
+        'best_train_aucs': [0.752]
+    }
+    assert result == expected
+
+
+@pytest.mark.skip(reason='Runs too long')
 def test_evolution():
     '''Testing the evolution function'''
     SETTINGS.update({'culling': 0, 'elitism': 0, 'sub_pops': 1})
@@ -220,11 +312,11 @@ def test_evolution():
     )
     assert len(result['best_parameters']) == len(PARAMETERS), \
         'test_evolution failed'
-    assert len(result['best_scores']) == SETTINGS['iterations'] + 1, \
+    assert len(result['avg_scores']) == len(result['best_fitnesses']), \
         'test_evolution failed'
-    assert len(result['avg_scores']) == len(result['best_scores']), \
+    assert len(result['compactnesses']) == len(result['avg_scores']), \
         'test_evolution failed'
-    assert len(result['worst_scores']) == len(result['avg_scores']), \
+    assert result['data_dict'] == DATA, \
         'test_evolution failed'
 
 
