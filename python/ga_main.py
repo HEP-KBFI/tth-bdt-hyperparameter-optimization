@@ -324,6 +324,95 @@ def sub_evolution(
     return merged_population, tracker, compactnesses
 
 
+# WORK IN PROGRESS
+# def arrange_population(subpopulations, pop_data):
+#     '''Arrange populations into separate lists in preparation for evaluation
+
+#     Parameters
+#     ----------
+#     subpopulations : list
+#         List of subpopulations
+#     pop_data : dictionary
+#         Information about the current subpopulations
+
+#     Returns
+#     -------
+#     eval_pop : list
+#         Members from all subpopulations to be evaluated
+#     rest_pop : list
+#         Members from all subpopulations already evaluated
+#     sub_data : dict
+#         Information about which subpopulation does a given member belong to
+#     '''
+#     eval_pop = []
+#     rest_pop = []
+#     sub_data = {
+#         'eval_pop': [],
+#         'rest_pop': []
+#     }
+
+#     for i, population in enumerate(subpopulations):
+#         try:
+#             if pop_data['fitnesses'][i]:
+#                 for j, member in enumerate(population):
+#                     if j in range(len(pop_data['fitnesses'][i])):
+#                         rest_pop.append(member)
+#                         sub_data['rest_pop'].append(i)
+#                     else:
+#                         eval_pop.append(member)
+#                         sub_data['eval_pop'].append(i)
+#             else:
+#                 eval_pop = population
+#                 for member in population:
+#                     sub_data['eval_pop'].append(i)
+#         except KeyError:
+#             eval_pop = population
+#             for member in population:
+#                 sub_data['eval_pop'].append(i)
+
+#     return eval_pop, rest_pop, sub_data
+
+
+# def evolve_v2(population):
+#     iteration = 0
+#     improvement = 1
+#     fitnesses = []
+#     improvements = []
+#     compactnesses = []
+#     tracker = {}
+#     pop_data = {}
+
+#     # Evolution loop
+#     while (improvement > settings['threshold']
+#            and iteration <= settings['iterations']):
+
+#         # Generate a new population
+
+#         ###
+
+#         # Arrange population
+#         eval_pop, rest_pop, sub_data = arrange_population(subpopulations, pop_data)
+
+#         # Calculate fitness scores
+#         fitnesses, scores, pred_trains, pred_tests, feature_importances = \
+#             fitness_calculation(eval_pop, settings, data, evaluate)
+
+#         if iteration == 0:
+#             tracker = score_tracker(
+#                 tracker, scores, fitnesses, initialize=True)
+#         else:
+#             tracker = score_tracker(tracker, scores, fitnesses)
+
+#         pop_data = {
+#             'scores': scores,
+#             'pred_trains': pred_trains,
+#             'pred_tests': pred_tests,
+#             'feature_importances': feature_importances,
+#             'fitnesses': fitnesses
+#         }
+
+###
+
 def evolve(population, settings, data, parameters, create_set, evaluate):
     '''Evolve a population until reaching the threshold
     or maximum number of iterations
