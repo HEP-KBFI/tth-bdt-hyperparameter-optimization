@@ -135,6 +135,10 @@ def run_iteration(
         sample_size = opt_settings['sample_size']
     parameters_to_file(output_dir, parameter_dicts)
     wild_card_path = os.path.join(output_dir, 'samples', '*', 'parameters.json')
+    zero_sized = 1
+    while zero_sized != 0:
+        zero_sized = check_parameter_file_sizes(wild_card_path)
+        time.sleep(2)
     for parameter_file in glob.glob(wild_card_path):
         sample_nr = get_sample_nr(parameter_file)
         job_file = prepare_job_file(
@@ -148,6 +152,28 @@ def run_iteration(
     feature_importances = read_feature_importances(output_dir)
     delete_previous_files(output_dir)
     return score_dicts, pred_trains, pred_tests, feature_importances
+
+
+def check_parameter_file_sizes(wild_card_path):
+    '''Checks all files in the wild_card_path for their size. Returns the number
+    of files with zero size
+
+    Paramters:
+    ---------
+    wild_card_path : str
+        Wild card path for glob to parse
+
+    Returns:
+    -------
+    zero_sized : int
+        Number of zero sized parameter files
+    '''
+    zero_sized = 0
+    for parameter_file in glob.glob(wild_card_path):
+        size = os.stat(parameter_file).st_size
+        if size == 0:
+            zero_sized += 1
+    return zero_sized
 
 
 def create_result_lists(output_dir, pred_type):
