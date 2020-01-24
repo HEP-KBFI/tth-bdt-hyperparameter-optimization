@@ -19,21 +19,21 @@ import json
 # perm = PermutationImportance(my_model, random_state).fit(X, y)
 
 
-nn_hyperparameters = {
-    'hidden_layer_dropout_rate': 0.5,
-    'visible_layer_dropout_rate': 0.8,
-    'learning_rate': 0.1,
-    'schedule_decay': 0.002,
-    'nr_hidden_layers': 2,
-    'alpha': 8,
-    'batch_size': 246,
-    'epochs': 45
-}
+# nn_hyperparameters = {
+#     'hidden_layer_dropout_rate': 0.5,
+#     'visible_layer_dropout_rate': 0.8,
+#     'learning_rate': 0.1,
+#     'schedule_decay': 0.002,
+#     'nr_hidden_layers': 2,
+#     'alpha': 8,
+#     'batch_size': 246,
+#     'epochs': 45
+# }
 
 
 
 def create_nn_model(
-        nn_hyperparameters=nn_hyperparameters,
+        nn_hyperparameters={},
         nr_trainvars=9,
         num_class=3,
         number_samples=5000,

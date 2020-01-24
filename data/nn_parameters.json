@@ -5,4 +5,4 @@
 {"p_name": "hidden_layer_dropout_rate", "range_start": 0.5, "range_end": 0.8, "true_int": 0}
 {"p_name": "alpha", "range_start": 2, "range_end": 10, "true_int": 0}
 {"p_name": "batch_size", "range_start": 0, "range_end": 500, "true_int": 1}
-{"p_name": "epochs", "range_start": 10, "range_end": 100, "true_int": 0}
+{"p_name": "epochs", "range_start": 10, "range_end": 100, "true_int": 1}
