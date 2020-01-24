@@ -33,10 +33,10 @@ nn_hyperparameters = {
 
 
 def create_nn_model(
-        nn_hyperparameters,
-        nr_trainvars,
-        num_class,
-        number_samples,
+        nn_hyperparameters=nn_hyperparameters,
+        nr_trainvars=9,
+        num_class=3,
+        number_samples=5000,
         metrics=['accuracy'],
 ):
     ''' Creates the neural network model. The normalization used is 
@@ -110,22 +110,26 @@ def parameter_evaluation(nn_hyperparameters, data_dict, nthread, num_class):
             )
         )
     )
-    nr_trainvars = len(data_dict['training_labels'])
+    nr_trainvars = len(data_dict['train'][0])
     number_samples = len(data_dict['train'])
     nn_model = create_nn_model(
         nn_hyperparameters, nr_trainvars, num_class, number_samples)
     k_model  = KerasClassifier(
-        build_fn=nn_model,
+        build_fn=create_nn_model,
         epochs=nn_hyperparameters['epochs'],
         batch_size=nn_hyperparameters['batch_size'],
-        verbose=2
+        verbose=2,
+        nn_hyperparameters=nn_hyperparameters,
+        nr_trainvars=nr_trainvars,
+        num_class=num_class,
+        number_samples=number_samples
     )
     fit_result = k_model.fit(
-        data_dict['train'].values,
-        data_dict['training_labels'].values,
+        data_dict['train'],
+        data_dict['training_labels'],
         validation_data=(
-            data_dict['test'].values,
-            data_dict['testing_labels'].values
+            data_dict['test'],
+            data_dict['testing_labels']
         )
     )
 
@@ -233,8 +237,8 @@ def create_data_dict(data, trainvars):
         data[variables],
         test_size=0.2, random_state=1
     )
-    training_labels = train['target'].astype(int)
-    testing_labels = test['target'].astype(int)
+    training_labels = np.array(train['target'].astype(int))
+    testing_labels = np.array(test['target'].astype(int))
     training_processes = train['process']
     testing_processes = test['process']
     traindataset = np.array(train[trainvars].values)
