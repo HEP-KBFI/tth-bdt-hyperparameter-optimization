@@ -13,23 +13,12 @@ import tensorflow as tf
 import keras
 from keras.wrappers.scikit_learn import KerasClassifier
 import json
+from eli5.formatters.as_dataframe import format_as_dataframe
+from tthAnalysis.bdtHyperparameterOptimization import universal
 
 
 # eli5.show_weights(perm, feature_names = X.columns.tolist())
 # perm = PermutationImportance(my_model, random_state).fit(X, y)
-
-
-# nn_hyperparameters = {
-#     'hidden_layer_dropout_rate': 0.5,
-#     'visible_layer_dropout_rate': 0.8,
-#     'learning_rate': 0.1,
-#     'schedule_decay': 0.002,
-#     'nr_hidden_layers': 2,
-#     'alpha': 8,
-#     'batch_size': 246,
-#     'epochs': 45
-# }
-
 
 
 def create_nn_model(
@@ -100,7 +89,13 @@ def create_nn_model(
 
 
 # Taken from XGBoost version
-def parameter_evaluation(nn_hyperparameters, data_dict, nthread, num_class):
+def parameter_evaluation(
+        nn_hyperparameters,
+        data_dict,
+        nthread,
+        num_class,
+        return_true_feature_importances=False
+):
     K.set_session(
         tf.Session(
             config=tf.ConfigProto(
@@ -132,6 +127,68 @@ def parameter_evaluation(nn_hyperparameters, data_dict, nthread, num_class):
             data_dict['testing_labels']
         )
     )
+    if return_true_feature_importances:
+        feature_importances = get_feature_importances(
+            k_model, data_dict)
+    else:
+        feature_importances = {}
+    pred_train = k_model.predict(data_dict['train'])
+    pred_test = k_model.predict(data_dict['test'])
+    score_dict = universal.get_scores_dict(pred_train, pred_test, data_dict)
+    return score_dict, pred_train, pred_test, feature_importance
+
+
+def ensemble_fitnesses(parameter_dicts, data_dict, global_settings):
+    '''Finds the data_dict, pred_train and pred_test for all particles
+
+    Parameters:
+    ----------
+    parameter_dicts : list of dicts
+        Parameter-sets of all particles
+    data_dict : dict
+        Dictionary that contains the labels for testing and training. Keys are
+        called 'testing_labels' and 'training_labels'
+    global_settings : dict
+        Global settings for the run.
+
+    Returns:
+    -------
+    score_dicts : list
+        List of score_dicts of each parameter-set
+    pred_trains : list of lols
+        List of pred_trains
+    pred_tests : list of lols
+        List of pred_tests
+    '''
+    score_dicts = []
+    pred_trains = []
+    pred_tests = []
+    feature_importances = []
+    for parameter_dict in parameter_dicts:
+        score_dict, pred_train, pred_test, feature_importance = parameter_evaluation(
+            parameter_dict, data_dict,
+            global_settings['nthread'], global_settings['num_classes'])
+        score_dicts.append(score_dict)
+        pred_trains.append(pred_train)
+        pred_tests.append(pred_test)
+        feature_importances.append(feature_importance)
+    return score_dicts, pred_trains, pred_tests, feature_importances
+
+
+
+def get_feature_importances(model, data_dict):
+    perm = PermutationImportance(model).fit(
+        data_dict['train'], data_dict['training_labels'])
+    weights = eli5.explain_weights(perm, feature_names=data_dict['trainvars'])
+    weights_df = format_as_dataframe(weights).sort_values(
+        by='weight', ascending=False).rename(columns={'weight': 'score'})
+    list_of_dicts = weights_df.to_dict('records')
+    feature_importances = {}
+    for single_variable_dict in list_of_dicts:
+        key = single_variable_dict['feature']
+        feature_importances[key] = single_variable_dict['score']
+    return feature_importances
+
 
 
 
@@ -249,7 +306,8 @@ def create_data_dict(data, trainvars):
         'training_labels': training_labels,
         'testing_labels': testing_labels,
         'training_processes': training_processes,
-        'testing_processes': testing_processes
+        'testing_processes': testing_processes,
+        'trainvars': trainvars
     }
     return data_dict
 
