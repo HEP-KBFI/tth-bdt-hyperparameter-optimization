@@ -352,8 +352,9 @@ def check_error(output_dir):
             lines = file.readlines()
             number_errors = len(lines)
             for line in lines:
-                text = "Using TensorFlow backend."
-                if text in line:
+                text1 = "Using TensorFlow backend."
+                text2 = "Your CPU supports"
+                if text1 in line or text2 in line:
                     number_errors -= 1
         if number_errors > 0:
             raise SystemExit(0)

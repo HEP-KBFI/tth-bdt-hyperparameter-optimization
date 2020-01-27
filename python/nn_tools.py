@@ -175,7 +175,6 @@ def ensemble_fitnesses(parameter_dicts, data_dict, global_settings):
     return score_dicts, pred_trains, pred_tests, feature_importances
 
 
-
 def get_feature_importances(model, data_dict):
     perm = PermutationImportance(model).fit(
         data_dict['train'], data_dict['training_labels'])
@@ -188,8 +187,6 @@ def get_feature_importances(model, data_dict):
         key = single_variable_dict['feature']
         feature_importances[key] = single_variable_dict['score']
     return feature_importances
-
-
 
 
 def calculate_number_nodes_in_hidden_layer(
