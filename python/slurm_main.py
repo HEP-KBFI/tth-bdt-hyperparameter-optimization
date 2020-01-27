@@ -349,7 +349,12 @@ def check_error(output_dir):
     error_file = os.path.join(output_dir, 'error')
     if os.path.exists(error_file):
         with open(error_file, 'r') as file:
-            number_errors = len(file.readlines())
+            lines = file.readlines()
+            number_errors = len(lines)
+            for line in lines:
+                text = "Using TensorFlow backend."
+                if text in line:
+                    number_errors -= 1
         if number_errors > 0:
             raise SystemExit(0)
 

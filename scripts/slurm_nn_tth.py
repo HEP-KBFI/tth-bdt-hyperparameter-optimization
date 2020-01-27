@@ -45,7 +45,7 @@ def main(parameter_file):
         output_dir, trainvar, cf
     )
     data_dict = ttHxt.create_nn_data_dict(
-        data, trainVars, nthread)
+        data, trainVars)
     parameter_dict = universal.read_parameters(parameter_file)[0]
     path = Path(parameter_file)
     save_dir = str(path.parent)
