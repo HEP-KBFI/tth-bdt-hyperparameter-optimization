@@ -15,9 +15,19 @@ import os
 
 
 def main():
+    cmssw_base_path = os.path.expandvars('$CMSSW_BASE')
+    main_dir = os.path.join(
+        cmssw_base_path,
+        'src',
+        'tthAnalysis',
+        'bdtHyperparameterOptimization'
+    )
+    settings_dir = os.path.join(
+        main_dir, 'data')
+    grid_settings = universal.read_settings('global')
+    outputDir = grid_settings['output_dir']
     if not os.path.isdir(outputDir):
         os.makedirs(outputDir)
-    grid_settings = universal.read_settings('global')
     grid_settings.update({'grid_size': 2})
     cmssw_base_path = os.path.expandvars('$CMSSW_BASE')
     param_file = os.path.join(

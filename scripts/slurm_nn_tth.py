@@ -1,10 +1,11 @@
 '''
 Call with 'python'
 
-Usage: slurm_nn_tth.py --parameter_file=PTH
+Usage: slurm_nn_tth.py --parameter_file=PTH --output_dir=DIR
 
 Options:
     -p --parameter_file=PTH      Path to parameters to be run
+    --output_dir=DIR             Directory of the output
 
 '''
 from __future__ import division
@@ -25,13 +26,13 @@ warnings.filterwarnings('ignore', category=FutureWarning)
 
 
 
-def main(parameter_file):
-    global_settings = universal.read_settings('global')
+def main(parameter_file, output_dir):
+    settings_dir = os.path.join(output_dir, 'run_settings')
+    global_settings = universal.read_settings(settings_dir, 'global')
     num_classes = global_settings['num_classes']
     channel = global_settings['channel']
     bdtType = global_settings['bdtType']
     trainvar = global_settings['trainvar']
-    output_dir = os.path.expandvars(global_settings['output_dir'])
     fnFile = '_'.join(['fn', channel])
     importString = "".join(['tthAnalysis.bdtTraining.', fnFile])
     if bool(int(global_settings['trainvar_opt'])):
@@ -58,6 +59,7 @@ if __name__ == '__main__':
     try:
         arguments = docopt.docopt(__doc__)
         parameter_file = arguments['--parameter_file']
-        main(parameter_file)
+        output_dir = arguments['--output_dir']
+        main(parameter_file, output_dir)
     except docopt.DocoptExit as e:
         print(e)

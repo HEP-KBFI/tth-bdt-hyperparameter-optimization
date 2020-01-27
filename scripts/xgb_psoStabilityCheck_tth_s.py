@@ -21,7 +21,16 @@ NUMBER_REPETITIONS = 50
 
 def main():
     print("::::::: Loading data ::::::::")
-    global_settings = universal.read_settings('global')
+    cmssw_base_path = os.path.expandvars('$CMSSW_BASE')
+    main_dir = os.path.join(
+        cmssw_base_path,
+        'src',
+        'tthAnalysis',
+        'bdtHyperparameterOptimization'
+    )
+    settings_dir = os.path.join(
+        main_dir, 'data')
+    global_settings = universal.read_settings(settings_dir, 'global')
     channel = global_settings['channel']
     bdtType = global_settings['bdtType']
     trainvar = global_settings['trainvar']
@@ -48,7 +57,7 @@ def main():
         'xgb_parameters.json'
     )
     value_dicts = universal.read_parameters(param_file)
-    pso_settings = pm.read_weights()
+    pso_settings = pm.read_weights(settings_dir)
     result_dicts = []
     for i in range(NUMBER_REPETITIONS):
         output_dir_single = os.path.join(output_dir, 'iteration_' + str(i))
@@ -56,7 +65,8 @@ def main():
         parameter_dicts = xt.prepare_run_params(
             value_dicts, pso_settings['sample_size'])
         result_dict = pm.run_pso(
-            data_dict, value_dicts, sm.run_iteration, parameter_dicts
+            data_dict, value_dicts, sm.run_iteration, parameter_dicts,
+            output_dir
         )
         universal.save_results(result_dict, output_dir_single)
         print(

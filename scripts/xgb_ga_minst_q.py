@@ -14,8 +14,17 @@ from tthAnalysis.bdtHyperparameterOptimization import ga_main as ga
 
 
 def main():
+    cmssw_base_path = os.path.expandvars('$CMSSW_BASE')
+    main_dir = os.path.join(
+        cmssw_base_path,
+        'src',
+        'tthAnalysis',
+        'bdtHyperparameterOptimization'
+    )
+    settings_dir = os.path.join(
+        main_dir, 'data')
     print('::::::: Reading GA settings & XGBoost parameters :::::::')
-    global_settings = universal.read_settings('global')
+    global_settings = universal.read_settings(settings_dir, 'global')
 
     output_dir = os.path.expandvars(global_settings['output_dir'])
     if not os.path.isdir(output_dir):
@@ -24,7 +33,6 @@ def main():
     settings_dict = universal.read_settings('ga')
     settings_dict.update(global_settings)
 
-    cmssw_base_path = os.path.expandvars('$CMSSW_BASE')
     param_file = os.path.join(
         cmssw_base_path,
         'src',
