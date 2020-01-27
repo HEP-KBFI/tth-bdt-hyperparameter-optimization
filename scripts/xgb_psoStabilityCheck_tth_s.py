@@ -9,7 +9,7 @@ Usage: quasar_pso_mnist.py
 from __future__ import division
 import numpy as np
 import os
-from tthAnalysis.bdtTraining import xgb_tth as ttHxt
+from tthAnalysis.bdtTraining import create_xgb_data_dict as ttHxt
 from tthAnalysis.bdtHyperparameterOptimization import universal
 from tthAnalysis.bdtHyperparameterOptimization import pso_main as pm
 from tthAnalysis.bdtHyperparameterOptimization import slurm_main as sm
@@ -36,8 +36,7 @@ def main():
         channel, bdtType, nthread,
         output_dir, trainvar, cf
     )
-    data = ttHxt.convert_data_to_correct_format(data)
-    data_dict = ttHxt.createDataSet(data, trainVars, nthread)
+    data_dict = ttHxt.create_xgb_data_dict(data, trainVars, nthread)
     print("::::::: Reading parameters :::::::")
     cmssw_base_path = os.path.expandvars('$CMSSW_BASE')
     param_file = os.path.join(

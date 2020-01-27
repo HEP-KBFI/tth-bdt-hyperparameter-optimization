@@ -81,7 +81,9 @@ def prepare_job_file(
     template_file = os.path.join(template_dir, 'submit_template.sh')
     error_file = os.path.join(output_dir, 'error')
     output_file = os.path.join(output_dir, 'output')
-    batch_job_file = 'slurm_fitness_' + global_settings['sample_type'] + '.py'
+    file_title = '_'.join([
+        'slurm', global_settings['ml_method'], global_settings['sample_type']])
+    batch_job_file = file_title + '.py'
     run_script = os.path.join(main_dir, 'scripts', batch_job_file)
     copyfile(template_file, job_file)
     with open(job_file, 'a') as filehandle:

@@ -13,7 +13,7 @@ from tthAnalysis.bdtHyperparameterOptimization import universal
 from tthAnalysis.bdtHyperparameterOptimization import xgb_tools as xt
 from tthAnalysis.bdtHyperparameterOptimization import slurm_main as sm
 from tthAnalysis.bdtTraining import trainvar_choice as tc
-from tthAnalysis.bdtTraining import xgb_tth as ttHxt
+from tthAnalysis.bdtTraining import tth_data_handler as ttHxt
 import docopt
 import json
 from pathlib import Path
@@ -44,12 +44,12 @@ def main(parameter_file):
         channel, bdtType, nthread,
         output_dir, trainvar, cf
     )
-    data_dict = ttHxt.createDataSet(
+    data_dict = ttHxt.create_xgb_data_dict(
         data, trainVars, nthread)
     parameter_dict = universal.read_parameters(parameter_file)[0]
     path = Path(parameter_file)
     save_dir = str(path.parent)
-    score, pred_train, pred_test, feature_importance = xt.parameter_evaluation(
+    score, pred_train, pred_test, feature_importance = nnt.parameter_evaluation(
         parameter_dict, data_dict, nthread, num_classes)
     sm.save_info(score, pred_train, pred_test, save_dir, feature_importance)
 

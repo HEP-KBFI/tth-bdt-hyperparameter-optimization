@@ -94,7 +94,7 @@ def parameter_evaluation(
         data_dict,
         nthread,
         num_class,
-        return_true_feature_importances=False
+        return_true_feature_importances=True
 ):
     K.set_session(
         tf.Session(
@@ -128,12 +128,12 @@ def parameter_evaluation(
         )
     )
     if return_true_feature_importances:
-        feature_importances = get_feature_importances(
+        feature_importance = get_feature_importances(
             k_model, data_dict)
     else:
-        feature_importances = {}
-    pred_train = k_model.predict(data_dict['train'])
-    pred_test = k_model.predict(data_dict['test'])
+        feature_importance = {}
+    pred_train = k_model.predict_proba(data_dict['train'])
+    pred_test = k_model.predict_proba(data_dict['test'])
     score_dict = universal.get_scores_dict(pred_train, pred_test, data_dict)
     return score_dict, pred_train, pred_test, feature_importance
 
@@ -267,49 +267,6 @@ def create_hidden_net_structure(
     number_nodes = int(np.floor(number_nodes/number_hidden_layers))
     hidden_net = [number_nodes] * number_hidden_layers
     return hidden_net
-
-
-def create_data_dict(data, trainvars):
-    '''Creates the data_dict to be used by the Neural Network
-
-    Parameters:
-    ----------
-    data : pandas dataframe
-        Dataframe containing the data
-    trainvars : list
-        List of names of the training variables
-
-    Returns:
-    -------
-    data_dict : dict
-        Dictionary containing training and testing labels
-    '''
-    print('::::::: Create datasets ::::::::')
-    additions = ['target', 'totalWeight', 'process']
-    variables = trainvars
-    for addition in additions:
-        if not addition in variables:
-            variables = variables + [addition]
-    train, test = train_test_split(
-        data[variables],
-        test_size=0.2, random_state=1
-    )
-    training_labels = np.array(train['target'].astype(int))
-    testing_labels = np.array(test['target'].astype(int))
-    training_processes = train['process']
-    testing_processes = test['process']
-    traindataset = np.array(train[trainvars].values)
-    testdataset = np.array(test[trainvars].values)
-    data_dict = {
-        'train': traindataset,
-        'test': testdataset,
-        'training_labels': training_labels,
-        'testing_labels': testing_labels,
-        'training_processes': training_processes,
-        'testing_processes': testing_processes,
-        'trainvars': trainvars
-    }
-    return data_dict
 
 
 
