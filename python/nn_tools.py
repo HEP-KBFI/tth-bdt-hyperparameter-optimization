@@ -6,7 +6,7 @@ from keras.activations import elu
 from keras.layers import ELU
 from keras.optimizers import Nadam
 # from keras.layers import Activation
-# from eli5.sklearn import PermutationImportance
+from eli5.sklearn import PermutationImportance
 import numpy as np
 from keras import backend as K
 import tensorflow as tf
