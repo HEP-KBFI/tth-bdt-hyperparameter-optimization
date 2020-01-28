@@ -1,6 +1,5 @@
 '''Main functions for the genetic algorithm'''
 from __future__ import division
-import copy
 import inspect
 import numpy as np
 from tthAnalysis.bdtHyperparameterOptimization import universal
@@ -32,7 +31,7 @@ class Individual:
     Methods
     -------
     add_result(score, pred_train, pred_test, feature_importance,
-    settings)
+    fitness)
         Adds the the evaluation results as attributes to the individual
     merge()
         Assignes the subpopulation number to be 0
@@ -50,15 +49,14 @@ class Individual:
         return self.values == other.values
 
     def add_result(
-            self, score, pred_train, pred_test, feature_importance, settings):
+            self, score, pred_train, pred_test, feature_importance, fitness):
         '''Adds the the evaluation results as attributes to the
         individual'''
         self.score = score
         self.pred_train = pred_train
         self.pred_test = pred_test
         self.feature_importance = feature_importance
-        self.fitness = universal.fitness_to_list(
-            score, fitness_key=settings['fitness_fn'])
+        self.fitness = fitness
 
     def merge(self):
         '''Assignes the subpopulation number to be 0'''
@@ -104,6 +102,7 @@ def create_population(settings, parameters, create_set):
     population : list
         Randomly generated population
     '''
+    print('\n::::: Generating initial population :::::')
     population = []
     size = settings['sample_size']
     num = settings['sub_pops']
@@ -260,17 +259,18 @@ def fitness_calculation(population, settings, data, evaluate):
     args = inspect.getargspec(evaluate)
     if len(args[0]) == 3:
         scores, pred_trains, pred_tests, feature_importances = evaluate(
-            population, data, settings)
+            population_list(population), data, settings)
     elif len(args[0]) == 4:
         scores, pred_trains, pred_tests, feature_importances = evaluate(
-            population, data, settings, len(population))
+            population_list(population), data, settings, len(population))
+    fitnesses = universal.fitness_to_list(scores, fitness_key=settings['fitness_fn'])
     for i, member in enumerate(population):
         member.add_result(
             scores[i],
             pred_trains[i],
             pred_tests[i],
             feature_importances[i],
-            settings
+            fitnesses[i]
         )
     return population
 
@@ -379,17 +379,17 @@ def new_population(population, settings, parameters, subpop=0):
     # Add best members of previous population into the new population
     offsprings = []
     next_population = elitism(population, settings)
+    fitnesses = fitness_list(population)
     # Generate offspring to fill the new generation
-    while len(next_population) < len(population):
-        fitnesses = fitness_list(population)
-        value_list = population_list(population)
-        parents = select.tournament(value_list, fitnesses)
+    while len(offsprings) < (len(population) - len(next_population)):
+        parents = select.tournament(population_list(population), fitnesses)
         offspring = gc.kpoint_crossover(
             parents, parameters, settings['mut_chance'])
         # No duplicate members
         if offspring not in next_population:
             offsprings.append(offspring)
     next_population += assign_individuals(offsprings, subpop)
+    assert len(next_population) == len(population)
     return next_population
 
 
@@ -571,6 +571,7 @@ def evolve(population, settings, parameters, data, create_set, evaluate):
     tracker = {}
     # Evolution loop for subpopulations
     if settings['sub_pops'] > 1:
+        finished_populations = []
         while (iteration <= settings['iterations']
                and population):
             # Generate a new population
@@ -611,17 +612,19 @@ def evolve(population, settings, parameters, data, create_set, evaluate):
                         improvements[i],
                         settings['threshold']
                     )
-                compactness = universal.calculate_compactness(subpopulation)
+                compactness = universal.calculate_compactness(population_list(subpopulation))
                 compactnesses[i].append(compactness)
             # Remove a subpopulation that has reached a stopping
             # criterium
+            print(curr_improvement) # SIIN ON MIDAGI PAHASTI
             for i, improvement in enumerate(curr_improvement):
                 if improvement <= settings['threshold']:
-                    removed_populations += subpopulations.pop(i)
+                    print("Removing subpopulation")
+                    finished_populations += subpopulations.pop(i)
             iteration += 1
         # Merge subpopulations into one
         print('::::: Merging subpopulations :::::')
-        subpopulations += removed_populations
+        subpopulations += finished_populations
         population = merge_subpopulations(subpopulations)
         iteration = 1
 
@@ -640,7 +643,7 @@ def evolve(population, settings, parameters, data, create_set, evaluate):
             population = new_population(population, settings, parameters)
         # Separate population for time efficiency
         eval_pop, rest_pop = arrange_population(population)
-        # Calculate fitness scores 
+        # Calculate fitness scores
         eval_pop = fitness_calculation(eval_pop, settings, data, evaluate)
         population = eval_pop + rest_pop
         # Track scores and calculate stopping criteria
@@ -653,13 +656,16 @@ def evolve(population, settings, parameters, data, create_set, evaluate):
             final_improvements,
             settings['threshold']
         )
-        compactness = universal.calculate_compactness(population)
+        compactness = universal.calculate_compactness(population_list(population))
         final_compactnesses.append(compactness)
         iteration += 1
 
     tracker.update({'final': final_tracker})
     # improvements.update({'final': final_improvements})
-    compactnesses.update({'final': final_compactnesses})
+    if compactnesses:
+        compactnesses.update({'final': final_compactnesses})
+    else:
+        compactnesses = final_compactnesses
 
     output = {
         'population': population,
@@ -726,6 +732,7 @@ def find_result(tracker, key):
             else:
                 result.update({subpop: tracker[subpop][key]})
     else:
+        result = []
         result += tracker['final'][key]
     return result
 
@@ -745,10 +752,11 @@ def finalize_result(output, data):
     result : dict
         Result of the run of the genetic algorithm
     '''
+    print('Saving results')
     keys = ['g_score', 'f1_score', 'd_score', 'test_auc', 'train_auc']
     index = np.argmax(output['fitnesses'])
     result = {
-        'best_parameters': output['population'][index],
+        'best_parameters': population_list(output['population'])[index],
         'best_fitnesses': find_result(output['scores'], 'best_fitnesses'),
         'avg_scores': find_result(output['scores'], 'avg_scores'),
         'compactnesses': output['compactnesses'],
@@ -758,6 +766,14 @@ def finalize_result(output, data):
             output['population'][index].feature_importance,
         'data_dict': data
     }
+    print('Best parameters')
+    print(result['best_parameters'])
+    print('Best fitnesses')
+    print(result['best_fitnesses'])
+    print('Avg scores')
+    print(result['avg_scores'])
+    print('Compactnesses')
+    print(result['compactnesses'])
     for key in keys:
         key_name = 'best_' + key + 's'
         result[key_name] = find_result(output['scores'], key_name)

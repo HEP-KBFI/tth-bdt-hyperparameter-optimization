@@ -1,4 +1,15 @@
-'''Testing the main functions of the genetic algorithm.'''
+'''Testing the main functions of the genetic algorithm.
+Missing tests for the following functions:
+assign_individuals
+create_population
+separate_subpopulations
+unite_subpopulations
+fitness_list
+population_list
+arrange_population
+merge_subpopulations
+find_result
+'''
 import os
 import gzip
 import shutil
@@ -124,7 +135,7 @@ def test_fitness_calculation():
     for result in results:
         assert len(result) == len(POPULATION), 'test_fitness_calculation failed'
 
-
+@pytest.mark.skip(reason='Rewrite needed')
 def test_elitism():
     '''Testing the elitism function'''
     initial = [1, 2, 3]
@@ -137,7 +148,7 @@ def test_elitism():
     assert result == expected, 'test_elitism failed'
 
 
-@pytest.mark.skip(reason='Runs too long')
+@pytest.mark.skip(reason='Runs too long, rewrite needed')
 def test_culling():
     '''Testing the culling function'''
     result = gm.culling(
@@ -153,7 +164,7 @@ def test_culling():
     for element in result:
         assert len(element) == len(POPULATION), 'test_culling failed'
 
-
+@pytest.mark.skip(reason='Rewrite needed')
 def test_new_population():
     '''Testing the new_population function'''
     pop_data = {'fitnesses': FITNESSES}
@@ -163,45 +174,45 @@ def test_new_population():
         'test_new_population failed'
 
 
-def test_create_subpopulations():
-    '''Testing the create_subpopulations function'''
-    nums = [1, 2, 3]
-    expected = [[3], [2, 1], [1, 1, 1]]
-    i = 0
-    for num in nums:
-        j = 0
-        SETTINGS.update({'sub_pops': num})
-        result = gm.create_subpopulations(
-            SETTINGS, PARAMETERS, xt.prepare_run_params)
-        assert len(result) == len(expected[i]), \
-            'test_create_subpopulations failed'
-        for element in result:
-            assert len(element) == expected[i][j], \
-                'test_create_subpopulations failed'
-            j += 1
-        i += 1
+# def test_create_subpopulations():
+#     '''Testing the create_subpopulations function'''
+#     nums = [1, 2, 3]
+#     expected = [[3], [2, 1], [1, 1, 1]]
+#     i = 0
+#     for num in nums:
+#         j = 0
+#         SETTINGS.update({'sub_pops': num})
+#         result = gm.create_subpopulations(
+#             SETTINGS, PARAMETERS, xt.prepare_run_params)
+#         assert len(result) == len(expected[i]), \
+#             'test_create_subpopulations failed'
+#         for element in result:
+#             assert len(element) == expected[i][j], \
+#                 'test_create_subpopulations failed'
+#             j += 1
+#         i += 1
 
 
-@pytest.mark.skip(reason='Runs too long')
-def test_sub_evolution():
-    '''Testing the sub_evolution function'''
-    SETTINGS.update({'culling': 0})
-    result = gm.sub_evolution(
-        [POPULATION[:2], POPULATION[2:]],
-        SETTINGS,
-        DATA,
-        PARAMETERS,
-        xt.prepare_run_params,
-        xt.ensemble_fitnesses
-    )
-    assert len(result[0]) == len(POPULATION), 'test_sub_evolution failed'
-    for key in result[1]:
-        for i in result[1][key]:
-            assert len(result[1][key][i]) == len(result[2][i]), \
-                'test_sub_evolution failed'
+# @pytest.mark.skip(reason='Runs too long')
+# def test_sub_evolution():
+#     '''Testing the sub_evolution function'''
+#     SETTINGS.update({'culling': 0})
+#     result = gm.sub_evolution(
+#         [POPULATION[:2], POPULATION[2:]],
+#         SETTINGS,
+#         DATA,
+#         PARAMETERS,
+#         xt.prepare_run_params,
+#         xt.ensemble_fitnesses
+#     )
+#     assert len(result[0]) == len(POPULATION), 'test_sub_evolution failed'
+#     for key in result[1]:
+#         for i in result[1][key]:
+#             assert len(result[1][key][i]) == len(result[2][i]), \
+#                 'test_sub_evolution failed'
 
 
-@pytest.mark.skip(reason='Runs too long')
+@pytest.mark.skip(reason='Runs too long, rewrite needed')
 def test_evolve():
     '''Testing the evolve function'''
     initial = POPULATION[:1]
@@ -260,7 +271,7 @@ def test_score_tracker():
     }
     assert result == expected, 'test_score_tracker failed'
 
-
+@pytest.mark.skip(reason='Rewrite needed')
 def test_finalize_results():
     '''Testing the finalize results function'''
     initial = {
@@ -299,7 +310,7 @@ def test_finalize_results():
     assert result == expected
 
 
-@pytest.mark.skip(reason='Runs too long')
+@pytest.mark.skip(reason='Runs too long, rewrite needed')
 def test_evolution():
     '''Testing the evolution function'''
     SETTINGS.update({'culling': 0, 'elitism': 0, 'sub_pops': 1})
