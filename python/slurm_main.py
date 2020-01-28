@@ -132,8 +132,10 @@ def run_iteration(
         test dataset
     '''
     output_dir = os.path.expandvars(global_settings['output_dir'])
+    settings_dir = os.path.join(output_dir, 'run_settings')
     if sample_size == 0:
-        opt_settings = universal.read_settings(global_settings['optimization_algo'])
+        opt_settings = universal.read_settings(
+            settings_dir, global_settings['optimization_algo'])
         sample_size = opt_settings['sample_size']
     parameters_to_file(output_dir, parameter_dicts)
     wild_card_path = os.path.join(output_dir, 'samples', '*', 'parameters.json')
