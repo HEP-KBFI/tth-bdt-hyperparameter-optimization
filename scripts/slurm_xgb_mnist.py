@@ -29,7 +29,6 @@ warnings.filterwarnings('ignore', category=FutureWarning)
 def main(parameter_file, output_dir):
     settings_dir = os.path.join(output_dir, 'run_settings')
     global_settings = universal.read_settings(settings_dir, 'global')
-    global_settings = universal.read_settings('global')
     num_classes = global_settings['num_classes']
     sample_dir = global_settings['sample_dir']
     nthread = global_settings['nthread']

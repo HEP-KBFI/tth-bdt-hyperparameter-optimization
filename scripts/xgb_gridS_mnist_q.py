@@ -28,6 +28,7 @@ def main():
     outputDir = grid_settings['output_dir']
     if not os.path.isdir(outputDir):
         os.makedirs(outputDir)
+    universal.save_run_settings(outputDir)
     grid_settings.update({'grid_size': 2})
     cmssw_base_path = os.path.expandvars('$CMSSW_BASE')
     param_file = os.path.join(

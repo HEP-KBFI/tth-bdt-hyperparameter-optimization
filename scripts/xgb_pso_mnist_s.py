@@ -33,6 +33,7 @@ def main():
     output_dir = os.path.expandvars(global_settings['output_dir'])
     if not os.path.isdir(output_dir):
         os.makedirs(output_dir)
+    universal.save_run_settings(output_dir)
     print("::::::: Loading data ::::::::")
     data_dict = mf.create_datasets(
         global_settings['sample_dir'],
