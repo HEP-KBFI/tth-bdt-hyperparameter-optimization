@@ -9,7 +9,7 @@ Usage: quasar_pso_mnist.py
 from __future__ import division
 import numpy as np
 import os
-from tthAnalysis.bdtTraining import xgb_tth as ttHxt
+from tthAnalysis.bdtTraining import create_xgb_data_dict as ttHxt
 from tthAnalysis.bdtHyperparameterOptimization import universal
 from tthAnalysis.bdtHyperparameterOptimization import pso_main as pm
 from tthAnalysis.bdtHyperparameterOptimization import slurm_main as sm
@@ -21,7 +21,16 @@ NUMBER_REPETITIONS = 50
 
 def main():
     print("::::::: Loading data ::::::::")
-    global_settings = universal.read_settings('global')
+    cmssw_base_path = os.path.expandvars('$CMSSW_BASE')
+    main_dir = os.path.join(
+        cmssw_base_path,
+        'src',
+        'tthAnalysis',
+        'bdtHyperparameterOptimization'
+    )
+    settings_dir = os.path.join(
+        main_dir, 'data')
+    global_settings = universal.read_settings(settings_dir, 'global')
     channel = global_settings['channel']
     bdtType = global_settings['bdtType']
     trainvar = global_settings['trainvar']
@@ -36,8 +45,7 @@ def main():
         channel, bdtType, nthread,
         output_dir, trainvar, cf
     )
-    data = ttHxt.convert_data_to_correct_format(data)
-    data_dict = ttHxt.createDataSet(data, trainVars, nthread)
+    data_dict = ttHxt.create_xgb_data_dict(data, trainVars, nthread)
     print("::::::: Reading parameters :::::::")
     cmssw_base_path = os.path.expandvars('$CMSSW_BASE')
     param_file = os.path.join(
@@ -49,7 +57,7 @@ def main():
         'xgb_parameters.json'
     )
     value_dicts = universal.read_parameters(param_file)
-    pso_settings = pm.read_weights()
+    pso_settings = pm.read_weights(settings_dir)
     result_dicts = []
     for i in range(NUMBER_REPETITIONS):
         output_dir_single = os.path.join(output_dir, 'iteration_' + str(i))
@@ -57,7 +65,8 @@ def main():
         parameter_dicts = xt.prepare_run_params(
             value_dicts, pso_settings['sample_size'])
         result_dict = pm.run_pso(
-            data_dict, value_dicts, sm.run_iteration, parameter_dicts
+            data_dict, value_dicts, sm.run_iteration, parameter_dicts,
+            output_dir
         )
         universal.save_results(result_dict, output_dir_single)
         print(
@@ -67,8 +76,11 @@ def main():
         sm.clear_from_files(global_settings)
         result_dicts.append(result_dict)
     keys = result_dicts[0].keys()
+    best_parameter_dicts = [
+        result_dict["best_parameters"] for result_dict in result_dicts
+    ]
     dict_of_parameter_lists = universal.values_to_list_dict(
-        keys, parameter_dicts)
+        keys, best_parameter_dicts)
     sct.stability_check_main(dict_of_parameter_lists, output_dir)
     sct.plot_all_radar_charts(result_dict['best_parameters'], output_dir)
     sct.plot_score_stability(result_dicts, output_dir)

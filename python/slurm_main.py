@@ -81,7 +81,9 @@ def prepare_job_file(
     template_file = os.path.join(template_dir, 'submit_template.sh')
     error_file = os.path.join(output_dir, 'error')
     output_file = os.path.join(output_dir, 'output')
-    batch_job_file = 'slurm_fitness_' + global_settings['sample_type'] + '.py'
+    file_title = '_'.join([
+        'slurm', global_settings['ml_method'], global_settings['sample_type']])
+    batch_job_file = file_title + '.py'
     run_script = os.path.join(main_dir, 'scripts', batch_job_file)
     copyfile(template_file, job_file)
     with open(job_file, 'a') as filehandle:
@@ -89,9 +91,9 @@ def prepare_job_file(
 #SBATCH --cpus-per-task=%s
 #SBATCH -e %s
 #SBATCH -o %s
-python %s --parameter_file %s
+python %s --parameter_file %s --output_dir %s
         ''' % (global_settings['nthread'], error_file, output_file, run_script,
-               parameter_file))
+               parameter_file, output_dir))
     return job_file
 
 
@@ -130,8 +132,10 @@ def run_iteration(
         test dataset
     '''
     output_dir = os.path.expandvars(global_settings['output_dir'])
+    settings_dir = os.path.join(output_dir, 'run_settings')
     if sample_size == 0:
-        opt_settings = universal.read_settings(global_settings['optimization_algo'])
+        opt_settings = universal.read_settings(
+            settings_dir, global_settings['optimization_algo'])
         sample_size = opt_settings['sample_size']
     parameters_to_file(output_dir, parameter_dicts)
     wild_card_path = os.path.join(output_dir, 'samples', '*', 'parameters.json')
@@ -347,7 +351,13 @@ def check_error(output_dir):
     error_file = os.path.join(output_dir, 'error')
     if os.path.exists(error_file):
         with open(error_file, 'r') as file:
-            number_errors = len(file.readlines())
+            lines = file.readlines()
+            number_errors = len(lines)
+            for line in lines:
+                text1 = "Using TensorFlow backend."
+                text2 = "Your CPU supports"
+                if text1 in line or text2 in line:
+                    number_errors -= 1
         if number_errors > 0:
             raise SystemExit(0)
 

@@ -10,7 +10,7 @@ import importlib
 import numpy as np
 import os
 import shutil
-from tthAnalysis.bdtTraining import xgb_tth as ttHxt
+from tthAnalysis.bdtTraining import tth_data_handler as ttHxt
 from tthAnalysis.bdtHyperparameterOptimization import universal
 from tthAnalysis.bdtHyperparameterOptimization import pso_main as pm
 from tthAnalysis.bdtHyperparameterOptimization import xgb_tools as xt
@@ -22,7 +22,16 @@ warnings.filterwarnings('ignore', category=FutureWarning)
 
 
 def main():
-    global_settings = universal.read_settings('global')
+    cmssw_base_path = os.path.expandvars('$CMSSW_BASE')
+    main_dir = os.path.join(
+        cmssw_base_path,
+        'src',
+        'tthAnalysis',
+        'bdtHyperparameterOptimization'
+    )
+    settings_dir = os.path.join(
+        main_dir, 'data')
+    global_settings = universal.read_settings(settings_dir, 'global')
     channel = global_settings['channel']
     bdtType = global_settings['bdtType']
     trainvar = global_settings['trainvar']
@@ -33,26 +42,21 @@ def main():
     output_dir = os.path.expandvars(global_settings['output_dir'])
     if not os.path.isdir(output_dir):
         os.makedirs(output_dir)
+    universal.save_run_settings(output_dir)
     data, trainVars = ttHxt.tth_analysis_main(
         channel, bdtType, nthread,
         output_dir, trainvar, cf
     )
-    data_dict = ttHxt.createDataSet(data, trainVars, nthread)
+    data_dict = ttHxt.create_xgb_data_dict(data, trainVars, nthread)
     print("::::::: Reading parameters :::::::")
-    cmssw_base_path = os.path.expandvars('$CMSSW_BASE')
-    main_dir = os.path.join(
-        cmssw_base_path,
-        'src',
-        'tthAnalysis',
-        'bdtHyperparameterOptimization'
-    )
     param_file = os.path.join(
         main_dir,
         'data',
         'xgb_parameters.json'
     )
     value_dicts = universal.read_parameters(param_file)
-    pso_settings = pm.read_weights()
+    settings_dir = os.path.join(output_dir, 'run_settings')
+    pso_settings = pm.read_weights(settings_dir)
     parameter_dicts = xt.prepare_run_params(
         value_dicts, pso_settings['sample_size'])
     print("\n============ Starting hyperparameter optimization ==========\n")
@@ -62,14 +66,15 @@ def main():
         main_dir, 'data', 'd_roc_settings', 'global_settings')
     os.rename(global_settings_path, global_settings_path + '_')
     for i in range(5):
-        new_settings = new_global_settings_path + '' + str(i) + '.json'
+        new_settings = new_global_settings_path +  str(i) + '.json'
         shutil.copy(new_settings, global_settings_path)
-        global_settings = universal.read_settings('global')
+        global_settings = universal.read_settings(settings_dir, 'global')
         output_dir = os.path.expandvars(global_settings['output_dir'])
         if not os.path.isdir(output_dir):
             os.makedirs(output_dir)
         result_dict = pm.run_pso(
-            data_dict, value_dicts, sm.run_iteration, parameter_dicts
+            data_dict, value_dicts, sm.run_iteration, parameter_dicts,
+            output_dir
         )
         print("\n============ Saving results ================\n")
         universal.save_results(result_dict, output_dir, plot_extras=True)

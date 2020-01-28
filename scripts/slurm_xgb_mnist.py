@@ -1,10 +1,11 @@
 '''
 Call with 'python3'
 
-Usage: slurm_fitness.py --parameter_file=PTH
+Usage: slurm_fitness.py --parameter_file=PTH --output_dir=DIR
 
 Options:
     -p --parameter_file=PTH      Path to parameters to be run
+    --output_dir=DIR             Directory of the output
 
 
 '''
@@ -25,8 +26,9 @@ warnings.filterwarnings('ignore', category=FutureWarning)
 
 
 
-def main(parameter_file):
-    global_settings = universal.read_settings('global')
+def main(parameter_file, output_dir):
+    settings_dir = os.path.join(output_dir, 'run_settings')
+    global_settings = universal.read_settings(settings_dir, 'global')
     num_classes = global_settings['num_classes']
     sample_dir = global_settings['sample_dir']
     nthread = global_settings['nthread']
@@ -43,6 +45,7 @@ if __name__ == '__main__':
     try:
         arguments = docopt.docopt(__doc__)
         parameter_file = arguments['--parameter_file']
-        main(parameter_file)
+        output_dir = arguments['--output_dir']
+        main(parameter_file, output_dir)
     except docopt.DocoptExit as e:
         print(e)
