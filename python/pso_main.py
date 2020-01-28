@@ -401,8 +401,8 @@ def run_pso(
     '''
     scoring_keys = ['g_score', 'f1_score', 'd_score', 'test_auc', 'train_auc']
     print(':::::::: Initializing :::::::::')
-    global_settings = universal.read_settings(output_dir, 'global')
     settings_dir = os.path.join(output_dir, 'run_settings')
+    global_settings = universal.read_settings(settings_dir, 'global')
     pso_settings = read_weights(settings_dir)
     inertial_weight, inertial_weight_step = get_weight_step(pso_settings)
     iterations = pso_settings['iterations']
