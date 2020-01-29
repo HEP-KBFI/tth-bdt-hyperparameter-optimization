@@ -61,7 +61,6 @@ def main():
         sm.run_iteration
     )
     universal.save_results(result, output_dir)
-    sm.clear_from_files(global_settings)
 
 
 if __name__ == '__main__':

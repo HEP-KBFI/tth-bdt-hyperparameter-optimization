@@ -78,7 +78,6 @@ def main():
         )
         print("\n============ Saving results ================\n")
         universal.save_results(result_dict, output_dir, plot_extras=True)
-        sm.clear_from_files(global_settings)
         print("Results saved to " + str(output_dir))
     os.rename(global_settings_path + '_', global_settings_path)
 

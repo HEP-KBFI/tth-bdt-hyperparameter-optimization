@@ -330,11 +330,14 @@ def move_previous_files(output_dir, previous_files_dir):
     -------
     Nothing
     '''
-    iter_nr = find_iter_nr(previous_files_dir)
+    iter_nr = find_iter_number(previous_files_dir)
     samples_dir = os.path.join(output_dir, 'samples')
     iter_dir = os.path.join(previous_files_dir, 'iteration_' + str(iter_nr))
     shutil.copytree(samples_dir, iter_dir)
     shutil.rmtree(samples_dir)
+    wild_card_path = os.path.join(output_dir, 'parameter_*.sh')
+    for path in glob.glob(wild_card_path):
+        os.remove(path)
 
 
 def find_iter_number(previous_files_dir):
@@ -431,23 +434,3 @@ def save_info(
         json.dump(score_dict, file)
     with open(importance_path, 'w') as file:
         json.dump(feature_importance, file)
-
-
-def clear_from_files(global_settings):
-    '''Cleans the output directory from the leftovers of the slurm run
-
-    Parameters:
-    ----------
-    global_settings : dict
-        Settings that contains the output directory of the run
-
-    Returns:
-    -------
-    Nothing
-    '''
-    output_dir = os.path.expandvars(global_settings['output_dir'])
-    wild_card_path = os.path.join(output_dir, 'parameter_*.sh')
-    for path in glob.glob(wild_card_path):
-        os.remove(path)
-    samples_dir = os.path.join(output_dir, 'samples')
-    shutil.rmtree(samples_dir)
