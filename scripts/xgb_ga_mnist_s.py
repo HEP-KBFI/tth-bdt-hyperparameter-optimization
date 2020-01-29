@@ -48,10 +48,7 @@ def main():
     param_dict = universal.read_parameters(param_file)
 
     print('::::::: Loading data ::::::::')
-    sample_dir = os.path.expandvars(global_settings['sample_dir'])
-    data_dict = mf.create_datasets(
-        sample_dir,
-        global_settings['nthread'])
+    data_dict = mf.create_datasets(global_settings)
 
     result = ga.evolution(
         settings_dict,

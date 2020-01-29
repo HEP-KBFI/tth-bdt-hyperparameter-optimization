@@ -6,6 +6,7 @@ import struct
 import os
 import xgboost as xgb
 import numpy as np
+from tthAnalysis.bdtHyperparameterOptimization import universal
 
 
 def read_images(images_name):
@@ -116,7 +117,7 @@ def read_dataset(images_name, labels_name):
     return (images, labels)
 
 
-def create_datasets(sample_dir, nthread): # MNIST & XGBoost
+def create_datasets(global_settings): # MNIST & XGBoost
     ''' Create a ready-to-use dataset from MNIST files.
 
     Parameters
@@ -131,7 +132,11 @@ def create_datasets(sample_dir, nthread): # MNIST & XGBoost
     data_dict : dict
         Dictionary containing the dataset
     '''
-    sample_dir = os.path.expandvars(sample_dir)
+    output_dir = os.path.expandvars(global_settings['output_dir'])
+    info_dir = os.path.join(output_dir, 'previous_files', 'data_dict')
+    if not os.path.exists(info_dir):
+        os.makedirs(info_dir)
+    sample_dir = os.path.expandvars(global_settings['sample_dir'])
     image_file = os.path.join(sample_dir, 'train-images-idx3-ubyte')
     label_file = os.path.join(sample_dir, 'train-labels-idx1-ubyte')
     training_images, training_labels = read_dataset(image_file, label_file)
@@ -141,12 +146,12 @@ def create_datasets(sample_dir, nthread): # MNIST & XGBoost
     dtrain = xgb.DMatrix(
         np.asmatrix(training_images),
         label=training_labels,
-        nthread=nthread
+        nthread=global_settings['nthread']
     )
     dtest = xgb.DMatrix(
         np.asmatrix(testing_images),
         label=testing_labels,
-        nthread=nthread
+        nthread=global_settings['nthread']
     )
     data_dict = {
         'dtrain': dtrain,

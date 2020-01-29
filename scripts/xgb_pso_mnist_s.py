@@ -14,7 +14,6 @@ from tthAnalysis.bdtHyperparameterOptimization import mnist_filereader  as mf
 from tthAnalysis.bdtHyperparameterOptimization import universal
 from tthAnalysis.bdtHyperparameterOptimization import pso_main as pm
 from tthAnalysis.bdtHyperparameterOptimization import xgb_tools as xt
-warnings.filterwarnings('ignore', category=DeprecationWarning)
 
 np.random.seed(1)
 
@@ -36,8 +35,7 @@ def main():
     universal.save_run_settings(output_dir)
     print("::::::: Loading data ::::::::")
     data_dict = mf.create_datasets(
-        global_settings['sample_dir'],
-        global_settings['nthread'])
+        global_settings)
     print("::::::: Reading parameters :::::::")
     cmssw_base_path = os.path.expandvars('$CMSSW_BASE')
     param_file = os.path.join(

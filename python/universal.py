@@ -972,6 +972,100 @@ def fitness_to_list(score_dicts, fitness_key='d_roc'):
     return fitnesses
 
 
+def save_predictions_and_score_dict(
+        score_dict,
+        pred_train,
+        pred_test,
+        feature_importance,
+        param_set_nr,
+        previous_files_dir
+):
+    '''Saves the iteration info
+    '''
+    iter_nr = find_iter_number(previous_files_dir)
+    save_dir = os.path.join(previous_files_dir, str(iter_nr), str(param_set_nr))
+    save_info(score_dict, pred_train, pred_test, save_dir, feature_importance)
+
+
+def find_iter_number(previous_files_dir):
+    '''Finds the number iterations done
+
+    Parameters:
+    ----------
+    previous_files_dir : str
+        Path to the directory where old iterations are saved
+
+    Returns:
+    -------
+    iter_number : int
+        Number of the current iteration
+    '''
+    wild_card_path = os.path.join(previous_files_dir, 'iteration_*')
+    iter_number = len(glob.glob(wild_card_path))
+    return iter_number
+
+
+def save_info(
+        score_dict,
+        pred_train,
+        pred_test,
+        save_dir,
+        feature_importance
+):
+    '''Saves the score, pred_train, pred_test into appropriate files in
+    the wanted directory
+
+    Parameters:
+    ----------
+    score_dict : float
+        Evaluation of the fitness of the parameters
+    pred_train : list of lists
+        Predicted probabilities for an event to have a certain label
+    pred_test : list of lists
+        Predicted probabilities for an event to have a certain label
+    save_dir : str
+        Path to the directory where restults will be saved
+
+    Returns:
+    -------
+    Nothing
+    '''
+    train_path = os.path.join(save_dir, 'pred_train.lst')
+    test_path = os.path.join(save_dir, 'pred_test.lst')
+    score_path = os.path.join(save_dir, 'score.json')
+    importance_path = os.path.join(save_dir, 'feature_importances.json')
+    with open(train_path, 'w') as file:
+        writer = csv.writer(file)
+        writer.writerows(pred_train)
+    with open(test_path, 'w') as file:
+        writer = csv.writer(file)
+        writer.writerows(pred_test)
+    with open(score_path, 'w') as file:
+        json.dump(score_dict, file)
+    with open(importance_path, 'w') as file:
+        json.dump(feature_importance, file)
+
+
+def write_data_dict_info(info_dir, data_dict):
+    test_labels_path = os.path.join(info_dir, 'testing_labels.txt')
+    train_labels_path = os.path.join(info_dir, 'training_labels.txt')
+    with open(train_labels_path, 'wt') as out_file:
+        for elem in list(data_dict['training_labels']):
+            out_file.write(str(elem) + '\n')
+    with open(test_labels_path, 'wt') as out_file:
+        for elem in list(data_dict['testing_labels']):
+            out_file.write(str(elem) + '\n')
+    if "training_processes" in data_dict:
+        train_process_path = os.path.join(info_dir, 'training_process.txt')
+        test_process_path = os.path.join(info_dir, 'testing_process.txt')
+        with open(train_process_path, 'wt') as out_file:
+            for elem in list(data_dict['training_processes']):
+                out_file.write(str(elem) + '\n')
+        with open(test_process_path, 'wt') as out_file:
+            for elem in list(data_dict['testing_processes']):
+                out_file.write(str(elem) + '\n')
+
+
 # One-vs-All ROC
 
 
