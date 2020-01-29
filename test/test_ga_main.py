@@ -1,13 +1,11 @@
 '''Testing the main functions of the genetic algorithm.
 Missing tests for the following functions:
-assign_individuals
-create_population
 separate_subpopulations
 unite_subpopulations
 fitness_list
-population_list
 arrange_population
 merge_subpopulations
+finish_subpopulation
 find_result
 '''
 import os
@@ -74,24 +72,27 @@ SETTINGS = {
 }
 
 POPULATION = [
-    {
-        'num_boost_round': 300,
-        'learning_rate': 0.20323,
-        'max_depth': 1,
-        'gamma': 0.31544
-    },
-    {
+    gm.Individual(
+        {
+           'num_boost_round': 300,
+           'learning_rate': 0.20323,
+           'max_depth': 1,
+           'gamma': 0.31544
+       }, 0),
+    gm.Individual(
+        {
         'num_boost_round': 55,
         'learning_rate': 0.07981,
         'max_depth': 8,
         'gamma': 4.12071
-    },
-    {
+        }, 0),
+    gm.Individual(
+        {
         'num_boost_round': 481,
         'learning_rate': 0.00411,
         'max_depth': 4,
         'gamma': 0.62212
-    }
+        }, 0)
 ]
 
 FITNESSES = [0.4, 0.6, 0.8]
@@ -117,6 +118,44 @@ for file in file_list:
 DATA = mf.create_datasets(sample_dir, 16)
 
 
+def test_assign_individuals():
+    '''Testing the assign_individuals function'''
+    initial = [
+        {
+           'num_boost_round': 300,
+           'learning_rate': 0.20323,
+           'max_depth': 1,
+           'gamma': 0.31544
+       },
+       {
+        'num_boost_round': 55,
+        'learning_rate': 0.07981,
+        'max_depth': 8,
+        'gamma': 4.12071
+        },
+        {
+        'num_boost_round': 481,
+        'learning_rate': 0.00411,
+        'max_depth': 4,
+        'gamma': 0.62212
+        }
+    ]
+    result = gm.assign_individuals(initial, 0)
+    assert result == POPULATION, 'test_assign_individuals failed'
+
+
+def test_create_population():
+    '''Testing the create_population function'''
+    result = gm.create_population(SETTINGS, PARAMETERS, xt.prepare_run_params)
+    assert len(result) == SETTINGS['sample_size'], 'test_create_population failed'
+
+
+# def test_separate_subpopulations():
+
+
+# def test_unite_subpopulations():
+
+
 def test_set_num():
     '''Testing the set_num function'''
     initial = [1, 2, 3]
@@ -128,12 +167,44 @@ def test_set_num():
     assert result == expected, 'test_set_num failed'
 
 
+# def test_fitness_list():
+
+
+def test_population_list():
+    '''Testing the population_list function'''
+    expected = [
+        {
+           'num_boost_round': 300,
+           'learning_rate': 0.20323,
+           'max_depth': 1,
+           'gamma': 0.31544
+       },
+       {
+        'num_boost_round': 55,
+        'learning_rate': 0.07981,
+        'max_depth': 8,
+        'gamma': 4.12071
+        },
+        {
+        'num_boost_round': 481,
+        'learning_rate': 0.00411,
+        'max_depth': 4,
+        'gamma': 0.62212
+        }
+    ]
+    result = gm.population_list(POPULATION)
+    assert result == expected, 'test_population_list failed'
+
+
+@pytest.mark.skip(reason='Runs too long') # KORRAS
 def test_fitness_calculation():
     '''Testing the fitness calculation function'''
-    results = gm.fitness_calculation(
+    result = gm.fitness_calculation(
         POPULATION, SETTINGS, DATA, xt.ensemble_fitnesses)
-    for result in results:
-        assert len(result) == len(POPULATION), 'test_fitness_calculation failed'
+    assert len(result) == len(POPULATION), 'test_fitness_calculation failed'
+    for member in result:
+        assert member.fitness, 'test_fitness_calculation failed'
+
 
 @pytest.mark.skip(reason='Rewrite needed')
 def test_elitism():
@@ -164,12 +235,11 @@ def test_culling():
     for element in result:
         assert len(element) == len(POPULATION), 'test_culling failed'
 
-@pytest.mark.skip(reason='Rewrite needed')
+
 def test_new_population():
     '''Testing the new_population function'''
-    pop_data = {'fitnesses': FITNESSES}
     result = gm.new_population(
-        POPULATION, pop_data, SETTINGS, PARAMETERS)[0]
+        POPULATION, SETTINGS, PARAMETERS)
     assert len(result) == len(POPULATION), \
         'test_new_population failed'
 
@@ -212,6 +282,15 @@ def test_new_population():
 #                 'test_sub_evolution failed'
 
 
+# def test_arrange_population()
+
+
+# def test_merge_subpopulations()
+
+
+# def test_finish_populations()
+
+
 @pytest.mark.skip(reason='Runs too long, rewrite needed')
 def test_evolve():
     '''Testing the evolve function'''
@@ -233,6 +312,7 @@ def test_evolve():
         'test_evolve failed'
 
 
+@pytest.mark.skip(reason='Rewrite needed')
 def test_score_tracker():
     '''Testing the score tracker function'''
     initial = [
@@ -270,6 +350,7 @@ def test_score_tracker():
         'best_fitnesses': [0.8]
     }
     assert result == expected, 'test_score_tracker failed'
+
 
 @pytest.mark.skip(reason='Rewrite needed')
 def test_finalize_results():
