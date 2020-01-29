@@ -132,6 +132,9 @@ def run_iteration(
         test dataset
     '''
     output_dir = os.path.expandvars(global_settings['output_dir'])
+    previous_files_dir = os.path.join(output_dir, 'previous_files')
+    if not os.path.exists(previous_files_dir):
+        os.makedirs(previous_files_dir)
     settings_dir = os.path.join(output_dir, 'run_settings')
     if sample_size == 0:
         opt_settings = universal.read_settings(
@@ -154,7 +157,7 @@ def run_iteration(
     pred_trains = create_result_lists(output_dir, 'pred_train')
     score_dicts = read_fitness(output_dir)
     feature_importances = read_feature_importances(output_dir)
-    delete_previous_files(output_dir)
+    move_previous_files(output_dir, previous_files_dir)
     return score_dicts, pred_trains, pred_tests, feature_importances
 
 
@@ -315,7 +318,7 @@ def lists_from_file(path):
     return row_res
 
 
-def delete_previous_files(output_dir):
+def move_previous_files(output_dir, previous_files_dir):
     '''Deletes the files from previous iteration
 
     Parameters:
@@ -327,12 +330,29 @@ def delete_previous_files(output_dir):
     -------
     Nothing
     '''
-    wild_card_path1 = os.path.join(output_dir, 'samples', '*', '*.lst')
-    wild_card_path2 = os.path.join(output_dir, 'samples', '*', '*.txt')
-    for path in glob.glob(wild_card_path1):
-        os.remove(path)
-    for path in glob.glob(wild_card_path2):
-        os.remove(path)
+    iter_nr = find_iter_nr(previous_files_dir)
+    samples_dir = os.path.join(output_dir, 'samples')
+    iter_dir = os.path.join(previous_files_dir, 'iteration_' + str(iter_nr))
+    shutil.copytree(samples_dir, iter_dir)
+    shutil.rmtree(samples_dir)
+
+
+def find_iter_number(previous_files_dir):
+    '''Finds the number iterations done
+
+    Parameters:
+    ----------
+    previous_files_dir : str
+        Path to the directory where old iterations are saved
+
+    Returns:
+    -------
+    iter_number : int
+        Number of the current iteration
+    '''
+    wild_card_path = os.path.join(previous_files_dir, 'iteration_*')
+    iter_number = len(glob.glob(wild_card_path))
+    return iter_number
 
 
 def check_error(output_dir):
@@ -348,18 +368,28 @@ def check_error(output_dir):
     -------
     Nothing
     '''
+    number_errors = 0
+    error_list = ['FAILED', 'CANCELLED', 'ERROR', 'Error']
+    output_error_list = ['Usage']
     error_file = os.path.join(output_dir, 'error')
+    output_file = os.path.join(output_dir, 'output')
     if os.path.exists(error_file):
-        with open(error_file, 'r') as file:
+        with open(error_file, 'rt') as file:
             lines = file.readlines()
-            number_errors = len(lines)
             for line in lines:
-                text1 = "Using TensorFlow backend."
-                text2 = "Your CPU supports"
-                if text1 in line or text2 in line:
-                    number_errors -= 1
-        if number_errors > 0:
-            raise SystemExit(0)
+                for error in error_list:
+                    if error in line:
+                        number_errors += 1
+    if os.path.exists(output_file):
+        with open(output_file, 'rt') as file:
+            lines = file.readlines()
+            for line in lines:
+                for error in output_error_list:
+                    if error in line:
+                        number_errors += 1
+    if number_errors > 0:
+        print("Found errors: " + str(number_errors))
+        raise SystemExit(0)
 
 
 def save_info(

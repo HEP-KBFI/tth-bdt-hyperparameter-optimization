@@ -1,7 +1,7 @@
 '''
 Call with 'python'
 
-Usage: slurm_fitness_tth.py --parameter_file=PTH --ouput_dir=DIR
+Usage: slurm_fitness_tth.py --parameter_file=PTH --output_dir=DIR
 
 Options:
     -p --parameter_file=PTH      Path to parameters to be run
@@ -50,7 +50,7 @@ def main(parameter_file, output_dir):
     parameter_dict = universal.read_parameters(parameter_file)[0]
     path = Path(parameter_file)
     save_dir = str(path.parent)
-    score, pred_train, pred_test, feature_importance = nnt.parameter_evaluation(
+    score, pred_train, pred_test, feature_importance = xt.parameter_evaluation(
         parameter_dict, data_dict, nthread, num_classes)
     sm.save_info(score, pred_train, pred_test, save_dir, feature_importance)
 
