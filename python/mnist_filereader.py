@@ -158,4 +158,5 @@ def create_datasets(global_settings): # MNIST & XGBoost
         'dtest': dtest,
         'training_labels': training_labels,
         'testing_labels': testing_labels}
+    universal.write_data_dict_info(info_dir, data_dict)
     return data_dict
