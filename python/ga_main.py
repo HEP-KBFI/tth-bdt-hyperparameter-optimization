@@ -389,7 +389,6 @@ def new_population(population, settings, parameters, subpop=0):
         if offspring not in next_population:
             offsprings.append(offspring)
     next_population += assign_individuals(offsprings, subpop)
-    assert len(next_population) == len(population)
     return next_population
 
 
@@ -538,6 +537,17 @@ def merge_subpopulations(subpopulations):
     return population
 
 
+def finish_subpopulation(subpopulations, improvements, threshold):
+    finished_subpopulations = []
+    remaining_subpopulations = []
+    for i, improvement in enumerate(improvements):
+        if improvement <= threshold:
+            finished_subpopulations.append(subpopulations[i])
+        else:
+            remaining_subpopulations.append(subpopulations[i])
+    return finished_subpopulations, remaining_subpopulations
+
+
 def evolve(population, settings, parameters, data, create_set, evaluate):
     '''Evolve a population until reaching the threshold
     or maximum number of iterations. In case of subpopulations, first
@@ -571,7 +581,6 @@ def evolve(population, settings, parameters, data, create_set, evaluate):
     tracker = {}
     # Evolution loop for subpopulations
     if settings['sub_pops'] > 1:
-        finished_populations = []
         while (iteration <= settings['iterations']
                and population):
             # Generate a new population
@@ -616,17 +625,15 @@ def evolve(population, settings, parameters, data, create_set, evaluate):
                 compactnesses[i].append(compactness)
             # Remove a subpopulation that has reached a stopping
             # criterium
-            print(curr_improvement) # SIIN ON MIDAGI PAHASTI
-            for i, improvement in enumerate(curr_improvement):
-                if improvement <= settings['threshold']:
-                    print("Removing subpopulation")
-                    finished_populations += subpopulations.pop(i)
+            finished_subpopulations, subpopulations = finish_subpopulation(
+                subpopulations, curr_improvement, settings['threshold'])
+            population = unite_subpopulations(subpopulations)
             iteration += 1
         # Merge subpopulations into one
         print('::::: Merging subpopulations :::::')
-        subpopulations += finished_populations
+        subpopulations += finished_subpopulations
         population = merge_subpopulations(subpopulations)
-        iteration = 1
+        iteration = 0
 
     improvement = 1
     final_improvements = []
@@ -661,7 +668,6 @@ def evolve(population, settings, parameters, data, create_set, evaluate):
         iteration += 1
 
     tracker.update({'final': final_tracker})
-    # improvements.update({'final': final_improvements})
     if compactnesses:
         compactnesses.update({'final': final_compactnesses})
     else:
