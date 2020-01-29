@@ -102,7 +102,6 @@ def create_population(settings, parameters, create_set):
     population : list
         Randomly generated population
     '''
-    print('\n::::: Generating initial population :::::')
     population = []
     size = settings['sample_size']
     num = settings['sub_pops']
@@ -586,8 +585,9 @@ def evolve(population, settings, parameters, data, create_set, evaluate):
             # Generate a new population
             if iteration != 0:
                 print('::::: Iteration:     ' + str(iteration) + ' :::::')
+                new_subpopulations = []
                 for i, subpopulation in enumerate(subpopulations):
-                    subpopulation = culling(
+                    new_subpopulation = culling(
                         subpopulation,
                         settings,
                         parameters,
@@ -596,9 +596,10 @@ def evolve(population, settings, parameters, data, create_set, evaluate):
                         evaluate,
                         i
                     )
-                    subpopulation = new_population(
+                    new_subpopulation = new_population(
                         subpopulation, settings, parameters, i)
-                population = unite_subpopulations(subpopulations)
+                    new_subpopulations.append(new_subpopulation)
+                population = unite_subpopulations(new_subpopulations)
             # Separate population for time efficiency
             eval_pop, rest_pop = arrange_population(population)
             # Calculate fitness scores
@@ -807,8 +808,10 @@ def evolution(settings, parameters, data, create_set, evaluate):
     result : dict
         Result of the run of the genetic algorithm
     '''
+    print('\n::::: Generating initial population :::::')
     population = create_population(settings, parameters, create_set)
     output = evolve(
         population, settings, parameters, data, create_set, evaluate)
+    print('\n::::: Finalizing results :::::')
     result = finalize_result(output, data)
     return result
