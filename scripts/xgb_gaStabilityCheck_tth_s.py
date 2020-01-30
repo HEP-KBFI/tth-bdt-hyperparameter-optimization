@@ -67,7 +67,6 @@ def main():
             'Results of stability iteration '
             + str(i) + ' are saved to ' + str(output_dir)
         )
-        sm.clear_from_files(global_settings)
         result_dicts.append(result)
 
     best_parameter_dicts = [
