@@ -95,7 +95,7 @@ def parameter_evaluation(
         data_dict,
         nthread,
         num_class,
-        return_true_feature_importances=True
+        return_true_feature_importances=False
 ):
     K.set_session(
         tf.Session(

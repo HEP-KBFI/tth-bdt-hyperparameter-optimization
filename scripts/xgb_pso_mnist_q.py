@@ -33,8 +33,7 @@ def main():
     universal.save_run_settings(output_dir)
     print("::::::: Loading data ::::::::")
     data_dict = mf.create_datasets(
-        global_settings['sample_dir'],
-        global_settings['nthread'])
+        global_settings)
     print("::::::: Reading parameters :::::::")
     cmssw_base_path = os.path.expandvars('$CMSSW_BASE')
     param_file = os.path.join(

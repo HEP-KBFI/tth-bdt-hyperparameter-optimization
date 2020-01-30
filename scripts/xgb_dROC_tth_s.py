@@ -47,7 +47,7 @@ def main():
         channel, bdtType, nthread,
         output_dir, trainvar, cf
     )
-    data_dict = ttHxt.create_xgb_data_dict(data, trainVars, nthread)
+    data_dict = ttHxt.create_xgb_data_dict(data, trainVars, global_settings)
     print("::::::: Reading parameters :::::::")
     param_file = os.path.join(
         main_dir,
@@ -78,7 +78,6 @@ def main():
         )
         print("\n============ Saving results ================\n")
         universal.save_results(result_dict, output_dir, plot_extras=True)
-        sm.clear_from_files(global_settings)
         print("Results saved to " + str(output_dir))
     os.rename(global_settings_path + '_', global_settings_path)
 
