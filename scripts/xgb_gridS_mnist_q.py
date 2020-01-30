@@ -40,8 +40,7 @@ def main():
         'xgb_parameters.json'
     )
     parameters = universal.read_parameters(param_file)
-    data_dict = mf.create_datasets(
-        global_settings['sample_dir'], global_settings['nthread'])
+    data_dict = mf.create_datasets(global_settings)
     result_dict = gsm.perform_gridsearch(
         parameters,
         xt.ensemble_fitnesses,

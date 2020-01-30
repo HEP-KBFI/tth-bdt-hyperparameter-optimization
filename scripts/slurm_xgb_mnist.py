@@ -20,10 +20,6 @@ import json
 from pathlib import Path
 import os
 import csv
-import warnings
-warnings.filterwarnings('ignore', category=DeprecationWarning)
-warnings.filterwarnings('ignore', category=FutureWarning)
-
 
 
 def main(parameter_file, output_dir):
@@ -33,12 +29,13 @@ def main(parameter_file, output_dir):
     sample_dir = global_settings['sample_dir']
     nthread = global_settings['nthread']
     parameter_dict = universal.read_parameters(parameter_file)[0]
-    data_dict = mf.create_datasets(sample_dir, nthread)
+    data_dict = mf.create_datasets(global_settings)
     path = Path(parameter_file)
     saveDir = str(path.parent)
     score, pred_train, pred_test, feature_importance = xt.parameter_evaluation(
         parameter_dict, data_dict, nthread, num_classes)
-    sm.save_info(score, pred_train, pred_test, saveDir, feature_importance)
+    univerasl.save_info(
+        score, pred_train, pred_test, saveDir, feature_importance)
 
 
 if __name__ == '__main__':

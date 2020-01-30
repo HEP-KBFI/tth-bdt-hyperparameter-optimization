@@ -4,6 +4,7 @@ from __future__ import division
 import numpy as np
 import xgboost as xgb
 from tthAnalysis.bdtHyperparameterOptimization import universal
+import os
 
 
 def initialize_values(value_dicts):
@@ -132,10 +133,20 @@ def ensemble_fitnesses(parameter_dicts, data_dict, global_settings):
     pred_trains = []
     pred_tests = []
     feature_importances = []
-    for parameter_dict in parameter_dicts:
+    output_dir = os.path.expandvars(global_settings['output_dir'])
+    previous_files_dir = os.path.join(output_dir, 'previous_files')
+    for param_set_nr, parameter_dict in enumerate(parameter_dicts):
         score_dict, pred_train, pred_test, feature_importance = parameter_evaluation(
             parameter_dict, data_dict,
             global_settings['nthread'], global_settings['num_classes'])
+        universal.save_predictions_and_score_dict(
+            score_dict,
+            pred_train,
+            pred_test,
+            feature_importance,
+            param_set_nr,
+            previous_files_dir
+        )
         score_dicts.append(score_dict)
         pred_trains.append(pred_train)
         pred_tests.append(pred_test)
