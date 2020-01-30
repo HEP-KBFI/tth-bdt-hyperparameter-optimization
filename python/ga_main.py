@@ -263,8 +263,6 @@ def fitness_calculation(population, settings, data, evaluate):
     '''
     # Separate population for time efficiency
     eval_pop, rest_pop = arrange_population(population)
-    print('Number of inidivuals to evaluate: ' + str(len(eval_pop)))
-    print('Number of individuals already evaluated: ' + str(len(rest_pop)))
     # Evaluate unevaluated members of population
     if eval_pop:
         args = inspect.getargspec(evaluate)
@@ -495,7 +493,6 @@ def finish_subpopulation(subpopulations, finished_subpopulations, improvements, 
     remaining_subpopulations = []
     for i, improvement in enumerate(improvements):
         if improvement <= threshold:
-            # print('Subpopulation finished, final improvement score: ' + str(improvement))
             finished_subpopulations.append(subpopulations[i])
         else:
             remaining_subpopulations.append(subpopulations[i])
