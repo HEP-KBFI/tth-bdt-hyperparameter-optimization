@@ -2,7 +2,7 @@
 Stability check for the genetic algorithm.
 Call with 'python'
 
-Usage: ga_stability_check.py
+Usage: xgb_gaStabilityCheck_tth_s.py
 '''
 from __future__ import division
 import os
@@ -14,26 +14,28 @@ from tthAnalysis.bdtHyperparameterOptimization import xgb_tools as xt
 from tthAnalysis.bdtHyperparameterOptimization import slurm_main as sm
 from tthAnalysis.bdtHyperparameterOptimization import stability_check_tools as sct
 
-NUMBER_REPETITIONS = 50
+NUMBER_REPETITIONS = 10
 
 def main():
     print('::::::: Reading GA settings & XGBoost parameters :::::::')
-    global_settings = universal.read_settings('global')
+    cmssw_base_path = os.path.expandvars('$CMSSW_BASE')
+    main_dir = os.path.join(
+        cmssw_base_path,
+        'src',
+        'tthAnalysis',
+        'bdtHyperparameterOptimization'
+    )
+    settings_dir = os.path.join(
+        main_dir, 'data')
+    global_settings = universal.read_settings(settings_dir, 'global')
     nthread = global_settings['nthread']
     output_dir = os.path.expandvars(global_settings['output_dir'])
     if not os.path.isdir(output_dir):
         os.makedirs(output_dir)
-    settings_dict = universal.read_settings('ga')
+    settings_dict = universal.read_settings(settings_dir, 'ga')
     settings_dict.update(global_settings)
-    cmssw_base_path = os.path.expandvars('$CMSSW_BASE')
     param_file = os.path.join(
-        cmssw_base_path,
-        'src',
-        'tthAnalysis',
-        'bdtHyperparameterOptimization',
-        'data',
-        'xgb_parameters.json'
-    )
+        settings_dir, 'xgb_parameters.json')
     param_dict = universal.read_parameters(param_file)
 
     print('::::::: Loading data ::::::::')
