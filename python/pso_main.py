@@ -4,6 +4,7 @@ from __future__ import division
 import numbers
 import numpy as np
 from tthAnalysis.bdtHyperparameterOptimization import universal
+import os
 np.random.seed(1)
 
 
@@ -238,7 +239,7 @@ def initialize_speeds(parameter_dicts):
     return speeds
 
 
-def read_weights():
+def read_weights(settings_dir):
     ''' Reads the weights for different components and normalizes them
 
     Parameters:
@@ -250,7 +251,7 @@ def read_weights():
     weight_dict : dict
         Contains all the weights for PSO
     '''
-    pso_settings = universal.read_settings('pso')
+    pso_settings = universal.read_settings(settings_dir, 'pso')
     normed_weights_dict = weight_normalization(pso_settings)
     weight_dict = {
         'w_init': normed_weights_dict['w_init'],
@@ -373,7 +374,8 @@ def run_pso(
         data_dict,
         value_dicts,
         calculate_fitnesses,
-        parameter_dicts
+        parameter_dicts,
+        output_dir
 ):
     '''Performs the whole particle swarm optimization
 
@@ -400,8 +402,9 @@ def run_pso(
     '''
     scoring_keys = ['g_score', 'f1_score', 'd_score', 'test_auc', 'train_auc']
     print(':::::::: Initializing :::::::::')
-    global_settings = universal.read_settings('global')
-    pso_settings = read_weights()
+    settings_dir = os.path.join(output_dir, 'run_settings')
+    global_settings = universal.read_settings(settings_dir, 'global')
+    pso_settings = read_weights(settings_dir)
     inertial_weight, inertial_weight_step = get_weight_step(pso_settings)
     iterations = pso_settings['iterations']
     compactness_threshold = pso_settings['compactness_threshold']

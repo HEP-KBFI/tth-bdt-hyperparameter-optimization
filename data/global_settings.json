@@ -9,3 +9,4 @@
 {"channel": "3l_1tau"}
 {"fitness_fn": "d_roc_1.5"}
 {"trainvar_opt": 0}
+{"ml_method": "xgb"}

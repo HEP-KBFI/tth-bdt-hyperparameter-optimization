@@ -16,6 +16,11 @@ pip install -r requirements.txt --user
 * attrs==19.1.0 version needed due to 19.2.0 breaking with older version of pytest.
 [update pytest to pytest==5.2.0](https://stackoverflow.com/questions/58189683/typeerror-attrib-got-an-unexpected-keyword-argument-convert)
 
+Also in order for feature importances to work with NN, eli5 package is needed:
+
+````console
+pip install --user eli5
+````
 
 ### Wiki
 

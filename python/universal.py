@@ -400,7 +400,6 @@ def save_results(result_dict, output_dir, plot_roc=True, plot_extras=False):
         save_feature_importances(result_dict, output_dir)
     best_to_file(
         result_dict['best_parameters'], output_dir, assessment)
-    save_run_settings(output_dir)
 
 
 def save_feature_importances(result_dict, output_dir):
@@ -930,7 +929,7 @@ def to_one_dict(list_of_dicts):
     return main_dict
 
 
-def read_settings(group):
+def read_settings(settings_dir, group):
     '''Function to read the global settings of the optimization
 
     Parameters:
@@ -943,13 +942,8 @@ def read_settings(group):
     settings_dict : dict
         Dictionary containing the settings for the optimization
     '''
-    cmssw_base_path = os.path.expandvars('$CMSSW_BASE')
     settings_path = os.path.join(
-        cmssw_base_path,
-        'src',
-        'tthAnalysis',
-        'bdtHyperparameterOptimization',
-        'data',
+        settings_dir,
         group + '_settings.json')
     parameter_list = read_parameters(settings_path)
     settings_dict = to_one_dict(parameter_list)
