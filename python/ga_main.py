@@ -6,6 +6,7 @@ from tthAnalysis.bdtHyperparameterOptimization import universal
 from tthAnalysis.bdtHyperparameterOptimization import ga_selection as select
 from tthAnalysis.bdtHyperparameterOptimization import ga_crossover as gc
 
+
 class Individual:
     ''' A class used to represent an individual member of a population
 
@@ -255,15 +256,20 @@ def fitness_calculation(population, settings, data, evaluate):
     population : list
         A group of individuals
     '''
+    # Separate population for time efficiency
+    eval_pop, rest_pop = arrange_population(population)
+    # Evaluate unevaluated members of population
     args = inspect.getargspec(evaluate)
     if len(args[0]) == 3:
         scores, pred_trains, pred_tests, feature_importances = evaluate(
-            population_list(population), data, settings)
+            population_list(eval_pop), data, settings)
     elif len(args[0]) == 4:
         scores, pred_trains, pred_tests, feature_importances = evaluate(
-            population_list(population), data, settings, len(population))
-    fitnesses = universal.fitness_to_list(scores, fitness_key=settings['fitness_fn'])
-    for i, member in enumerate(population):
+            population_list(eval_pop), data, settings, len(eval_pop))
+    fitnesses = universal.fitness_to_list(
+        scores, fitness_key=settings['fitness_fn'])
+    # Assign scores to the individuals
+    for i, member in enumerate(eval_pop):
         member.add_result(
             scores[i],
             pred_trains[i],
@@ -271,6 +277,8 @@ def fitness_calculation(population, settings, data, evaluate):
             feature_importances[i],
             fitnesses[i]
         )
+    # Reunite population
+    population = eval_pop + rest_pop
     return population
 
 
@@ -356,7 +364,15 @@ def culling(
     return population
 
 
-def new_population(population, settings, parameters, subpop=0):
+def new_population(
+        population,
+        settings,
+        parameters,
+        data,
+        create_set,
+        evaluate,
+        subpop=0
+    ):
     '''Create the next generation population.
 
     Parameters
@@ -367,6 +383,12 @@ def new_population(population, settings, parameters, subpop=0):
         Settings of the genetic algorithm
     parameters: dict
         Descriptions of the xgboost parameters
+    data : dict
+        Training and testing data sets
+    create_set : function
+        Function used to generate a population
+    evaluate : function
+        Function used to calculate scores
     subpop : int (optional)
         Which subpopulation is being updated
 
@@ -375,6 +397,9 @@ def new_population(population, settings, parameters, subpop=0):
     next_population : list
         Newly generated set of individuals
     '''
+    # Cull worst members of previous population
+    population = culling(
+        population, settings, parameters, data, create_set, evaluate, subpop)
     # Add best members of previous population into the new population
     offsprings = []
     next_population = elitism(population, settings)
@@ -389,104 +414,6 @@ def new_population(population, settings, parameters, subpop=0):
             offsprings.append(offspring)
     next_population += assign_individuals(offsprings, subpop)
     return next_population
-
-
-# def create_subpopulations(settings, parameters, create_set):
-#     '''Create num amount of subpopulations
-
-#     Parameters
-#     ----------
-#     settings : dict
-#         Settings of the genetic algorithm
-#     parameters: dict
-#         Descriptions of the xgboost parameters
-
-#     Returns
-#     -------
-#     subpopulations : list
-#         Randomly generated subpopulations
-#     '''
-#     subpopulations = []
-#     size = settings['sample_size']
-#     num = settings['sub_pops']
-
-#     # Return empty list in case of invalid settings
-#     if num > size:
-#         return subpopulations
-
-#     # Divide population into num amount of subpopulations
-#     for i in range(num):
-#         if i == 0:
-#             sub_size = size//num + size % num
-#         else:
-#             sub_size = size//num
-
-#         # Generate subpopulation
-#         sub_population = create_set(parameters, sub_size)
-#         subpopulations.append(sub_population)
-
-#     return subpopulations
-
-
-# def sub_evolution(
-#         subpopulations,
-#         settings,
-#         data,
-#         parameters,
-#         create_set,
-#         evaluate
-# ):
-#     '''Evolve subpopulations separately and then merge them into one
-
-#     Parameters
-#     ----------
-#     subpopulations : list
-#         Initial subpopulations
-#     settings : dict
-#         Settings of the genetic algorithm
-#     data : dict
-#         Data sets for testing and training
-#     parameters : dict
-#         Descriptions of the xgboost parameters
-#     create_set : function
-#         Function used to generate a population
-#     evaluate : function
-#         Function used to calculate scores
-
-#     Returns
-#     -------
-#     merged_population : list
-#         Final subpopulations merged into one
-#     tracker : dict
-#         History of best scores from all iterations
-#     compactness : dict
-#         History of compactness scores from all iterations
-#     '''
-#     compactnesses = {}
-#     merged_population = []
-#     sub_iteration = 1
-#     tracker = {}
-
-#     # Evolution for each subpopulation
-#     for population in subpopulations:
-#         print('\n::::: Subpopulation: ' + str(sub_iteration) + ' :::::')
-#         output = evolve(
-#             population, settings, data, parameters, create_set, evaluate)
-
-#         # Saving results in dictionaries
-#         for key in output['scores']:
-#             try:
-#                 tracker[key].update({sub_iteration: output['scores'][key]})
-#             except KeyError:
-#                 tracker[key] = {}
-#                 tracker[key].update({sub_iteration: output['scores'][key]})
-#         compactnesses.update({sub_iteration: output['compactnesses']})
-
-#         # Gather final generations of each subpopulation
-#         merged_population += output['population']
-#         sub_iteration += 1
-
-#     return merged_population, tracker, compactnesses
 
 
 def arrange_population(population):
@@ -587,8 +514,8 @@ def evolve(population, settings, parameters, data, create_set, evaluate):
                 print('::::: Iteration:     ' + str(iteration) + ' :::::')
                 new_subpopulations = []
                 for i, subpopulation in enumerate(subpopulations):
-                    new_subpopulation = culling(
-                        subpopulation,
+                    new_subpopulation = new_population(
+                        population,
                         settings,
                         parameters,
                         data,
@@ -596,15 +523,11 @@ def evolve(population, settings, parameters, data, create_set, evaluate):
                         evaluate,
                         i
                     )
-                    new_subpopulation = new_population(
-                        subpopulation, settings, parameters, i)
                     new_subpopulations.append(new_subpopulation)
                 population = unite_subpopulations(new_subpopulations)
-            # Separate population for time efficiency
-            eval_pop, rest_pop = arrange_population(population)
             # Calculate fitness scores
-            eval_pop = fitness_calculation(eval_pop, settings, data, evaluate)
-            population = eval_pop + rest_pop
+            population = fitness_calculation(
+                population, settings, data, evaluate)
             subpopulations = separate_subpopulations(population, settings)
             # Track scores and calculate stopping criteria
             for i, subpopulation in enumerate(subpopulations):
@@ -613,7 +536,8 @@ def evolve(population, settings, parameters, data, create_set, evaluate):
                     improvements[i] = []
                     compactnesses[i] = []
                     curr_improvement.append(1)
-                    tracker[i] = score_tracker(tracker[i], subpopulation, True)
+                    tracker[i] = score_tracker(
+                        tracker[i], subpopulation, True)
                 else:
                     tracker[i] = score_tracker(tracker[i], subpopulation)
                 improvements[i], curr_improvement[i] = \
@@ -622,7 +546,8 @@ def evolve(population, settings, parameters, data, create_set, evaluate):
                         improvements[i],
                         settings['threshold']
                     )
-                compactness = universal.calculate_compactness(population_list(subpopulation))
+                compactness = universal.calculate_compactness(
+                    population_list(subpopulation))
                 compactnesses[i].append(compactness)
             # Remove a subpopulation that has reached a stopping
             # criterium
@@ -646,25 +571,24 @@ def evolve(population, settings, parameters, data, create_set, evaluate):
         # Generate new population
         if iteration != 0:
             print('::::: Iteration:     ' + str(iteration) + ' :::::')
-            population = culling(
+            population = new_population(
                 population, settings, parameters, data, create_set, evaluate)
-            population = new_population(population, settings, parameters)
-        # Separate population for time efficiency
-        eval_pop, rest_pop = arrange_population(population)
         # Calculate fitness scores
-        eval_pop = fitness_calculation(eval_pop, settings, data, evaluate)
-        population = eval_pop + rest_pop
+        population = fitness_calculation(
+            population, settings, data, evaluate)
         # Track scores and calculate stopping criteria
         if iteration == 0:
             final_tracker = score_tracker(final_tracker, population, True)
         else:
             final_tracker = score_tracker(final_tracker, population)
-        final_improvements, improvement = universal.calculate_improvement_wAVG(
-            final_tracker['avg_scores'],
-            final_improvements,
-            settings['threshold']
-        )
-        compactness = universal.calculate_compactness(population_list(population))
+        final_improvements, improvement = \
+            universal.calculate_improvement_wAVG(
+                final_tracker['avg_scores'],
+                final_improvements,
+                settings['threshold']
+            )
+        compactness = universal.calculate_compactness(
+            population_list(population))
         final_compactnesses.append(compactness)
         iteration += 1
 
@@ -759,7 +683,6 @@ def finalize_result(output, data):
     result : dict
         Result of the run of the genetic algorithm
     '''
-    print('Saving results')
     keys = ['g_score', 'f1_score', 'd_score', 'test_auc', 'train_auc']
     index = np.argmax(output['fitnesses'])
     result = {
@@ -773,14 +696,6 @@ def finalize_result(output, data):
             output['population'][index].feature_importance,
         'data_dict': data
     }
-    print('Best parameters')
-    print(result['best_parameters'])
-    print('Best fitnesses')
-    print(result['best_fitnesses'])
-    print('Avg scores')
-    print(result['avg_scores'])
-    print('Compactnesses')
-    print(result['compactnesses'])
     for key in keys:
         key_name = 'best_' + key + 's'
         result[key_name] = find_result(output['scores'], key_name)
