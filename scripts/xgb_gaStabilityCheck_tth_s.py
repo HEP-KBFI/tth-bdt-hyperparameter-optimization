@@ -37,6 +37,7 @@ def main():
     param_file = os.path.join(
         settings_dir, 'xgb_parameters.json')
     param_dict = universal.read_parameters(param_file)
+    universal.save_run_settings(output_dir)
 
     print('::::::: Loading data ::::::::')
     channel = global_settings['channel']

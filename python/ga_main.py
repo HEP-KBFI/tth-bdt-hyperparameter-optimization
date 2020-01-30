@@ -134,10 +134,11 @@ def separate_subpopulations(population, settings):
 
     Returns
     -------
-    subpopulations : list
-        List of subpopulations
+    separated : list
+        List of separated subpopulations
     '''
     subpopulations = []
+    separated = []
     # Create empty subpopulations
     for i in range(settings['sub_pops']):
         subpopulations.append([])
@@ -145,7 +146,11 @@ def separate_subpopulations(population, settings):
     for member in population:
         index = member.subpop
         subpopulations[index].append(member)
-    return subpopulations
+    # Select subpopulations that are not empty
+    for subpopulation in subpopulations:
+        if subpopulation:
+            separated.append(subpopulation)
+    return separated
 
 
 def unite_subpopulations(subpopulations):
@@ -258,27 +263,30 @@ def fitness_calculation(population, settings, data, evaluate):
     '''
     # Separate population for time efficiency
     eval_pop, rest_pop = arrange_population(population)
+    print('Number of inidivuals to evaluate: ' + str(len(eval_pop)))
+    print('Number of individuals already evaluated: ' + str(len(rest_pop)))
     # Evaluate unevaluated members of population
-    args = inspect.getargspec(evaluate)
-    if len(args[0]) == 3:
-        scores, pred_trains, pred_tests, feature_importances = evaluate(
-            population_list(eval_pop), data, settings)
-    elif len(args[0]) == 4:
-        scores, pred_trains, pred_tests, feature_importances = evaluate(
-            population_list(eval_pop), data, settings, len(eval_pop))
-    fitnesses = universal.fitness_to_list(
-        scores, fitness_key=settings['fitness_fn'])
-    # Assign scores to the individuals
-    for i, member in enumerate(eval_pop):
-        member.add_result(
-            scores[i],
-            pred_trains[i],
-            pred_tests[i],
-            feature_importances[i],
-            fitnesses[i]
-        )
-    # Reunite population
-    population = eval_pop + rest_pop
+    if eval_pop:
+        args = inspect.getargspec(evaluate)
+        if len(args[0]) == 3:
+            scores, pred_trains, pred_tests, feature_importances = evaluate(
+                population_list(eval_pop), data, settings)
+        elif len(args[0]) == 4:
+            scores, pred_trains, pred_tests, feature_importances = evaluate(
+                population_list(eval_pop), data, settings, len(eval_pop))
+        fitnesses = universal.fitness_to_list(
+            scores, fitness_key=settings['fitness_fn'])
+        # Assign scores to the individuals
+        for i, member in enumerate(eval_pop):
+            member.add_result(
+                scores[i],
+                pred_trains[i],
+                pred_tests[i],
+                feature_importances[i],
+                fitnesses[i]
+            )
+        # Reunite population
+        population = eval_pop + rest_pop
     return population
 
 
@@ -463,11 +471,31 @@ def merge_subpopulations(subpopulations):
     return population
 
 
-def finish_subpopulation(subpopulations, improvements, threshold):
-    finished_subpopulations = []
+def finish_subpopulation(subpopulations, finished_subpopulations, improvements, threshold):
+    '''Separate out a subpopulation that has reached the improvement threshold
+    
+    Parameters
+    ----------
+    subpopulations : list
+        List of all current subpopulations
+    finished_subpopulations : list
+        List of already finished subpopulations
+    improvements : list
+        Improvement scores for the current subpopulations
+    threshold : float
+        Threshold value for the improvement score
+
+    Returns
+    -------
+    finished_subpopulations : list
+        Updated list of finished subpopulations
+    remaining_subpopulations : list
+        Subpopulations to continue evolving
+    '''
     remaining_subpopulations = []
     for i, improvement in enumerate(improvements):
         if improvement <= threshold:
+            # print('Subpopulation finished, final improvement score: ' + str(improvement))
             finished_subpopulations.append(subpopulations[i])
         else:
             remaining_subpopulations.append(subpopulations[i])
@@ -507,21 +535,22 @@ def evolve(population, settings, parameters, data, create_set, evaluate):
     tracker = {}
     # Evolution loop for subpopulations
     if settings['sub_pops'] > 1:
+        finished_subpopulations = []
         while (iteration <= settings['iterations']
                and population):
             # Generate a new population
             if iteration != 0:
                 print('::::: Iteration:     ' + str(iteration) + ' :::::')
                 new_subpopulations = []
-                for i, subpopulation in enumerate(subpopulations):
+                for subpopulation in subpopulations:
                     new_subpopulation = new_population(
-                        population,
+                        subpopulation,
                         settings,
                         parameters,
                         data,
                         create_set,
                         evaluate,
-                        i
+                        subpopulation[0].subpop
                     )
                     new_subpopulations.append(new_subpopulation)
                 population = unite_subpopulations(new_subpopulations)
@@ -530,29 +559,31 @@ def evolve(population, settings, parameters, data, create_set, evaluate):
                 population, settings, data, evaluate)
             subpopulations = separate_subpopulations(population, settings)
             # Track scores and calculate stopping criteria
+            curr_improvements = []
             for i, subpopulation in enumerate(subpopulations):
+                index = subpopulation[0].subpop
                 if iteration == 0:
-                    tracker[i] = {}
-                    improvements[i] = []
-                    compactnesses[i] = []
-                    curr_improvement.append(1)
-                    tracker[i] = score_tracker(
-                        tracker[i], subpopulation, True)
+                    tracker[index] = {}
+                    improvements[index] = []
+                    compactnesses[index] = []
+                    tracker[index] = score_tracker(
+                        tracker[index], subpopulation, True)
                 else:
-                    tracker[i] = score_tracker(tracker[i], subpopulation)
-                improvements[i], curr_improvement[i] = \
+                    tracker[index] = score_tracker(tracker[index], subpopulation)
+                improvements[index], curr_improvement = \
                     universal.calculate_improvement_wAVG(
-                        tracker[i]['avg_scores'],
-                        improvements[i],
+                        tracker[index]['avg_scores'],
+                        improvements[index],
                         settings['threshold']
                     )
+                curr_improvements.append(curr_improvement)
                 compactness = universal.calculate_compactness(
                     population_list(subpopulation))
-                compactnesses[i].append(compactness)
+                compactnesses[index].append(compactness)
             # Remove a subpopulation that has reached a stopping
             # criterium
             finished_subpopulations, subpopulations = finish_subpopulation(
-                subpopulations, curr_improvement, settings['threshold'])
+                subpopulations, finished_subpopulations, curr_improvements, settings['threshold'])
             population = unite_subpopulations(subpopulations)
             iteration += 1
         # Merge subpopulations into one
