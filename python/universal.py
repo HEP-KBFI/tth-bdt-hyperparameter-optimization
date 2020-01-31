@@ -893,10 +893,10 @@ def plot_costfunction(avg_scores, output_dir):
             if i != 'final':
                 gen_numbers = np.arange(n_gens)
                 plt.plot(gen_numbers, avg_scores[i], color='b')
-        n_gens_final = x_max + len(avg_scores['final']) - 2
+        n_gens_final = x_max + len(avg_scores['final']) - 1
         gen_numbers = np.arange(x_max - 1, n_gens_final)
         plt.plot(gen_numbers, avg_scores['final'], color='k')
-        plt.xlim(0, n_gens_final)
+        plt.xlim(0, n_gens_final - 1)
         plt.xticks(np.arange(n_gens_final))
     finally:
         plt.xlabel('Generation')
