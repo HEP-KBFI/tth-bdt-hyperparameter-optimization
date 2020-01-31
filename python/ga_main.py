@@ -7,6 +7,9 @@ from tthAnalysis.bdtHyperparameterOptimization import ga_selection as select
 from tthAnalysis.bdtHyperparameterOptimization import ga_crossover as gc
 
 
+KEYS = ['g_score', 'f1_score', 'd_score', 'test_auc', 'train_auc']
+
+
 class Individual:
     ''' A class used to represent an individual member of a population
 
@@ -652,10 +655,9 @@ def score_tracker(tracker, population, initialize=False):
     tracker : dict
         Dictionary of best scores from each iteration
     '''
-    keys = ['g_score', 'f1_score', 'd_score', 'test_auc', 'train_auc']
     fitnesses = fitness_list(population)
     index = np.argmax(fitnesses)
-    for key in keys:
+    for key in KEYS:
         key_name = 'best_' + key + 's'
         if initialize:
             tracker[key_name] = []
@@ -711,7 +713,6 @@ def finalize_result(output, data):
     result : dict
         Result of the run of the genetic algorithm
     '''
-    keys = ['g_score', 'f1_score', 'd_score', 'test_auc', 'train_auc']
     index = np.argmax(output['fitnesses'])
     result = {
         'best_parameters': population_list(output['population'])[index],
@@ -724,9 +725,11 @@ def finalize_result(output, data):
             output['population'][index].feature_importance,
         'data_dict': data
     }
-    for key in keys:
-        key_name = 'best_' + key + 's'
-        result[key_name] = find_result(output['scores'], key_name)
+    for key in KEYS:
+        key_name = 'best_' + key
+        result[key_name] = output['population'][index].score[key]
+        list_key = key_name + 's'
+        result[list_key] = find_result(output['scores'], list_key)
     return result
 
 

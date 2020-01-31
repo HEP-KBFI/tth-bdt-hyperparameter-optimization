@@ -14,7 +14,7 @@ from tthAnalysis.bdtHyperparameterOptimization import xgb_tools as xt
 from tthAnalysis.bdtHyperparameterOptimization import slurm_main as sm
 from tthAnalysis.bdtHyperparameterOptimization import stability_check_tools as sct
 
-NUMBER_REPETITIONS = 10
+NUMBER_REPETITIONS = 1
 
 def main():
     print('::::::: Reading GA settings & XGBoost parameters :::::::')
@@ -76,7 +76,7 @@ def main():
     dict_of_parameter_lists = universal.values_to_list_dict(
         keys, best_parameter_dicts)
     sct.stability_check_main(dict_of_parameter_lists, output_dir)
-    sct.plot_all_radar_charts(dict_of_parameter_lists, output_dir)
+    sct.plot_all_radar_charts(best_parameter_dicts, output_dir)
     sct.plot_score_stability(result_dicts, output_dir)    
 
 
