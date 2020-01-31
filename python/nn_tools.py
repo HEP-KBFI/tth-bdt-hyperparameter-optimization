@@ -282,17 +282,20 @@ def initialize_values(value_dicts):
         Parameter-set for a particle
     '''
     sample = {}
-    for hyper_params in value_dicts:
-        if bool(hyper_params['true_int']):
-            sample[str(hyper_params['p_name'])] = np.random.randint(
-                low=hyper_params['range_start'],
-                high=hyper_params['range_end']
+    for xgb_params in value_dicts:
+        if bool(xgb_params['true_int']):
+             value = np.random.randint(
+                low=xgb_params['range_start'],
+                high=xgb_params['range_end']
             )
         else:
-            sample[str(hyper_params['p_name'])] = np.random.uniform(
-                low=hyper_params['range_start'],
-                high=hyper_params['range_end']
+            value = np.random.uniform(
+                low=xgb_params['range_start'],
+                high=xgb_params['range_end']
             )
+        if bool(xgb_params['exp']):
+            value = np.exp(value)
+        sample[str(xgb_params['p_name'])] = value
     return sample
 
 
