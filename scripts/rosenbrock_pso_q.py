@@ -40,7 +40,8 @@ def main():
         parameter_dicts,
         true_values,
         value_dicts,
-        output_dir
+        output_dir,
+        global_settings
     )
     rt.plot_progress(result_dict, true_values, output_dir)
     rt.plot_distance_history(result_dict, true_values, output_dir)

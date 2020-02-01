@@ -67,7 +67,8 @@ def run_pso(
         parameter_dicts,
         true_values,
         value_dicts,
-        output_dir
+        output_dir,
+        global_settings
 ):
     '''Performs the whole particle swarm optimization
 
@@ -206,7 +207,7 @@ def initialize_values(value_dicts):
     '''
     sample = {}
     for parameters in value_dicts:
-         sample[str(params['p_name'])] = np.random.randint(
+         sample[str(parameters['p_name'])] = np.random.randint(
             low=parameters['range_start'],
             high=parameters['range_end']
         )
