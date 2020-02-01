@@ -1,6 +1,5 @@
 '''Tools necessary for XGBoost based fitness calculation and model creation
 '''
-from __future__ import division
 import numpy as np
 import xgboost as xgb
 from tthAnalysis.bdtHyperparameterOptimization import universal
