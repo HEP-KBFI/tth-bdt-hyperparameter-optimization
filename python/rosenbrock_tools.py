@@ -1,7 +1,7 @@
 from tthAnalysis.bdtHyperparameterOptimization import universal
 from tthAnalysis.bdtHyperparameterOptimization import pso_main as pm
 import numpy as np
-import matplotlib.pytplot as plt
+import matplotlib.pyplot as plt
 import os
 import matplotlib.ticker as ticker
 import json
@@ -9,7 +9,7 @@ import json
 
 
 def parameter_evaluation(
-        parameter_dict
+        parameter_dict,
         a,
         b
 ):
@@ -28,8 +28,10 @@ def parameter_evaluation(
         Contains only the 'rosenbrock_score'
 
     '''
-    f_x_y = (a - parameter_dict['x'])**2
-            + b*(parameter_dict['y']- parameter_dict['x']**2)**2
+    f_x_y = (
+        (a - parameter_dict['x'])**2
+        + b*(parameter_dict['y']- parameter_dict['x']**2)**2
+    )
     score = (-1)*f_x_y
     pred_train = []
     pred_test = []
@@ -61,11 +63,9 @@ def check_distance(true_values, best_parameters):
     return distance
 
 
-
-
 def run_pso(
         parameter_dicts,
-        true_values
+        true_values,
         value_dicts,
         output_dir
 ):
