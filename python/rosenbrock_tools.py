@@ -105,7 +105,7 @@ def run_pso(
     personal_bests = parameter_dicts
     best_fitnesses = fitnesses
     current_speeds = pm.initialize_speeds(parameter_dicts)
-    distance = check_distance(true_values, best_parameters)
+    distance = check_distance(true_values, result_dict['best_parameters'])
     while i <= iterations or distance < 1e-3:
         parameter_dicts = new_parameters
         fitnesses = ensemble_fitness(parameter_dicts, true_values)
@@ -126,7 +126,7 @@ def run_pso(
             index = np.argmax(fitnesses)
             result_dict['best_fitness'] = max(fitnesses)
             result_dict['best_parameters'] = parameter_dicts[index]
-        distance = check_distance(true_values, best_parameters)
+        distance = check_distance(true_values, result_dict['best_parameters'])
         result_dict['list_of_old_bests'].append(result_dict['best_parameters'])
         inertial_weight += inertial_weight_step
         i += 1
