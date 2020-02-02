@@ -188,6 +188,28 @@ def plot_distance_history(result_dict, true_values, output_dir):
     plt.close('all')
 
 
+def plot_fitness_history(result_dict, true_values, output_dir):
+    plot_out = os.path.join(output_dir, 'best_fitnesses.png')
+    x_values = np.arange(len(result_dict['list_of_best_fitnesses']))
+    plt.plot(
+        x_values,
+        result_dict['list_of_best_fitnesses'],
+        label='Best fitness'
+    )
+    plt.axhline(y=0.0, color='r', linestyle='-')
+    plt.xlabel('Iteration number / #')
+    plt.ylabel('Fitness')
+    axis = plt.gca()
+    axis.set_aspect('auto', adjustable='box')
+    axis.xaxis.set_major_locator(ticker.AutoLocator())
+    plt.grid(True)
+    plt.legend()
+    plt.yscale('log')
+    plt.tick_params(top=True, right=True, direction='in')
+    plt.savefig(plot_out, bbox_inches='tight')
+    plt.close('all')
+
+
 def save_results(result_dict, output_dir):
     best_parameters_path = os.path.join(output_dir, 'best_parameters.json')
     best_parameter_history_path = os.path.join(output_dir, 'history.json')
