@@ -105,7 +105,9 @@ def run_pso(
     best_fitnesses = fitnesses
     current_speeds = pm.initialize_speeds(parameter_dicts)
     distance = check_distance(true_values, result_dict['best_parameters'])
-    while i <= iterations or distance < 1e-3:
+    print('::::::::::: Optimizing ::::::::::')
+    while i <= iterations or distance < 1e-8:
+        print('---- Iteration: ' + str(i) + '----')
         parameter_dicts = new_parameters
         fitnesses = ensemble_fitness(parameter_dicts, true_values)
         best_fitnesses = pm.find_best_fitness(fitnesses, best_fitnesses)
@@ -185,7 +187,7 @@ def plot_distance_history(result_dict, true_values, output_dir):
     plt.close('all')
 
 
-def plot_fitness_history(result_dict, true_values, output_dir):
+def plot_fitness_history(result_dict, output_dir):
     plot_out = os.path.join(output_dir, 'best_fitnesses.png')
     x_values = np.arange(len(result_dict['list_of_best_fitnesses']))
     plt.plot(
@@ -329,3 +331,31 @@ def prepare_new_day(
     new_parameters = calculate_new_position(
         current_speeds, parameter_dicts, value_dicts)
     return new_parameters, current_speeds
+
+
+def plot_2d_location_progress(result_dict, true_values, output_dir):
+    plot_out = os.path.join(output_dir, '2d_progress.png')
+    flattened_dict = flatten_dict_list(result_dict)
+    plt.plot(
+        flattened_dict['x'],
+        flattened_dict['y'],
+        label='Approximation'
+    )
+    plt.plot(
+        true_values['a'],
+        true_values['a']**2,
+        marker='o',
+        markersize=3,
+        color="red",
+        label='True minimum'
+    )
+    plt.xlabel('x position')
+    plt.ylabel('y position')
+    axis = plt.gca()
+    axis.set_aspect('auto', adjustable='box')
+    axis.xaxis.set_major_locator(ticker.AutoLocator())
+    plt.grid(True)
+    plt.legend()
+    plt.tick_params(top=True, right=True, direction='in')
+    plt.savefig(plot_out, bbox_inches='tight')
+    plt.close('all')
