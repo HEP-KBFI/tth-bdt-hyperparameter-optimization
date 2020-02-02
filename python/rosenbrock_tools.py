@@ -67,7 +67,6 @@ def check_distance(true_values, best_parameters):
 def run_pso(
         parameter_dicts,
         true_values,
-        value_dicts,
         output_dir,
         global_settings
 ):
@@ -117,11 +116,10 @@ def run_pso(
             'c1': pso_settings['c1'],
             'c2': pso_settings['c2'],
             'w': inertial_weight}
-        new_parameters, current_speeds = pm.prepare_new_day(
+        new_parameters, current_speeds = prepare_new_day(
             personal_bests, parameter_dicts,
             result_dict['best_parameters'],
-            current_speeds, value_dicts,
-            weight_dict
+            current_speeds, weight_dict
         )
         if result_dict['best_fitness'] < max(fitnesses):
             index = np.argmax(fitnesses)
@@ -237,3 +235,68 @@ def prepare_run_params(value_dicts, sample_size):
         run_param = initialize_values(value_dicts)
         run_params.append(run_param)
     return run_params
+
+
+def calculate_new_position(
+        current_speeds,
+        parameter_dicts,
+):
+    '''Calculates the new parameters for the next iteration
+
+    Parameters:
+    ----------
+    current_speeds : list of dicts
+        Current speed in each parameter direction for each particle
+    parameter_dicts : list of dicts
+        Current parameter-sets of all particles
+
+    Returns:
+    -------
+    new_values : list of dicts
+        New parameters to be used in the next iteration
+    '''
+    new_values = []
+    for current_speed, parameter_dict in zip(current_speeds, parameter_dicts):
+        new_value = {}
+        for parameter in value_dicts:
+            key = parameter['p_name']
+            new_value[key] = parameter_dict[key] + current_speed[key]
+        new_values.append(new_value)
+    return new_values
+
+
+def prepare_new_day(
+        personal_bests,
+        parameter_dicts,
+        best_parameters,
+        current_speeds,
+        weight_dict
+):
+    '''Finds the new new parameters to find the fitness of
+
+    Parameters:
+    ----------
+    personal_bests : list of dicts
+        Best parameters for each individual particle
+    parameter_dicts : list of dicts
+        Current iteration parameters for each particle
+    current_speeds : list of dicts
+        Speed in every parameter direction for each particle
+    weight_dict : dict
+        dictionary containing the normalized weights [w: inertial weight,
+        c1: cognitive weight, c2: social weight]
+
+    Returns:
+    -------
+    new_parameters : list of dicts
+        Parameter-sets that are used in the next iteration
+    current_speeds : list of dicts
+        New speed of each particle
+    '''
+    current_speeds = pm.calculate_new_speed(
+        personal_bests, parameter_dicts, best_parameters,
+        current_speeds, weight_dict
+    )
+    new_parameters = calculate_new_position(
+        current_speeds, parameter_dicts)
+    return new_parameters, current_speeds

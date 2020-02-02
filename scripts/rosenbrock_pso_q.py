@@ -39,7 +39,6 @@ def main():
     result_dict = rt.run_pso(
         parameter_dicts,
         true_values,
-        value_dicts,
         output_dir,
         global_settings
     )
