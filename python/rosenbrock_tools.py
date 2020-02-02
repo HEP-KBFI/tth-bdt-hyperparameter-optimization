@@ -101,6 +101,7 @@ def run_pso(
     fitnesses = ensemble_fitness(parameter_dicts, true_values)
     result_dict = {}
     index = np.argmax(fitnesses)
+    result_dict['best_fitness'] = fitnesses[index]
     result_dict['best_parameters'] = parameter_dicts[index]
     result_dict['list_of_old_bests'] = [parameter_dicts[index]]
     personal_bests = parameter_dicts
