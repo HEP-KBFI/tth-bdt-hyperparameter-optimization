@@ -143,6 +143,7 @@ def flatten_dict_list(result_dict):
 
 
 def plot_progress(result_dict, true_values, output_dir):
+
     param_progress = flatten_dict_list(result_dict)
     for key in param_progress:
         plot_out = os.path.join(output_dir, key + '_process.png')
@@ -162,6 +163,7 @@ def plot_progress(result_dict, true_values, output_dir):
 
 
 def plot_distance_history(result_dict, true_values, output_dir):
+    true_parameters = {'x': true_values['a'], 'y': true_values['a']**2}
     distances = []
     for old_best in result_dict['list_of_old_bests']:
         distance = check_distance(true_values, old_best)
@@ -169,7 +171,7 @@ def plot_distance_history(result_dict, true_values, output_dir):
     plot_out = os.path.join(output_dir, 'distance_from_minima.png')
     x_values = np.arange(len(param_progress[key]))
     plt.plot(x_values, param_progress[key], label='Predicted value')
-    plt.plot(x_values, true_values[key])
+    plt.plot(x_values, true_parameters[key])
     plt.xlabel('Iteration number / #')
     plt.ylabel('Distance from minimum')
     axis = plt.gca()

@@ -35,7 +35,7 @@ def main():
     value_dicts = universal.read_parameters(param_file)
     parameter_dicts = rt.prepare_run_params(
         value_dicts, pso_settings['sample_size'])
-    true_values = {'a': 1, 'b': 100}
+    true_values = {'x': 1, 'y': 1}
     result_dict = rt.run_pso(
         parameter_dicts,
         true_values,
