@@ -28,11 +28,10 @@ def parameter_evaluation(
         Contains only the 'rosenbrock_score'
 
     '''
-    f_x_y = (
+    score = (
         (a - parameter_dict['x'])**2
         + b*(parameter_dict['y']- parameter_dict['x']**2)**2
     )
-    score = (-1)*f_x_y
     pred_train = []
     pred_test = []
     feature_importance = {}
@@ -104,6 +103,7 @@ def run_pso(
     result_dict['best_fitness'] = fitnesses[index]
     result_dict['best_parameters'] = parameter_dicts[index]
     result_dict['list_of_old_bests'] = [parameter_dicts[index]]
+    result_dict['list_of_best_fitnesses'] = [fitnesses[index]]
     personal_bests = parameter_dicts
     best_fitnesses = fitnesses
     current_speeds = pm.initialize_speeds(parameter_dicts)
@@ -124,12 +124,13 @@ def run_pso(
             current_speeds, value_dicts,
             weight_dict
         )
-        if result_dict['best_fitness'] < max(fitnesses):
+        if result_dict['best_fitness'] > max(fitnesses):
             index = np.argmax(fitnesses)
             result_dict['best_fitness'] = max(fitnesses)
             result_dict['best_parameters'] = parameter_dicts[index]
         distance = check_distance(true_values, result_dict['best_parameters'])
         result_dict['list_of_old_bests'].append(result_dict['best_parameters'])
+        result_dict['list_of_best_fitnesses'].append(result_dict['best_fitness'])
         inertial_weight += inertial_weight_step
         i += 1
     return result_dict
