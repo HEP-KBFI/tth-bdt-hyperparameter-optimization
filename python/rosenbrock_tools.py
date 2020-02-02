@@ -96,7 +96,7 @@ def run_pso(
     personal_bests = {}
     fitnesses = ensemble_fitness(parameter_dicts, true_values)
     result_dict = {}
-    index = np.argmax(fitnesses)
+    index = np.argmin(fitnesses)
     result_dict['best_fitness'] = fitnesses[index]
     result_dict['best_parameters'] = parameter_dicts[index]
     result_dict['list_of_old_bests'] = [parameter_dicts[index]]
@@ -121,9 +121,9 @@ def run_pso(
             current_speeds, value_dicts,
             weight_dict
         )
-        if result_dict['best_fitness'] > max(fitnesses):
-            index = np.argmax(fitnesses)
-            result_dict['best_fitness'] = max(fitnesses)
+        if result_dict['best_fitness'] > min(fitnesses):
+            index = np.argmin(fitnesses)
+            result_dict['best_fitness'] = min(fitnesses)
             result_dict['best_parameters'] = parameter_dicts[index]
         distance = check_distance(true_values, result_dict['best_parameters'])
         result_dict['list_of_old_bests'].append(result_dict['best_parameters'])

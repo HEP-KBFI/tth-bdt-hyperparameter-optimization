@@ -43,6 +43,7 @@ def main():
         output_dir,
         global_settings
     )
+    print(':::::::::: Saving results :::::::::::::')
     rt.plot_progress(result_dict, true_values, output_dir)
     rt.plot_distance_history(result_dict, true_values, output_dir)
     rt.plot_fitness_history(result_dict, true_values, output_dir)
