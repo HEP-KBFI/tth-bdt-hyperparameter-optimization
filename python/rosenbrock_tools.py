@@ -91,7 +91,7 @@ def run_pso(
     output_dir = os.path.expandvars(global_settings['output_dir'])
     settings_dir = os.path.join(output_dir, 'run_settings')
     global_settings = universal.read_settings(settings_dir, 'global')
-    pso_settings = read_weights(settings_dir)
+    pso_settings = universal.read_settings(settings_dir, 'pso')
     inertial_weight, inertial_weight_step = pm.get_weight_step(pso_settings)
     iterations = pso_settings['iterations']
     i = 1
@@ -332,28 +332,3 @@ def prepare_new_day(
     new_parameters = calculate_new_position(
         current_speeds, parameter_dicts, value_dicts)
     return new_parameters, current_speeds
-
-
-def read_weights(settings_dir):
-    ''' Reads the weights for different components and normalizes them
-
-    Parameters:
-    ----------
-    None
-
-    Returns:
-    -------
-    weight_dict : dict
-        Contains all the weights for PSO
-    '''
-    pso_settings = universal.read_settings(settings_dir, 'pso')
-    weight_dict = {
-        'w_init': normed_weights_dict['w_init'],
-        'w_fin': normed_weights_dict['w_fin'],
-        'c1': normed_weights_dict['c1'],
-        'c2': normed_weights_dict['c2'],
-        'iterations': pso_settings['iterations'],
-        'sample_size': pso_settings['sample_size'],
-        'compactness_threshold': pso_settings['compactness_threshold']
-    }
-    return weight_dict
