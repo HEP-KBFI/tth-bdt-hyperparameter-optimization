@@ -32,9 +32,6 @@ def parameter_evaluation(
         (a - parameter_dict['x'])**2
         + b*(parameter_dict['y']- parameter_dict['x']**2)**2
     )
-    pred_train = []
-    pred_test = []
-    feature_importance = {}
     return score
 
 
@@ -182,7 +179,7 @@ def plot_distance_history(result_dict, true_values, output_dir):
     axis.xaxis.set_major_locator(ticker.AutoLocator())
     plt.grid(True)
     plt.legend()
-    plt.yscale('log')
+    # plt.yscale('log')
     plt.tick_params(top=True, right=True, direction='in')
     plt.savefig(plot_out, bbox_inches='tight')
     plt.close('all')
