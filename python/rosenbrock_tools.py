@@ -171,7 +171,7 @@ def plot_distance_history(result_dict, true_values, output_dir):
         distance = check_distance(true_values, old_best)
         distances.append(distance)
     plot_out = os.path.join(output_dir, 'distance_from_minima.png')
-    x_values = np.arange(len(param_progress[key]))
+    x_values = np.arange(len(distances))
     plt.plot(x_values, distances, label='Predicted value')
     plt.axhline(y=0.0, color='r', linestyle='-')
     plt.xlabel('Iteration number / #')
