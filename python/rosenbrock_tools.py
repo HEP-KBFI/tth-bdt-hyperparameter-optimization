@@ -145,13 +145,13 @@ def flatten_dict_list(result_dict):
 
 
 def plot_progress(result_dict, true_values, output_dir):
-
+    true_parameters = {'x': true_values['a'], 'y': true_values['a']**2}
     param_progress = flatten_dict_list(result_dict)
     for key in param_progress:
         plot_out = os.path.join(output_dir, key + '_process.png')
         x_values = np.arange(len(param_progress[key]))
         plt.plot(x_values, param_progress[key], label='Predicted value')
-        plt.plot(x_values, true_values[key])
+        plt.plot(x_values, true_parameters[key])
         plt.xlabel('Iteration number / #')
         plt.ylabel('Minima location')
         axis = plt.gca()
