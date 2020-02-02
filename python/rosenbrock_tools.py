@@ -193,7 +193,7 @@ def save_results(result_dict, output_dir):
     with open(best_parameters_path, 'w') as file:
         json.dump(result_dict['best_parameters'], file)
     with open(best_parameter_history_path, 'w') as file:
-        json.dump(result_dict['list_of_old_bests'])
+        json.dump(result_dict['list_of_old_bests'], file)
 
 
 def initialize_values(value_dicts):
