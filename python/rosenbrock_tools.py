@@ -54,10 +54,11 @@ def ensemble_fitness(
 
 
 def check_distance(true_values, best_parameters):
+    true_parameters = {'x': true_values['a'], 'y': true_values['a']**2}
     diff_dict = {}
     diff_sqared_sum = 0
-    for key in true_values:
-        diff_dict[key] = true_values[key] - best_parameters[key]
+    for key in true_parameters:
+        diff_dict[key] = true_parameters[key] - best_parameters[key]
         diff_sqared_sum += diff_dict[key]**2
     distance = np.sqrt(diff_sqared_sum)
     return distance
