@@ -67,6 +67,7 @@ def check_distance(true_values, best_parameters):
 def run_pso(
         parameter_dicts,
         true_values,
+        value_dicts,
         output_dir,
         global_settings
 ):
@@ -119,7 +120,8 @@ def run_pso(
         new_parameters, current_speeds = prepare_new_day(
             personal_bests, parameter_dicts,
             result_dict['best_parameters'],
-            current_speeds, weight_dict
+            current_speeds, value_dicts,
+            weight_dict
         )
         if result_dict['best_fitness'] < max(fitnesses):
             index = np.argmax(fitnesses)
@@ -240,6 +242,7 @@ def prepare_run_params(value_dicts, sample_size):
 def calculate_new_position(
         current_speeds,
         parameter_dicts,
+        value_dicts
 ):
     '''Calculates the new parameters for the next iteration
 
@@ -249,6 +252,8 @@ def calculate_new_position(
         Current speed in each parameter direction for each particle
     parameter_dicts : list of dicts
         Current parameter-sets of all particles
+    value_dicts : list of dicts
+        Info about every variable that is to be optimized
 
     Returns:
     -------
@@ -270,6 +275,7 @@ def prepare_new_day(
         parameter_dicts,
         best_parameters,
         current_speeds,
+        value_dicts,
         weight_dict
 ):
     '''Finds the new new parameters to find the fitness of
@@ -282,6 +288,8 @@ def prepare_new_day(
         Current iteration parameters for each particle
     current_speeds : list of dicts
         Speed in every parameter direction for each particle
+    value_dicts : list of dicts
+        Info about every variable that is to be optimized
     weight_dict : dict
         dictionary containing the normalized weights [w: inertial weight,
         c1: cognitive weight, c2: social weight]
@@ -298,5 +306,5 @@ def prepare_new_day(
         current_speeds, weight_dict
     )
     new_parameters = calculate_new_position(
-        current_speeds, parameter_dicts)
+        current_speeds, parameter_dicts, value_dicts)
     return new_parameters, current_speeds
