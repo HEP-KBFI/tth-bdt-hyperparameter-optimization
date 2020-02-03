@@ -11,7 +11,7 @@ from tthAnalysis.bdtHyperparameterOptimization import universal
 from tthAnalysis.bdtHyperparameterOptimization import pso_main as pm
 from tthAnalysis.bdtHyperparameterOptimization import rosenbrock_tools as rt
 
-np.random.seed(1)
+np.random.seed(4)
 
 
 def main():
@@ -36,18 +36,25 @@ def main():
     parameter_dicts = rt.prepare_run_params(
         value_dicts, pso_settings['sample_size'])
     true_values = {'a': 1, 'b': 100}
-    result_dict = rt.run_pso(
+    result_dict = rt.run_random(
         parameter_dicts,
         true_values,
         value_dicts,
         output_dir,
-        global_settings,
-        plot_pso_location=True
+        global_settings
+    )
+    result_dict_pso = rt.run_pso(
+        parameter_dicts,
+        true_values,
+        value_dicts,
+        output_dir,
+        global_settings
     )
     print(':::::::::: Saving results :::::::::::::')
     rt.plot_progress(result_dict, true_values, output_dir)
     rt.plot_distance_history(result_dict, true_values, output_dir)
-    rt.plot_fitness_history(result_dict, output_dir)
+    rt.plot_fitness_history(result_dict, output_dir, label='rnd', close=False)
+    rt.plot_fitness_history(result_dict_pso, output_dir, label='pso')
     rt.plot_2d_location_progress(result_dict, true_values, output_dir)
     rt.save_results(result_dict, output_dir)
 
