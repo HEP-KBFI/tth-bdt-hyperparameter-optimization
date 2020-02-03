@@ -155,7 +155,7 @@ def plot_particle_swarm(parameter_dicts, true_values, iteration, output_dir):
         os.makedirs(iteration_pic_path)
     true_parameters = {'x': true_values['a'], 'y': true_values['a']**2}
     output_path = os.path.join(
-        iteration_pic_path, 'iteration_' + str(i) + '.png')
+        iteration_pic_path, 'iteration_' + str(iteration) + '.png')
     for parameter_dict in parameter_dicts:
         plt.plot(
             parameter_dict['x'],
@@ -172,6 +172,7 @@ def plot_particle_swarm(parameter_dicts, true_values, iteration, output_dir):
     plt.xlim(-1000, 1000)
     plt.legend()
     plt.grid(True)
+    plt.title('Iteration ' + str(iteration))
     axis = plt.gca()
     axis.set_aspect('auto', adjustable='box')
     axis.xaxis.set_major_locator(ticker.AutoLocator())
