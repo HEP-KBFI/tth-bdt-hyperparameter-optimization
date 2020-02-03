@@ -187,7 +187,9 @@ def plot_distance_history(result_dict, true_values, output_dir):
     plt.close('all')
 
 
-def plot_fitness_history(result_dict, output_dir):
+def plot_fitness_history(
+        result_dict, output_dir, close=True, label='Best fitness'
+):
     plot_out = os.path.join(output_dir, 'best_fitnesses.png')
     x_values = np.arange(len(result_dict['list_of_best_fitnesses']))
     plt.plot(
@@ -205,8 +207,9 @@ def plot_fitness_history(result_dict, output_dir):
     plt.legend()
     plt.yscale('log')
     plt.tick_params(top=True, right=True, direction='in')
-    plt.savefig(plot_out, bbox_inches='tight')
-    plt.close('all')
+    if close:
+        plt.savefig(plot_out, bbox_inches='tight')
+        plt.close('all')
 
 
 def save_results(result_dict, output_dir):
@@ -366,3 +369,64 @@ def plot_2d_location_progress(result_dict, true_values, output_dir):
     plt.tick_params(top=True, right=True, direction='in')
     plt.savefig(plot_out, bbox_inches='tight')
     plt.close('all')
+
+
+
+def run_random(
+        parameter_dicts,
+        true_values,
+        value_dicts,
+        output_dir,
+        global_settings
+):
+    '''Performs the whole particle swarm optimization
+
+    Parameters:
+    ----------
+    global_settings : dict
+        Global settings for the run.
+    pso_settings : dict
+        Particle swarm settings for the run
+    parameter_dicts : list of dicts
+        The parameter-sets of all particles.
+
+    Returns:
+    -------
+    result_dict : dict
+        Dictionary that contains the results like best_parameters,
+        best_fitnesses, avg_scores, pred_train, pred_test, data_dict
+    '''
+    print(':::::::: Initializing :::::::::')
+    output_dir = os.path.expandvars(global_settings['output_dir'])
+    settings_dir = os.path.join(output_dir, 'run_settings')
+    pso_settings = universal.read_settings(settings_dir, 'pso')
+    iterations = pso_settings['iterations']
+    i = 1
+    new_parameters = parameter_dicts
+    personal_bests = {}
+    fitnesses = ensemble_fitness(parameter_dicts, true_values)
+    result_dict = {}
+    index = np.argmin(fitnesses)
+    result_dict['best_fitness'] = fitnesses[index]
+    result_dict['best_parameters'] = parameter_dicts[index]
+    result_dict['list_of_old_bests'] = [parameter_dicts[index]]
+    result_dict['list_of_best_fitnesses'] = [fitnesses[index]]
+    personal_bests = parameter_dicts
+    best_fitnesses = fitnesses
+    print('::::::::::: Optimizing ::::::::::')
+    while i <= iterations:
+        print('---- Iteration: ' + str(i) + '----')
+        parameter_dicts = rt.prepare_run_params(
+            value_dicts, pso_settings['sample_size'])
+        fitnesses = ensemble_fitness(parameter_dicts, true_values)
+        best_fitnesses = pm.find_best_fitness(fitnesses, best_fitnesses)
+        if result_dict['best_fitness'] > min(fitnesses):
+            index = np.argmin(fitnesses)
+            result_dict['best_fitness'] = min(fitnesses)
+            result_dict['best_parameters'] = parameter_dicts[index]
+        distance = check_distance(true_values, result_dict['best_parameters'])
+        result_dict['list_of_old_bests'].append(result_dict['best_parameters'])
+        result_dict['list_of_best_fitnesses'].append(result_dict['best_fitness'])
+        inertial_weight += inertial_weight_step
+        i += 1
+    return result_dict
