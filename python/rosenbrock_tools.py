@@ -177,7 +177,7 @@ def plot_particle_swarm(
     plt.plot(
         result_dict['list_of_old_bests'][0]['x'],
         result_dict['list_of_old_bests'][0]['y'],
-        color='r',
+        color='b',
         marker='o',
         label='Current best')
     plt.plot(
@@ -188,14 +188,13 @@ def plot_particle_swarm(
         label='Global minimum')
     plt.ylim(-500, 500)
     plt.xlim(-500, 500)
-    plt.legend()
     plt.grid(True)
     plt.title('Iteration ' + str(iteration))
     axis = plt.gca()
     axis.set_aspect('auto', adjustable='box')
     axis.xaxis.set_major_locator(ticker.AutoLocator())
     plt.tick_params(top=True, right=True, direction='in')
-    plt.savefig(plot_out, bbox_inches='tight')
+    plt.savefig(plot_out)
     plt.close('all')
 
 
