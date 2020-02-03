@@ -288,8 +288,8 @@ def calculate_new_position(
         new_value = {}
         for parameter in value_dicts:
             key = parameter['p_name']
-            maximum = parameter['range_start']
-            minimum = parameter['range_end']
+            minimum = parameter['range_start']
+            maximum = parameter['range_end']
             new_value[key] = parameter_dict[key] + current_speed[key]
             if new_value[key] > maximum:
                 new_value[key] = maximum
