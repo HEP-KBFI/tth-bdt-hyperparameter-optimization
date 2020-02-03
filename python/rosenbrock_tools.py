@@ -416,7 +416,7 @@ def run_random(
     print('::::::::::: Optimizing ::::::::::')
     while i <= iterations:
         print('---- Iteration: ' + str(i) + '----')
-        parameter_dicts = rt.prepare_run_params(
+        parameter_dicts = prepare_run_params(
             value_dicts, pso_settings['sample_size'])
         fitnesses = ensemble_fitness(parameter_dicts, true_values)
         best_fitnesses = pm.find_best_fitness(fitnesses, best_fitnesses)
