@@ -361,6 +361,7 @@ def plot_2d_location_progress(result_dict, true_values, output_dir):
     axis.set_aspect('auto', adjustable='box')
     axis.xaxis.set_major_locator(ticker.AutoLocator())
     plt.grid(True)
+    plt.yscale('symlog')
     plt.legend()
     plt.tick_params(top=True, right=True, direction='in')
     plt.savefig(plot_out, bbox_inches='tight')
