@@ -167,19 +167,19 @@ def plot_particle_swarm(
             parameter_dict['y'],
             color='k',
             marker='o')
-    for old_best in result_dict['list_of_old_bests']:
-        plt.plot(
-            old_best['x'],
-            old_best['y'],
-            color='g',
-            marker='o',
-            label='Previous bests')
-    plt.plot(
-        result_dict['list_of_old_bests'][0]['x'],
-        result_dict['list_of_old_bests'][0]['y'],
-        color='b',
-        marker='o',
-        label='Current best')
+    # for old_best in result_dict['list_of_old_bests']:
+    #     plt.plot(
+    #         old_best['x'],
+    #         old_best['y'],
+    #         color='g',
+    #         marker='o',
+    #         label='Previous bests')
+    # plt.plot(
+    #     result_dict['list_of_old_bests'][0]['x'],
+    #     result_dict['list_of_old_bests'][0]['y'],
+    #     color='b',
+    #     marker='o',
+    #     label='Current best')
     plt.plot(
         true_parameters['x'],
         true_parameters['y'],
