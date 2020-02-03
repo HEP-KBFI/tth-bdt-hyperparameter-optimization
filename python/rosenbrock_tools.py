@@ -111,7 +111,8 @@ def run_pso(
         print('---- Iteration: ' + str(i) + '----')
         parameter_dicts = new_parameters
         if plot_pso_location and i % 500 == 0:
-            plot_particle_swarm(parameter_dicts, true_values, i, output_dir)
+            plot_particle_swarm(
+                parameter_dicts, true_values, i, output_dir, result_dict)
         fitnesses = ensemble_fitness(parameter_dicts, true_values)
         best_fitnesses = pm.find_best_fitness(fitnesses, best_fitnesses)
         personal_bests = pm.calculate_personal_bests(
