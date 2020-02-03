@@ -427,6 +427,5 @@ def run_random(
         distance = check_distance(true_values, result_dict['best_parameters'])
         result_dict['list_of_old_bests'].append(result_dict['best_parameters'])
         result_dict['list_of_best_fitnesses'].append(result_dict['best_fitness'])
-        inertial_weight += inertial_weight_step
         i += 1
     return result_dict
