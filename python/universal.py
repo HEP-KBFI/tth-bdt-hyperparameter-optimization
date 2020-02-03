@@ -885,8 +885,8 @@ def plot_costfunction(avg_scores, output_dir):
         plt.xlim(0, n_gens - 1)
         plt.xticks(np.arange(n_gens - 1))
     except:  # in case of a genetic algorithm with multiple subpopulations
+        x_max = 0
         for i in avg_scores.keys():
-            x_max = 0
             n_gens = len(avg_scores[i])
             if n_gens > x_max:
                 x_max = n_gens
@@ -894,7 +894,7 @@ def plot_costfunction(avg_scores, output_dir):
                 gen_numbers = np.arange(n_gens)
                 plt.plot(gen_numbers, avg_scores[i], color='b')
         n_gens_final = x_max + len(avg_scores['final']) - 1
-        gen_numbers = np.arange(x_max - 1, n_gens_final)
+        gen_numbers = np.arange(x_max, n_gens_final - 1)
         plt.plot(gen_numbers, avg_scores['final'], color='k')
         plt.xlim(0, n_gens_final - 1)
         plt.xticks(np.arange(n_gens_final))
