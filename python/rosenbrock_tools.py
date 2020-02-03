@@ -92,7 +92,7 @@ def run_pso(
     pso_settings = universal.read_settings(settings_dir, 'pso')
     inertial_weight, inertial_weight_step = pm.get_weight_step(pso_settings)
     iterations = pso_settings['iterations']
-    i = 1
+    i = 0
     new_parameters = parameter_dicts
     personal_bests = {}
     fitnesses = ensemble_fitness(parameter_dicts, true_values)
@@ -106,8 +106,6 @@ def run_pso(
     best_fitnesses = fitnesses
     current_speeds = pm.initialize_speeds(parameter_dicts)
     distance = check_distance(true_values, result_dict['best_parameters'])
-    if plot_pso_location:
-        plot_particle_swarm(parameter_dicts, true_values, i, output_dir)
     print('::::::::::: Optimizing ::::::::::')
     while i <= iterations or distance < 1e-8:
         print('---- Iteration: ' + str(i) + '----')
@@ -149,7 +147,13 @@ def flatten_dict_list(result_dict):
     return flattened_dict
 
 
-def plot_particle_swarm(parameter_dicts, true_values, iteration, output_dir):
+def plot_particle_swarm(
+        parameter_dicts,
+        true_values,
+        iteration,
+        output_dir,
+        result_dict
+):
     iteration_pic_path = os.path.join(output_dir, 'pso_iteration_pictures')
     if not os.path.exists(iteration_pic_path):
         os.makedirs(iteration_pic_path)
@@ -162,14 +166,27 @@ def plot_particle_swarm(parameter_dicts, true_values, iteration, output_dir):
             parameter_dict['y'],
             color='k',
             marker='o')
+    for old_best in result_dict['list_of_old_bests']:
+        plt.plot(
+            old_best['x'],
+            old_best['y'],
+            color='g',
+            marker='o',
+            label='Previous bests')
+    plt.plot(
+        result_dict['list_of_old_bests'][0]['x'],
+        result_dict['list_of_old_bests'][0]['y'],
+        color='r',
+        marker='o',
+        label='Current best')
     plt.plot(
         true_parameters['x'],
         true_parameters['y'],
         color='r',
         marker='o',
         label='Global minimum')
-    plt.ylim(-1000, 1000)
-    plt.xlim(-1000, 1000)
+    plt.ylim(-500, 500)
+    plt.xlim(-500, 500)
     plt.legend()
     plt.grid(True)
     plt.title('Iteration ' + str(iteration))
