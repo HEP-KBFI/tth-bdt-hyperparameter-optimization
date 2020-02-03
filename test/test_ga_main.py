@@ -2,11 +2,17 @@
 Missing tests for the following functions:
 separate_subpopulations
 unite_subpopulations
-fitness_list
+fitness_calculation
+elitism
+culling
 arrange_population
 merge_subpopulations
 finish_subpopulation
+evolve
+score_tracker
 find_result
+finalize_result
+evolution
 '''
 import os
 import gzip
@@ -167,7 +173,10 @@ def test_set_num():
     assert result == expected, 'test_set_num failed'
 
 
-# def test_fitness_list():
+def test_fitness_list():
+    '''Testing the fitness_list function'''
+    result = gm.fitness_list(POPULATION)
+    assert len(result) == len(POPULATION), 'test_fitness_list failed'
 
 
 def test_population_list():
@@ -219,7 +228,7 @@ def test_elitism():
     assert result == expected, 'test_elitism failed'
 
 
-@pytest.mark.skip(reason='Runs too long, rewrite needed')
+@pytest.mark.skip(reason='Rewrite needed')
 def test_culling():
     '''Testing the culling function'''
     result = gm.culling(
@@ -291,7 +300,7 @@ def test_new_population():
 # def test_finish_populations()
 
 
-@pytest.mark.skip(reason='Runs too long, rewrite needed')
+@pytest.mark.skip(reason='Rewrite needed')
 def test_evolve():
     '''Testing the evolve function'''
     initial = POPULATION[:1]
@@ -391,7 +400,7 @@ def test_finalize_results():
     assert result == expected
 
 
-@pytest.mark.skip(reason='Runs too long, rewrite needed')
+@pytest.mark.skip(reason='Rewrite needed')
 def test_evolution():
     '''Testing the evolution function'''
     SETTINGS.update({'culling': 0, 'elitism': 0, 'sub_pops': 1})

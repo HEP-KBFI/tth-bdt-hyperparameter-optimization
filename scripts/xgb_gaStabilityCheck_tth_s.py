@@ -14,7 +14,7 @@ from tthAnalysis.bdtHyperparameterOptimization import xgb_tools as xt
 from tthAnalysis.bdtHyperparameterOptimization import slurm_main as sm
 from tthAnalysis.bdtHyperparameterOptimization import stability_check_tools as sct
 
-NUMBER_REPETITIONS = 1
+NUMBER_REPETITIONS = 10
 
 def main():
     print('::::::: Reading GA settings & XGBoost parameters :::::::')

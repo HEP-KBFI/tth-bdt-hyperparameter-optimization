@@ -272,6 +272,13 @@ def mutation_fix(offspring, parameters):
         # Current parameter
         key = parameter['p_name']
 
+        # Forces exp parameters to have values between 0 and 1
+        if parameter['exp'] == 1: 
+            if offspring[key] > 1:
+                offspring[key] = 1
+            elif offspring[key] < 0:
+                offspring[key] = 0
+
         # Forces int parameters to have integer values
         if parameter['true_int'] == 1:
             offspring[key] = int(round(offspring[key]))
