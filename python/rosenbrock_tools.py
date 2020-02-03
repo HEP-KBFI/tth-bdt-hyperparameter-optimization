@@ -65,7 +65,8 @@ def run_pso(
         true_values,
         value_dicts,
         output_dir,
-        global_settings
+        global_settings,
+        plot_pso_location=False
 ):
     '''Performs the whole particle swarm optimization
 
@@ -105,10 +106,14 @@ def run_pso(
     best_fitnesses = fitnesses
     current_speeds = pm.initialize_speeds(parameter_dicts)
     distance = check_distance(true_values, result_dict['best_parameters'])
+    if plot_pso_location:
+        plot_particle_swarm(parameter_dicts, true_values, i, output_dir)
     print('::::::::::: Optimizing ::::::::::')
     while i <= iterations or distance < 1e-8:
         print('---- Iteration: ' + str(i) + '----')
         parameter_dicts = new_parameters
+        if plot_pso_location and i % 500 == 0:
+            plot_particle_swarm(parameter_dicts, true_values, i, output_dir)
         fitnesses = ensemble_fitness(parameter_dicts, true_values)
         best_fitnesses = pm.find_best_fitness(fitnesses, best_fitnesses)
         personal_bests = pm.calculate_personal_bests(
@@ -142,6 +147,37 @@ def flatten_dict_list(result_dict):
         for old_best in result_dict['list_of_old_bests']:
             flattened_dict[key].append(old_best[key])
     return flattened_dict
+
+
+def plot_particle_swarm(parameter_dicts, true_values, iteration, output_dir):
+    iteration_pic_path = os.path.join(output_dir, 'pso_iteration_pictures')
+    if not os.path.exists(iteration_pic_path):
+        os.makedirs(iteration_pic_path)
+    true_parameters = {'x': true_values['a'], 'y': true_values['a']**2}
+    output_path = os.path.join(
+        iteration_pic_path, 'iteration_' + str(i) + '.png')
+    for parameter_dict in parameter_dicts:
+        plt.plot(
+            parameter_dict['x'],
+            parameter_dict['y'],
+            color='k',
+            marker='o')
+    plt.plot(
+        true_parameters['x'],
+        true_parameters['y'],
+        color='r',
+        marker='o',
+        label='Global minimum')
+    plt.ylim(-1000, 1000)
+    plt.xlim(-1000, 1000)
+    plt.legend()
+    plt.grid(True)
+    axis = plt.gca()
+    axis.set_aspect('auto', adjustable='box')
+    axis.xaxis.set_major_locator(ticker.AutoLocator())
+    plt.tick_params(top=True, right=True, direction='in')
+    plt.savefig(plot_out, bbox_inches='tight')
+    plt.close('all')
 
 
 def plot_progress(result_dict, true_values, output_dir):

@@ -41,7 +41,8 @@ def main():
         true_values,
         value_dicts,
         output_dir,
-        global_settings
+        global_settings,
+        plot_pso_location=True
     )
     print(':::::::::: Saving results :::::::::::::')
     rt.plot_progress(result_dict, true_values, output_dir)
