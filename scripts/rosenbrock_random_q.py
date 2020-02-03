@@ -11,7 +11,7 @@ from tthAnalysis.bdtHyperparameterOptimization import universal
 from tthAnalysis.bdtHyperparameterOptimization import pso_main as pm
 from tthAnalysis.bdtHyperparameterOptimization import rosenbrock_tools as rt
 
-np.random.seed(1)
+np.random.seed(4)
 
 
 def main():

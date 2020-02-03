@@ -195,7 +195,7 @@ def plot_fitness_history(
     plt.plot(
         x_values,
         result_dict['list_of_best_fitnesses'],
-        label='Best fitness'
+        label=label
     )
     plt.axhline(y=0.0, color='r', linestyle='-')
     plt.xlabel('Iteration number / #')
