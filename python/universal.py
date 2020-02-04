@@ -897,7 +897,7 @@ def plot_costfunction(avg_scores, output_dir):
             if len(avg_scores[i]) < x_max and i != 'final':
                 line_length = x_max - len(avg_scores[i]) + 1
                 y_values = [avg_scores[i][-1] for n in range(line_length)]
-                x_values = np.arange(len(avg_scores[i] - 1, x_max))
+                x_values = np.arange(len(avg_scores[i]) - 1, x_max)
                 plt.plot(x_values, y_values, color='b', linestyle='--', alpha=0.2)
         n_gens_final = x_max + len(avg_scores['final']) - 1
         gen_numbers = np.arange(x_max - 1, n_gens_final)
