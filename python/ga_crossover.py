@@ -272,18 +272,25 @@ def mutation_fix(offspring, parameters):
         # Current parameter
         key = parameter['p_name']
 
-        # Forces int parameters to have integer values
-        if parameter['true_int'] == 1:
-            offspring[key] = int(round(offspring[key]))
+        # Forces exp parameters to have values between 0 and 1
+        if parameter['exp'] == 1: 
+            if offspring[key] > 1:
+                offspring[key] = 1
+            elif offspring[key] < 0:
+                offspring[key] = 0
+        else:
+            # Forces int parameters to have integer values
+            if parameter['true_int'] == 1:
+                offspring[key] = int(round(offspring[key]))
 
-        # Forces parameter values not to be lower
-        # than range start value
-        if offspring[key] < parameter['range_start']:
-            offspring[key] = parameter['range_start']
+            # Forces parameter values not to be lower
+            # than range start value
+            if offspring[key] < parameter['range_start']:
+                offspring[key] = parameter['range_start']
 
-        # Forces parameter values not to exceed range end value
-        elif offspring[key] > parameter['range_end']:
-            offspring[key] = parameter['range_end']
+            # Forces parameter values not to exceed range end value
+            elif offspring[key] > parameter['range_end']:
+                offspring[key] = parameter['range_end']
 
     return offspring
 
