@@ -5,13 +5,13 @@ import matplotlib.pyplot as plt
 import os
 import matplotlib.ticker as ticker
 import json
-
+from mpl_toolkits import mplot3d
 
 
 def parameter_evaluation(
         parameter_dict,
-        a,
-        b
+        a=1,
+        b=100
 ):
     '''Evaluation of the Rosenbrock function to find the minimum. For Rosenbrock
     function the global minimum is as (x, y) = (a, a^2). Thus for our case where
@@ -175,8 +175,8 @@ def plot_particle_swarm(
     #         marker='o',
     #         label='Previous bests')
     # plt.plot(
-    #     result_dict['list_of_old_bests'][0]['x'],
-    #     result_dict['list_of_old_bests'][0]['y'],
+    #     result_dict['list_of_old_bests'][-1]['x'],
+    #     result_dict['list_of_old_bests'][-1]['y'],
     #     color='b',
     #     marker='o',
     #     label='Current best')
@@ -483,3 +483,79 @@ def run_random(
         result_dict['list_of_best_fitnesses'].append(result_dict['best_fitness'])
         i += 1
     return result_dict
+
+
+def plot_3d_contour(
+        parameter_dicts,
+        true_values,
+        iteration,
+        output_dir,
+        result_dict,
+        max_unit=500,
+        count=100
+):
+    iteration_pic_path = os.path.join(output_dir, 'pso_3d_iteration_pictures')
+    if not os.path.exists(iteration_pic_path):
+        os.makedirs(iteration_pic_path)
+    true_parameters = {'x': true_values['a'], 'y': true_values['a']**2}
+    plot_out = os.path.join(
+        iteration_pic_path, 'iteration_' + str(iteration) + '.png')
+    X, Y, Z = create_meshgrid(max_unit, count)
+    fig = plt.figure()
+    ax = plt.axes(projection='3d')
+    ax.plot3D(
+        [true_parameters['x']],
+        [true_parameters['y']],
+        [parameter_evaluation(true_parameters)],
+        marker='o',
+        color='r'
+    )
+    ax.contour3D(X, Y, Z, 100, cmap='viridis')
+    for parameter_dict in parameter_dicts:
+        ax.plot3D(
+            [parameter_dict['x']],
+            [parameter_dict['y']],
+            [parameter_evaluation(parameter_dict)]
+            color='k',
+            marker='o')
+    plt.savefig(plot_out)
+    plt.close('all')
+
+
+def create_meshgrid(max_unit, count):
+    x_values = np.linspace(-max_unit, max_unit, count)
+    y_values = np.linspace(-max_unit, max_unit, count)
+    X, Y = np.meshgrid(x_values, y_values)
+    loc_2d = {'x': X, 'y': Y}
+    Z = parameter_evaluation(loc_2d)
+    return X, Y, Z
+
+
+def plot_2d_contour(
+        parameter_dicts,
+        true_values,
+        iteration,
+        output_dir,
+        result_dict,
+        max_unit=500,
+        count=100
+):
+    iteration_pic_path = os.path.join(output_dir, 'pso_2d_iteration_pictures')
+    if not os.path.exists(iteration_pic_path):
+        os.makedirs(iteration_pic_path)
+    true_parameters = {'x': true_values['a'], 'y': true_values['a']**2}
+    plot_out = os.path.join(
+        iteration_pic_path, 'iteration_' + str(iteration) + '.png')
+    X, Y, Z = create_meshgrid(max_unit, count)
+    plt.contour(X, Y, Z, 500)
+    plt.plot(true_parameters['x'], true_parameters['y'], marker='o', color='r')
+    for parameter_dict in parameter_dicts:
+        plt.plot(
+            [parameter_dict['x']],
+            [parameter_dict['y']],
+            [parameter_evaluation(parameter_dict)]
+            color='k',
+            marker='o')
+    plt.grid(True)
+    plt.savefig(plot_out)
+    plt.close('all')

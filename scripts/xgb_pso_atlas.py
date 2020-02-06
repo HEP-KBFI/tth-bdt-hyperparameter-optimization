@@ -1,21 +1,14 @@
-'''
-Particle swarm optimization for the hyperparameters optimization of XGBoost.
-(MNIST numbers). Version for slurm.
-Call with 'python'
-
-Usage: slurm_pso_mnist.py
-'''
 import numpy as np
 import os
 import warnings
 from tthAnalysis.bdtHyperparameterOptimization import slurm_main as sm
-from tthAnalysis.bdtHyperparameterOptimization import mnist_filereader  as mf
+from tthAnalysis.bdtHyperparameterOptimization import atlas_tools as at
 from tthAnalysis.bdtHyperparameterOptimization import universal
 from tthAnalysis.bdtHyperparameterOptimization import pso_main as pm
 from tthAnalysis.bdtHyperparameterOptimization import xgb_tools as xt
 
 np.random.seed(1)
-
+path_to_file = "/foo/bar"
 
 def main():
     cmssw_base_path = os.path.expandvars('$CMSSW_BASE')
@@ -33,8 +26,7 @@ def main():
         os.makedirs(output_dir)
     universal.save_run_settings(output_dir)
     print("::::::: Loading data ::::::::")
-    data_dict = mf.create_datasets(
-        global_settings)
+    data_dict = at.create_atlas_data_dict(path_to_file, global_settings)
     print("::::::: Reading parameters :::::::")
     cmssw_base_path = os.path.expandvars('$CMSSW_BASE')
     param_file = os.path.join(
