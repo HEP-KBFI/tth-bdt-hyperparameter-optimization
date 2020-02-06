@@ -1,4 +1,19 @@
-'''Testing the main functions of the genetic algorithm.'''
+'''Testing the main functions of the genetic algorithm.
+Missing tests for the following functions:
+separate_subpopulations
+unite_subpopulations
+fitness_calculation
+elitism
+culling
+arrange_population
+merge_subpopulations
+finish_subpopulation
+evolve
+score_tracker
+find_result
+finalize_result
+evolution
+'''
 import os
 import gzip
 import shutil
@@ -63,24 +78,27 @@ SETTINGS = {
 }
 
 POPULATION = [
-    {
-        'num_boost_round': 300,
-        'learning_rate': 0.20323,
-        'max_depth': 1,
-        'gamma': 0.31544
-    },
-    {
+    gm.Individual(
+        {
+           'num_boost_round': 300,
+           'learning_rate': 0.20323,
+           'max_depth': 1,
+           'gamma': 0.31544
+       }, 0),
+    gm.Individual(
+        {
         'num_boost_round': 55,
         'learning_rate': 0.07981,
         'max_depth': 8,
         'gamma': 4.12071
-    },
-    {
+        }, 0),
+    gm.Individual(
+        {
         'num_boost_round': 481,
         'learning_rate': 0.00411,
         'max_depth': 4,
         'gamma': 0.62212
-    }
+        }, 0)
 ]
 
 FITNESSES = [0.4, 0.6, 0.8]
@@ -106,6 +124,44 @@ for file in file_list:
 DATA = mf.create_datasets(sample_dir, 16)
 
 
+def test_assign_individuals():
+    '''Testing the assign_individuals function'''
+    initial = [
+        {
+           'num_boost_round': 300,
+           'learning_rate': 0.20323,
+           'max_depth': 1,
+           'gamma': 0.31544
+       },
+       {
+        'num_boost_round': 55,
+        'learning_rate': 0.07981,
+        'max_depth': 8,
+        'gamma': 4.12071
+        },
+        {
+        'num_boost_round': 481,
+        'learning_rate': 0.00411,
+        'max_depth': 4,
+        'gamma': 0.62212
+        }
+    ]
+    result = gm.assign_individuals(initial, 0)
+    assert result == POPULATION, 'test_assign_individuals failed'
+
+
+def test_create_population():
+    '''Testing the create_population function'''
+    result = gm.create_population(SETTINGS, PARAMETERS, xt.prepare_run_params)
+    assert len(result) == SETTINGS['sample_size'], 'test_create_population failed'
+
+
+# def test_separate_subpopulations():
+
+
+# def test_unite_subpopulations():
+
+
 def test_set_num():
     '''Testing the set_num function'''
     initial = [1, 2, 3]
@@ -117,14 +173,49 @@ def test_set_num():
     assert result == expected, 'test_set_num failed'
 
 
+def test_fitness_list():
+    '''Testing the fitness_list function'''
+    result = gm.fitness_list(POPULATION)
+    assert len(result) == len(POPULATION), 'test_fitness_list failed'
+
+
+def test_population_list():
+    '''Testing the population_list function'''
+    expected = [
+        {
+           'num_boost_round': 300,
+           'learning_rate': 0.20323,
+           'max_depth': 1,
+           'gamma': 0.31544
+       },
+       {
+        'num_boost_round': 55,
+        'learning_rate': 0.07981,
+        'max_depth': 8,
+        'gamma': 4.12071
+        },
+        {
+        'num_boost_round': 481,
+        'learning_rate': 0.00411,
+        'max_depth': 4,
+        'gamma': 0.62212
+        }
+    ]
+    result = gm.population_list(POPULATION)
+    assert result == expected, 'test_population_list failed'
+
+
+@pytest.mark.skip(reason='Runs too long') # KORRAS
 def test_fitness_calculation():
     '''Testing the fitness calculation function'''
-    results = gm.fitness_calculation(
+    result = gm.fitness_calculation(
         POPULATION, SETTINGS, DATA, xt.ensemble_fitnesses)
-    for result in results:
-        assert len(result) == len(POPULATION), 'test_fitness_calculation failed'
+    assert len(result) == len(POPULATION), 'test_fitness_calculation failed'
+    for member in result:
+        assert member.fitness, 'test_fitness_calculation failed'
 
 
+@pytest.mark.skip(reason='Rewrite needed')
 def test_elitism():
     '''Testing the elitism function'''
     initial = [1, 2, 3]
@@ -137,7 +228,7 @@ def test_elitism():
     assert result == expected, 'test_elitism failed'
 
 
-@pytest.mark.skip(reason='Runs too long')
+@pytest.mark.skip(reason='Rewrite needed')
 def test_culling():
     '''Testing the culling function'''
     result = gm.culling(
@@ -156,52 +247,60 @@ def test_culling():
 
 def test_new_population():
     '''Testing the new_population function'''
-    pop_data = {'fitnesses': FITNESSES}
     result = gm.new_population(
-        POPULATION, pop_data, SETTINGS, PARAMETERS)[0]
+        POPULATION, SETTINGS, PARAMETERS)
     assert len(result) == len(POPULATION), \
         'test_new_population failed'
 
 
-def test_create_subpopulations():
-    '''Testing the create_subpopulations function'''
-    nums = [1, 2, 3]
-    expected = [[3], [2, 1], [1, 1, 1]]
-    i = 0
-    for num in nums:
-        j = 0
-        SETTINGS.update({'sub_pops': num})
-        result = gm.create_subpopulations(
-            SETTINGS, PARAMETERS, xt.prepare_run_params)
-        assert len(result) == len(expected[i]), \
-            'test_create_subpopulations failed'
-        for element in result:
-            assert len(element) == expected[i][j], \
-                'test_create_subpopulations failed'
-            j += 1
-        i += 1
+# def test_create_subpopulations():
+#     '''Testing the create_subpopulations function'''
+#     nums = [1, 2, 3]
+#     expected = [[3], [2, 1], [1, 1, 1]]
+#     i = 0
+#     for num in nums:
+#         j = 0
+#         SETTINGS.update({'sub_pops': num})
+#         result = gm.create_subpopulations(
+#             SETTINGS, PARAMETERS, xt.prepare_run_params)
+#         assert len(result) == len(expected[i]), \
+#             'test_create_subpopulations failed'
+#         for element in result:
+#             assert len(element) == expected[i][j], \
+#                 'test_create_subpopulations failed'
+#             j += 1
+#         i += 1
 
 
-@pytest.mark.skip(reason='Runs too long')
-def test_sub_evolution():
-    '''Testing the sub_evolution function'''
-    SETTINGS.update({'culling': 0})
-    result = gm.sub_evolution(
-        [POPULATION[:2], POPULATION[2:]],
-        SETTINGS,
-        DATA,
-        PARAMETERS,
-        xt.prepare_run_params,
-        xt.ensemble_fitnesses
-    )
-    assert len(result[0]) == len(POPULATION), 'test_sub_evolution failed'
-    for key in result[1]:
-        for i in result[1][key]:
-            assert len(result[1][key][i]) == len(result[2][i]), \
-                'test_sub_evolution failed'
+# @pytest.mark.skip(reason='Runs too long')
+# def test_sub_evolution():
+#     '''Testing the sub_evolution function'''
+#     SETTINGS.update({'culling': 0})
+#     result = gm.sub_evolution(
+#         [POPULATION[:2], POPULATION[2:]],
+#         SETTINGS,
+#         DATA,
+#         PARAMETERS,
+#         xt.prepare_run_params,
+#         xt.ensemble_fitnesses
+#     )
+#     assert len(result[0]) == len(POPULATION), 'test_sub_evolution failed'
+#     for key in result[1]:
+#         for i in result[1][key]:
+#             assert len(result[1][key][i]) == len(result[2][i]), \
+#                 'test_sub_evolution failed'
 
 
-@pytest.mark.skip(reason='Runs too long')
+# def test_arrange_population()
+
+
+# def test_merge_subpopulations()
+
+
+# def test_finish_populations()
+
+
+@pytest.mark.skip(reason='Rewrite needed')
 def test_evolve():
     '''Testing the evolve function'''
     initial = POPULATION[:1]
@@ -222,6 +321,7 @@ def test_evolve():
         'test_evolve failed'
 
 
+@pytest.mark.skip(reason='Rewrite needed')
 def test_score_tracker():
     '''Testing the score tracker function'''
     initial = [
@@ -261,6 +361,7 @@ def test_score_tracker():
     assert result == expected, 'test_score_tracker failed'
 
 
+@pytest.mark.skip(reason='Rewrite needed')
 def test_finalize_results():
     '''Testing the finalize results function'''
     initial = {
@@ -299,7 +400,7 @@ def test_finalize_results():
     assert result == expected
 
 
-@pytest.mark.skip(reason='Runs too long')
+@pytest.mark.skip(reason='Rewrite needed')
 def test_evolution():
     '''Testing the evolution function'''
     SETTINGS.update({'culling': 0, 'elitism': 0, 'sub_pops': 1})
