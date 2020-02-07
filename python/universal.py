@@ -1039,6 +1039,8 @@ def save_info(
     -------
     Nothing
     '''
+    if not os.path.exists(save_dir):
+        os.makedirs(save_dir)
     train_path = os.path.join(save_dir, 'pred_train.lst')
     test_path = os.path.join(save_dir, 'pred_test.lst')
     score_path = os.path.join(save_dir, 'score.json')
