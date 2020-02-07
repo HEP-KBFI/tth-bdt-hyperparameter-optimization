@@ -42,9 +42,10 @@ def main():
     parameter_dicts = xt.prepare_run_params(
         value_dicts, pso_settings['sample_size'])
     result_dict = pm.run_pso(
-        data_dict, value_dicts, sm.run_iteration, parameter_dicts,
+        data_dict, value_dicts, xt.ensemble_fitness, parameter_dicts,
         output_dir
     )
+    # sm.run_iteration
     universal.save_results(result_dict, output_dir, plot_extras=True)
     print("Results saved to " + str(output_dir))
 

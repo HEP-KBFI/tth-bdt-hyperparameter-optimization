@@ -29,8 +29,8 @@ def create_atlas_data_dict(path_to_file, global_settings):
     print(':::::::::::: Creating datasets ::::::::::::::::')
     train, test = train_test_split(
         atlas_data_df, test_size=0.2, random_state=1)
-    training_labels = np.array(train['Label']).astype(int)
-    testing_labels = np.array(test['Label']).astype(int)
+    training_labels = np.array(train['Label'].astype(int))
+    testing_labels = np.array(test['Label'].astype(int))
     traindataset = np.array(train[trainvars].values)
     testdataset = np.array(test[trainvars].values)
     data_dict = {
