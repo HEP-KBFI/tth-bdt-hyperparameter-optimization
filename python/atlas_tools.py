@@ -34,8 +34,8 @@ def create_atlas_data_dict(path_to_file, global_settings):
     traindataset = np.array(train[trainvars].values)
     testdataset = np.array(test[trainvars].values)
     data_dict = {
-        'train': traindataset,
-        'test': testdataset,
+        'dtrain': traindataset,
+        'dtest': testdataset,
         'training_labels': training_labels,
         'testing_labels': testing_labels,
         'trainvars': trainvars
