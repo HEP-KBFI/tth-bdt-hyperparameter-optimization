@@ -53,7 +53,7 @@ def create_atlas_data_dict(path_to_file, global_settings):
         'testing_labels': testing_labels,
         'trainvars': trainvars
     }
-    # universal.write_data_dict_info(info_dir, data_dict)
+    universal.write_data_dict_info(info_dir, data_dict)
     return data_dict
 
 
