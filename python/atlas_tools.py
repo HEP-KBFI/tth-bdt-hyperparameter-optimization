@@ -33,9 +33,21 @@ def create_atlas_data_dict(path_to_file, global_settings):
     testing_labels = test['Label'].astype(int)
     traindataset = np.array(train[trainvars].values)
     testdataset = np.array(test[trainvars].values)
+    dtrain = xgb.DMatrix(
+        traindataset,
+        label=training_labels,
+        nthread=global_settings['nthread'],
+        feature_names=trainvars
+    )
+    dtest = xgb.DMatrix(
+        testdataset,
+        label=testing_labels,
+        nthread=global_settings['nthread'],
+        feature_names=trainvars
+    )
     data_dict = {
-        'dtrain': traindataset,
-        'dtest': testdataset,
+        'dtrain': dtrain,
+        'dtest': dtest,
         'training_labels': training_labels,
         'testing_labels': testing_labels,
         'trainvars': trainvars
