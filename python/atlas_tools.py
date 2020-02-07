@@ -6,6 +6,7 @@ import numpy as np
 
 def create_atlas_data_dict(path_to_file, global_settings):
     print('::: Loading data from ' + path_to_file + ' :::')
+    path_to_file = os.path.expandvars(path_to_file)
     labels_to_drop = ['Kaggle', 'EventId', 'Weight']
     atlas_data_df = pandas.read_csv(path_to_file)
     atlas_data_df['Label'] = atlas_data_df['Label'].replace(
