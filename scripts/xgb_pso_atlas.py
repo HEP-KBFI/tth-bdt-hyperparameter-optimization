@@ -42,7 +42,7 @@ def main():
     parameter_dicts = xt.prepare_run_params(
         value_dicts, pso_settings['sample_size'])
     result_dict = pm.run_pso(
-        data_dict, value_dicts, xt.ensemble_fitness, parameter_dicts,
+        data_dict, value_dicts, xt.ensemble_fitnesses, parameter_dicts,
         output_dir
     )
     # sm.run_iteration
