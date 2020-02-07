@@ -87,7 +87,7 @@ def update_values(curr_values, gradients, learning_rate):
     return new_values
 
 
-def calculate_gradient(curr_values, true_values, h):
+def calculate_gradient(curr_values, true_values, h, evaluate):
     '''Calculate the gradient for given variable values
 
     Parameters
@@ -108,11 +108,11 @@ def calculate_gradient(curr_values, true_values, h):
     for variable in curr_values:
         temp_values = curr_values.copy()
         temp_values[variable] += h
-        fxph = rt.parameter_evaluation(
+        fxph = evaluate(
             temp_values, true_values['a'], true_values['b'])
         temp_values = curr_values.copy()
         temp_values[variable] -= h
-        fxmh = rt.parameter_evaluation(
+        fxmh = evaluate(
             temp_values, true_values['a'], true_values['b'])
         gradient[variable] = (fxph - fxmh) / (2 * h)
     return gradient
@@ -123,6 +123,7 @@ def gradient_descent(
         parameters,
         true_values,
         initialize=rt.initialize_values,
+        evaluate=rt.parameter_evaluation,
         distance=rt.check_distance
 ):
     '''Performs the gradient descent optimization algorithm
@@ -151,7 +152,7 @@ def gradient_descent(
     previous_values = []
     # Choose random values
     value_set = initialize(parameters)
-    while iteration <= settings['iterations'] or distance < 1e-8:
+    while iteration <= settings['iterations'] or dist < 1e-8:
         if iteration % 10000 == 0:
             print('Iteration: ' + str(iteration))
         curr_values = value_set
@@ -159,14 +160,14 @@ def gradient_descent(
         previous_values.append(curr_values)
         # Calculate gradient
         gradient = calculate_gradient(
-            curr_values, true_values, settings['h'])
+            curr_values, true_values, settings['h'], evaluate)
         # Adjust values with gradients
         value_set = update_values(curr_values, gradient, settings['gamma'])
         # Calculate distance
-        distance = distance(true_values, value_set)
+        dis = distance(true_values, value_set)
         iteration += 1
     x_range, y_range = set_ranges(parameters)
-    print('Final distance: ' + str(distance))
+    print('Final distance: ' + str(dist))
     contourplot(true_values, x_range, y_range, previous_values, rosenbrock)
     return value_set
 
