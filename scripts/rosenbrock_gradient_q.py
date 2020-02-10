@@ -17,7 +17,7 @@ np.random.seed(1)
 
 def main():
     print('::::::: Reading settings and parameters :::::::')
-	cmssw_base_path = os.path.expandvars('$CMSSW_BASE')
+    cmssw_base_path = os.path.expandvars('$CMSSW_BASE')
     main_dir = os.path.join(
         cmssw_base_path,
         'src',
@@ -35,21 +35,20 @@ def main():
     param_file = os.path.join(settings_dir, 'rosenbrock_parameters.json')
     param_dict = universal.read_parameters(param_file)
     true_values = {'a': 1, 'b': 100}
-    result_dict = gd.run_random(
-        parameter_dicts,
+    result_dict = gd.gradient_descent(
+        settings_dict,
+        param_dict,
         true_values,
-        value_dicts,
-        output_dir,
-        global_settings
+        rt.initialize_values,
+        rt.parameter_evaluation,
+        rt.check_distance
     )
     print(':::::::::: Saving results :::::::::::::')
     rt.plot_progress(result_dict, true_values, output_dir)
     rt.plot_distance_history(result_dict, true_values, output_dir)
-    rt.plot_fitness_history(result_dict, output_dir, label='rnd', close=False)
-    rt.plot_fitness_history(result_dict_pso, output_dir, label='pso')
+    rt.plot_fitness_history(result_dict, output_dir)
     rt.plot_2d_location_progress(result_dict, true_values, output_dir)
     rt.save_results(result_dict, output_dir)
 
 if __name__ == '__main__':
     main()
-    

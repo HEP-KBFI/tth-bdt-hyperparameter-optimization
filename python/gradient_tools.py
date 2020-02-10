@@ -1,4 +1,4 @@
-'''Tools for a gradient descent algorithm for Rosenbrock function'''
+'''Tools for a gradient descent algorithm'''
 import copy
 import numpy as np
 import matplotlib.pyplot as plt
@@ -164,7 +164,7 @@ def gradient_descent(
         # Adjust values with gradients
         value_set = update_values(curr_values, gradient, settings['gamma'])
         # Calculate distance
-        dis = distance(true_values, value_set)
+        dist = distance(true_values, value_set)
         iteration += 1
     x_range, y_range = set_ranges(parameters)
     print('Final distance: ' + str(dist))
