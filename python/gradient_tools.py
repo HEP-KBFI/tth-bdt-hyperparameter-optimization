@@ -1,5 +1,5 @@
 '''Tools for a gradient descent algorithm'''
-import copy
+import os
 import numpy as np
 import matplotlib.pyplot as plt
 from tthAnalysis.bdtHyperparameterOptimization import rosenbrock_tools as rt
@@ -145,19 +145,32 @@ def gradient_descent(
 
     Return
     ------
-    value_set : dict
-        Final variable values
+    result : dict
+        Results of the algorithm
     '''
     iteration = 0
-    previous_values = []
+    result = {}
     # Choose random values
     value_set = initialize(parameters)
     while iteration <= settings['iterations'] or dist < 1e-8:
         if iteration % 10000 == 0:
             print('Iteration: ' + str(iteration))
         curr_values = value_set
-        # Save previous values for plotting
-        previous_values.append(curr_values)
+        # Evaluate current values
+        fitness = evaluate(
+            curr_values, true_values['a'], true_values['b'])
+        # Save data
+        if iteration == 0:
+            result['list_of_old_bests'] = [curr_values]
+            result['list_of_best_fitnesses'] = [fitness]
+            result['best_fitness'] = fitness
+            result['best_parameters']= curr_values
+        else:
+            result['list_of_old_bests'].append(curr_values)
+            result['list_of_best_fitnesses'].append(fitness)
+        if fitness > result['best_fitness']:
+            result['best_fitness'] = fitness
+            result['best_parameters']= curr_values
         # Calculate gradient
         gradient = calculate_gradient(
             curr_values, true_values, settings['h'], evaluate)
@@ -166,17 +179,23 @@ def gradient_descent(
         # Calculate distance
         dist = distance(true_values, value_set)
         iteration += 1
-    x_range, y_range = set_ranges(parameters)
-    print('Final distance: ' + str(dist))
-    contourplot(true_values, x_range, y_range, previous_values, rosenbrock)
-    return value_set
+    # Final evaluation
+    fitness = evaluate(
+            value_set, true_values['a'], true_values['b'])
+    # Save data
+    result['list_of_old_bests'].append(value_set)
+    result['list_of_best_fitnesses'].append(fitness)
+    if fitness > result['best_fitness']:
+        result['best_fitness'] = fitness
+        result['best_parameters']= value_set
+    return result
 
 
 def contourplot(
+        result_dict,
         true_values,
-        x_range,
-        y_range,
-        previous_values,
+        parameters,
+        output_dir,
         function=rosenbrock
 ):
     '''Draws a contour plot of the function along with a marker for
@@ -184,17 +203,19 @@ def contourplot(
 
     Parameters
     ----------
+    result_dict : dict
+        Results of the gradient descent algorithm
     true_values : dict
         Parameter values for the function
-    x_range : range
-        Range of x-axis
-    y_range : range
-        Range of y-axis
-    previous_values : list
-        Progress of the algorithm
+    parameters : dict
+        Parameters for the given function
+    output_dir : string
+        Path to the directory where to save the plot
     function : function
         Function used
     '''
+    # Select ranges
+    x_range, y_range = set_ranges(parameters)
     # Create grid
     x = np.arange(min(x_range), max(x_range) + 1)
     y = np.arange(min(y_range), max(y_range) + 1)
@@ -216,10 +237,13 @@ def contourplot(
     # Plot the progress
     x_progress = []
     y_progress = []
-    for values in previous_values:
+    for values in result_dict['list_of_old_bests']:
         x_progress.append(values['x'])
         y_progress.append(values['y'])
     plt.plot(x_progress, y_progress)
     plt.xlim(min(x_range), max(x_range))
     plt.ylim(min(y_range), max(y_range))
-    plt.show()
+    # Save plot
+    plot_out = os.path.join(output_dir, 'contourplot.png')
+    plt.savefig(plot_out, bbox_inches='tight')
+    plt.close('all')
