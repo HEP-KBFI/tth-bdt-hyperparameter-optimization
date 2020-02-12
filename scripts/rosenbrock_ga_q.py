@@ -8,7 +8,7 @@ import os
 import json
 import numpy as np
 from tthAnalysis.bdtHyperparameterOptimization import universal
-from tthAnalysis.bdtHyperparameterOptimization import ga_rosenbrock as ga
+from tthAnalysis.bdtHyperparameterOptimization import ga_main as ga
 from tthAnalysis.bdtHyperparameterOptimization import rosenbrock_tools as rt
 
 NUMBER_REPETITIONS = 10
