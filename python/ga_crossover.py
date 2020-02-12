@@ -193,7 +193,10 @@ def chromosome_mutate(chromosome, mutation_chance):
     # Random mutation based on mutation_chance
     for gene in chromosome:
         if random.random() < mutation_chance:
-            mutated_chromosome += str(abs(int(gene) - 1))
+            try:
+                mutated_chromosome += str(abs(int(gene) - 1))
+            except ValueError:
+                pass
         else:
             mutated_chromosome += gene
 
@@ -273,15 +276,22 @@ def mutation_fix(offspring, parameters):
         key = parameter['p_name']
 
         # Forces exp parameters to have values between 0 and 1
-        if parameter['exp'] == 1: 
-            if offspring[key] > 1:
-                offspring[key] = 1
-            elif offspring[key] < 0:
-                offspring[key] = 0
+        try:
+            if parameter['exp'] == 1: 
+                if offspring[key] > 1:
+                    offspring[key] = 1
+                elif offspring[key] < 0:
+                    offspring[key] = 0
+        except KeyError:
+            pass
+
         else:
             # Forces int parameters to have integer values
-            if parameter['true_int'] == 1:
-                offspring[key] = int(round(offspring[key]))
+            try:
+                if parameter['true_int'] == 1:
+                    offspring[key] = int(round(offspring[key]))
+            except KeyError:
+                pass
 
             # Forces parameter values not to be lower
             # than range start value
@@ -392,7 +402,10 @@ def encode_parent(parent, parameters):
     # Encoding values in parent
     for parameter in parameters:
         key = parameter['p_name']
-        true_int = parameter['true_int']
+        try:
+            true_int = parameter['true_int']
+        except KeyError:
+            true_int = 0
         if true_int == 1:
             encoded_parent[key] = int_encoding(parent[key])
         else:
@@ -423,7 +436,10 @@ def decode_offspring(offspring, parameters):
     # Decoding values in offspring
     for parameter in parameters:
         key = parameter['p_name']
-        true_int = parameter['true_int']
+        try:
+            true_int = parameter['true_int']
+        except KeyError:
+            true_int = 0
         if true_int == 1:
             decoded_offspring[key] = int_decoding(offspring[key])
         else:

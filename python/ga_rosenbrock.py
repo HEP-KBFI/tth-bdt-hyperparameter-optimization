@@ -252,6 +252,15 @@ def population_list(population):
     return value_list
 
 
+def minimizing_fitnesses(fitnesses):
+    '''Turn rosenbrock fitness score into an appropriate score for genetic algorithm'''
+    new_fitnesses = []
+    for fitness in fitnesses:
+        fitness = np.log10(fitness) / 38
+        new_fitnesses.append(1 - fitness)
+    return new_fitnesses
+
+
 def fitness_calculation(population, settings, data, evaluate):
     '''Calculate the fitness scores of the given generation
 
@@ -278,6 +287,7 @@ def fitness_calculation(population, settings, data, evaluate):
         args = inspect.getargspec(evaluate)
         if len(args[0]) == 2: #rosenbrock function optimization
             fitnesses = evaluate(population_list(eval_pop), data)
+            fitnesses = minimizing_fitnesses(fitnesses)
             for i, member in enumerate(eval_pop):
                 member.add_result(fitnesses[i])
         else: #hyperparameter optimization
@@ -783,12 +793,7 @@ def evolution_rosenbrock(settings, parameters, data, create_set, evaluate):
     improvements = {}
     avg_scores = {}
 
-    result = {
-        'best_parameters': None,
-        'best_fitness': 0,
-        'list_of_old_bests': [],
-        'list_of_best_fitnesses': []
-    }
+    result = {}
 
     # Evolution loop for subpopulations
     if settings['sub_pops'] > 1:
@@ -818,10 +823,15 @@ def evolution_rosenbrock(settings, parameters, data, create_set, evaluate):
             # Track results and calculate stopping criteria
             curr_improvements = []
             for i, subpopulation in enumerate(subpopulations):
-                if iteration == 0:
-                    avg_scores[index] = []
                 index = subpopulation[0].subpop
                 fitnesses = fitness_list(subpopulation)
+                if iteration == 0:
+                    avg_scores[index] = []
+                    improvements[index] = []
+                    result['best_fitness'] = max(fitnesses)
+                    result['best_parameters'] = population_list(subpopulation)[np.argmax(fitnesses)]
+                    result['list_of_old_bests'] = [result['best_parameters']]
+                    result['list_of_best_fitnesses']= [result['best_fitness']]
                 avg_scores[index].append(np.mean(fitnesses))
                 improvements[index], curr_improvement = \
                     universal.calculate_improvement_wAVG(
@@ -831,10 +841,10 @@ def evolution_rosenbrock(settings, parameters, data, create_set, evaluate):
                     )
                 curr_improvements.append(curr_improvement)
                 if max(fitnesses) > result['best_fitness']:
-                    result['list_of_old_bests'].append(result['best_parameters'])
-                    result['list_of_fitnesses'].append(result['list_of_best_fitnesses'])
                     result['best_fitness'] = max(fitnesses)
-                    result['best_parameters'] = subpopulation[np.argmax(fitnesses)]
+                    result['best_parameters'] = population_list(subpopulation)[np.argmax(fitnesses)]
+                    result['list_of_old_bests'].append(result['best_parameters'])
+                    result['list_of_best_fitnesses'].append(result['best_fitness'])
             # Remove a subpopulation that has reached a stopping
             # criterium
             finished_subpopulations, subpopulations = finish_subpopulation(
@@ -872,10 +882,10 @@ def evolution_rosenbrock(settings, parameters, data, create_set, evaluate):
                 settings['threshold']
             )
         if max(fitnesses) > result['best_fitness']:
-            result['list_of_old_bests'].append(result['best_parameters'])
-            result['list_of_fitnesses'].append(result['list_of_best_fitnesses'])
             result['best_fitness'] = max(fitnesses)
-            result['best_parameters'] = subpopulation[np.argmax(fitnesses)]
+            result['best_parameters'] = population_list(population)[np.argmax(fitnesses)]
+            result['list_of_old_bests'].append(result['best_parameters'])
+            result['list_of_best_fitnesses'].append(result['best_fitness'])
         iteration += 1
 
     return result
