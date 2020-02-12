@@ -9,7 +9,6 @@ Options:
 
 
 '''
-from __future__ import division
 import numpy as np
 from tthAnalysis.bdtHyperparameterOptimization import universal
 from tthAnalysis.bdtHyperparameterOptimization import mnist_filereader as mf
