@@ -252,7 +252,7 @@ def population_list(population):
     return value_list
 
 
-def minimizing_fitnesses(fitnesses):
+def rosenbrock_fitnesses(fitnesses):
     '''Turn rosenbrock fitness score into an appropriate score for genetic algorithm'''
     new_fitnesses = []
     for fitness in fitnesses:
@@ -287,7 +287,7 @@ def fitness_calculation(population, settings, data, evaluate):
         args = inspect.getargspec(evaluate)
         if len(args[0]) == 2: #rosenbrock function optimization
             fitnesses = evaluate(population_list(eval_pop), data)
-            fitnesses = minimizing_fitnesses(fitnesses)
+            fitnesses = rosenbrock_fitnesses(fitnesses)
             for i, member in enumerate(eval_pop):
                 member.add_result(fitnesses[i])
         else: #hyperparameter optimization
@@ -438,7 +438,7 @@ def new_population(
     # Generate offspring to fill the new generation
     while len(offsprings) < (len(population) - len(next_population)):
         parents = select.tournament(population_list(population), fitnesses)
-        offspring = gc.kpoint_crossover(
+        offspring = gc.uniform_crossover(
             parents, parameters, settings['mut_chance'])
         # No duplicate members
         if offspring not in next_population:
