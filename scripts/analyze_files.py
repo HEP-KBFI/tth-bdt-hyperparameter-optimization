@@ -152,3 +152,8 @@ def plot_scoring_metrics(evolutions, output_dir):
     plt.tick_params(top=True, right=True, direction='in')
     plt.savefig(plot_out)
     plt.close('all')
+
+
+def main(main_dir, output_dir):
+    result_dict = parse_iterations(main_dir)
+    plotting_and_save_info(result_dict, output_dir)
