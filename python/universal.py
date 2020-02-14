@@ -861,7 +861,7 @@ def plot_roc_curve(
     plt.close('all')
 
 
-def plot_costfunction(avg_scores, output_dir):
+def plot_costfunction(avg_scores, output_dir, y_label='Fitness score'):
     '''Creates a plot of the cost function
 
     Parameters:
@@ -906,12 +906,11 @@ def plot_costfunction(avg_scores, output_dir):
         plt.xticks(np.arange(n_gens_final - 1))
     finally:
         plt.xlabel('Generation')
-        plt.ylabel('Fitness score')
+        plt.ylabel(y_label)
         axis = plt.gca()
         axis.set_aspect('auto', adjustable='box')
         axis.xaxis.set_major_locator(ticker.AutoLocator())
         plt.grid(True)
-        plt.title('Average fitness over iterations')
         plt.tick_params(top=True, right=True, direction='in')
         plt.savefig(plot_out)
         plt.close('all')
