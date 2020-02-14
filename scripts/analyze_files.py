@@ -90,6 +90,7 @@ def create_result_dict(best_particles, data_dict):
         'auc_info': auc_info,
         'evolutions': evolutions
     }
+    return result_dict
 
 
 def create_data_dict(data_dict_dir_path):
