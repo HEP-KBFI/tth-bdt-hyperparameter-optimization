@@ -41,11 +41,11 @@ def main():
         rt.prepare_run_params,
         rt.ensemble_fitness)
     print(':::::::::: Saving results :::::::::::::')
-    universal.plot_costfunction(result['list_of_best_fitnesses'], output_dir_single)
-    rt.plot_progress(result, true_values, output_dir_single)
-    rt.plot_distance_history(result, true_values, output_dir_single)
-    rt.plot_2d_location_progress(result, true_values, output_dir_single)
-    rt.save_results(result, output_dir_single)
+    universal.plot_costfunction(result['list_of_best_fitnesses'], output_dir)
+    rt.plot_progress(result, true_values, output_dir)
+    rt.plot_distance_history(result, true_values, output_dir)
+    rt.plot_2d_location_progress(result, true_values, output_dir)
+    rt.save_results(result, output_dir)
 
 
 if __name__ == '__main__':
