@@ -18,7 +18,7 @@ def parse_iterations(main_dir):
         best_particle, compactness = analyze_iteration(iter_dir)
         best_particles.append(best_particle)
     result_dict = create_result_dict(best_particles, data_dict)
-    result_dict['compactnesses': compactnesses]
+    result_dict['compactnesses'] = compactnesses
     return result_dict
 
 
