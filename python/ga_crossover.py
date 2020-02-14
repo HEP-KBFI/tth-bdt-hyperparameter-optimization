@@ -282,7 +282,7 @@ def mutation_fix(offspring, parameters):
             parameter['true_int'] = 0
 
         # Forces exp parameters to have values between 0 and 1
-        if parameter['exp'] == 1: 
+        if parameter['exp'] == 1:
             if offspring[key] > 1:
                 offspring[key] = 1
             elif offspring[key] < 0:

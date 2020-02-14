@@ -5,7 +5,6 @@ Call with 'python'
 Usage: rosenbrock_ga_q.py
 '''
 import os
-import json
 import numpy as np
 from tthAnalysis.bdtHyperparameterOptimization import universal
 from tthAnalysis.bdtHyperparameterOptimization import ga_main as ga
