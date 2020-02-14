@@ -11,7 +11,7 @@ def parse_iterations(main_dir):
     data_dict_dir_path = os.path.join(previous_files_dir, 'data_dict')
     data_dict = create_data_dict(data_dict_dir_path)
     wild_card_iterations = os.path.join(previous_files_dir, 'iteration_*')
-    ordered_iteration_nrs = list(range(len(glob.glob(wild_card_iterations))))
+    ordered_iteration_nrs = list(range(len(glob.glob(wild_card_iterations))-1))
     for iter_nr in ordered_iteration_nrs:
         iter_dir = os.path.join(previous_files_dir, 'iteration_' + str(iter_nr))
         best_particle, compactness = analyze_iteration(iter_dir)
