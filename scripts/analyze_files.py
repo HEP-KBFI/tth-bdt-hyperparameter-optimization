@@ -49,8 +49,8 @@ def get_particle_evaluation(particle_dir):
         particle_dir, 'parameters.json')
     feature_importances_path = os.path.join(
         particle_dir, 'feature_importances.json')
-    pred_train = sm.lists_from_file(pred_train_path)
-    pred_test = sm.lists_from_file(pred_test_path)
+    pred_train = np.array(sm.lists_from_file(pred_train_path), dtype=float)
+    pred_test = np.array(sm.lists_from_file(pred_test_path), dtype=float)
     score_dict = universal.read_parameters(score_path)[0]
     feature_importances = universal.read_parameters(feature_importances_path)[0]
     parameters = universal.read_parameters(parameter_path)[0]
