@@ -2,6 +2,7 @@ import glob
 import os
 from tthAnalysis.bdtHyperparameterOptimization import universal
 from tthAnalysis.bdtHyperparameterOptimization import slurm_main as sm
+import numpy as np
 
 
 def parse_iterations(main_dir):
