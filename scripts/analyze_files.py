@@ -16,6 +16,7 @@ def parse_iterations(main_dir):
     for iter_nr in ordered_iteration_nrs:
         iter_dir = os.path.join(previous_files_dir, 'iteration_' + str(iter_nr))
         best_particle, compactness = analyze_iteration(iter_dir)
+        compactnesses.append(compactness)
         best_particles.append(best_particle)
     result_dict = create_result_dict(best_particles, data_dict)
     result_dict['compactnesses'] = compactnesses
