@@ -134,7 +134,7 @@ def plotting_and_save_info(result_dict, output_dir):
     universal.best_to_file(
         result_dict['best_parameters'], output_dir, result_dict['score_dict'])
     universal.plot_costfunction(
-        result_dict['compactesses'], output_dir, y_label='Compactness (cov)')
+        result_dict['compactnesses'], output_dir, y_label='Compactness (cov)')
 
 
 def plot_scoring_metrics(evolutions, output_dir):
