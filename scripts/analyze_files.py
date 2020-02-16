@@ -3,6 +3,8 @@ import os
 from tthAnalysis.bdtHyperparameterOptimization import universal
 from tthAnalysis.bdtHyperparameterOptimization import slurm_main as sm
 import numpy as np
+import matplotlib.pyplot as plt
+import matplotlib.ticker as ticker
 
 
 def parse_iterations(main_dir):
@@ -151,7 +153,6 @@ def plot_scoring_metrics(evolutions, output_dir):
     axis.xaxis.set_major_locator(ticker.AutoLocator())
     plt.grid(True)
     plt.legend(loc='lower right')
-    plt.title(title)
     plt.tick_params(top=True, right=True, direction='in')
     plt.savefig(plot_out)
     plt.close('all')

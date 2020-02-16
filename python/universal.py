@@ -1,6 +1,5 @@
 '''Universal functions to be used in evolutionary algorithms
 '''
-from __future__ import division
 import warnings
 import itertools
 import json
