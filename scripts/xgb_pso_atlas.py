@@ -8,7 +8,7 @@ from tthAnalysis.bdtHyperparameterOptimization import pso_main as pm
 from tthAnalysis.bdtHyperparameterOptimization import xgb_tools as xt
 
 np.random.seed(1)
-path_to_file = "$HOME/atlas_higgs_train.csv"
+path_to_file = "$HOME/training.csv"
 
 def main():
     cmssw_base_path = os.path.expandvars('$CMSSW_BASE')
