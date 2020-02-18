@@ -39,16 +39,17 @@ def main():
     )
     value_dicts = universal.read_parameters(param_file)
     pso_settings = pm.read_weights(settings_dir)
-    parameter_dicts = sm.prepare_run_params(
+    parameter_dicts = xt.prepare_run_params(
         value_dicts, pso_settings['sample_size'])
     result_dict = pm.run_pso(
-        data_dict, value_dicts, xt.ensemble_fitnesses, parameter_dicts,
+        data_dict, value_dicts, sm.run_iteration, parameter_dicts,
         output_dir
     )
+    return result_dict, output_dir
     # sm.run_iteration
-    universal.save_results(result_dict, output_dir, plot_extras=True)
-    print("Results saved to " + str(output_dir))
 
 
 if __name__ == '__main__':
-    main()
+    result_dict, output_dir = main()
+    at.save_results(result_dict, output_dir)
+    print("Results saved to " + str(output_dir))

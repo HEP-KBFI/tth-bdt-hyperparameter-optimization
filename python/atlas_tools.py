@@ -118,6 +118,7 @@ def higgs_evaluation(parameter_dict, data_dict, nthread, num_class):
     pred_test = model.predict(data_dict['dtest'])
     d_ams = calculate_d_ams(pred_train, pred_test, data_dict)
     feature_importance = model.get_score(importance_type='gain')
+    score_dict = {'d_ams': d_ams}
     return score_dict, pred_train, pred_test, feature_importance
 
 
@@ -182,27 +183,32 @@ def run_pso(
     i = 0
     new_parameters = parameter_dicts
     personal_bests = {}
-    fitnesses, pred_trains, pred_tests, feature_importances = ensemble_fitness(
+    score_dicts, pred_trains, pred_tests, feature_importances = ensemble_fitness(
         parameter_dicts, data_dict, global_settings)
+    fitnesses = universal.fitness_to_list(
+        score_dicts, fitness_key='d_ams')
     result_dict = {}
     index = np.argmax(fitnesses)
+    compactness = universal.calculate_compactness(parameter_dicts)
     result_dict['best_fitness'] = fitnesses[index]
     result_dict['pred_test'] = pred_tests[index]
     result_dict['pred_train'] = pred_trains[index]
     result_dict['feature_importances'] = feature_importances[index]
     result_dict['best_parameters'] = parameter_dicts[index]
-    result_dict['list_of_old_bests'] = [parameter_dicts[index]]
-    result_dict['list_of_best_fitnesses'] = [fitnesses[index]]
+    result_dict['best_fitnesses'] = [fitnesses[index]]
+    result_dict['compactnesses'] = [compactness]
     personal_bests = parameter_dicts
     best_fitnesses = fitnesses
     current_speeds = pm.initialize_speeds(parameter_dicts)
-    distance = check_distance(true_values, result_dict['best_parameters'])
     print('::::::::::: Optimizing ::::::::::')
     while i <= iterations and compactness_threshold < compactness:
         print('---- Iteration: ' + str(i) + '----')
         parameter_dicts = new_parameters
-        fitnesses, pred_trains, pred_tests, feature_importances = ensemble_fitness(
+        print(' --- Compactness: ' + str(compactness) + ' ---')
+        score_dicts, pred_trains, pred_tests, feature_importances = ensemble_fitness(
             parameter_dicts, data_dict, global_settings)
+        fitnesses = universal.fitness_to_list(
+            score_dicts, fitness_key='d_ams')
         best_fitnesses = pm.find_best_fitness(fitnesses, best_fitnesses)
         personal_bests = pm.calculate_personal_bests(
             fitnesses, best_fitnesses, parameter_dicts, personal_bests)
@@ -223,8 +229,67 @@ def run_pso(
             result_dict['pred_test'] = pred_tests[index]
             result_dict['pred_train'] = pred_trains[index]
             result_dict['feature_importances'] = feature_importances[index]
-        distance = check_distance(true_values, result_dict['best_parameters'])
-        result_dict['list_of_best_fitnesses'].append(result_dict['best_fitness'])
+        compactness = universal.calculate_compactness(parameter_dicts)
+        result_dict['best_fitnesses'].append(result_dict['best_fitness'])
+        result_dict['compactnesses'].append(compactness)
         inertial_weight += inertial_weight_step
         i += 1
     return result_dict
+
+
+def save_results(result_dict, output_dir):
+    universal.save_feature_importances(result_dict, output_dir)
+    universal.best_to_file(
+        result_dict['best_parameters'], output_dir, result_dict['score_dict'])
+    universal.plot_costfunction(
+        result_dict['compactnesses'], output_dir, y_label='Compactness (cov)')
+    save_extra_results(result_dict, output_dir)
+    create_extra_plots(result_dict, output_dir)
+
+
+
+def save_extra_results(result_dict, output_dir):
+    '''Saves the scoring and stopping criteria values to file.
+
+    Parameters:
+    ----------
+    result_dicts : dict
+        Dictionary containing the results and info that is to be plotted
+    output_dir : str
+        Path to the directory where the plots are to be saved
+
+    Returns:
+    -------
+    Nothing
+    '''
+    file_out1 = os.path.join(output_dir, 'scoring_metrics.json')
+    file_out2 = os.path.join(output_dir, 'stopping_criteria.json')
+    keys1 = ['d_ams']
+    keys2 = ['compactnesses']
+    universal.save_single_file(keys1, result_dict, file_out1)
+    universal.save_single_file(keys2, result_dict, file_out2)
+    universal.save_fitness_improvement(result_dict, keys1, output_dir)
+
+
+def create_extra_plots(result_dict, output_dir):
+    '''Creates some additional figures
+
+    Parameters:
+    ----------
+    result_dicts : dict
+        Dictionary containing the results and info that is to be plotted
+    output_dir : str
+        Path to the directory where the plots are to be saved
+
+    Returns:
+    -------
+    Nothing
+    '''
+    plot_out1 = os.path.join(output_dir, 'scoring_metrics.png')
+    plot_out2 = os.path.join(output_dir, 'stopping_criteria.png')
+    keys1 = ['best_fitnesses']
+    keys2 = ['compactnesses']
+    universal.plot_single_evolution(
+        keys1, result_dict, 'Scoring metrics', plot_out1)
+    universal.plot_single_evolution(
+        keys2, result_dict, 'Stopping criteria', plot_out2)
