@@ -175,7 +175,6 @@ def run_pso(
         best_fitnesses, avg_scores, pred_train, pred_test, data_dict
     '''
     print(':::::::: Initializing :::::::::')
-    output_dir = os.path.expandvars(global_settings['output_dir'])
     settings_dir = os.path.join(output_dir, 'run_settings')
     global_settings = universal.read_settings(settings_dir, 'global')
     pso_settings = universal.read_settings(settings_dir, 'pso')
