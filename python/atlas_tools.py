@@ -153,6 +153,7 @@ def ensemble_fitness(
 def run_pso(
         parameter_dicts,
         value_dicts,
+        calculate_result,
         global_settings,
         plot_pso_location=False
 ):
@@ -183,7 +184,7 @@ def run_pso(
     i = 0
     new_parameters = parameter_dicts
     personal_bests = {}
-    score_dicts, pred_trains, pred_tests, feature_importances = ensemble_fitness(
+    score_dicts, pred_trains, pred_tests, feature_importances = calculate_result(
         parameter_dicts, data_dict, global_settings)
     fitnesses = universal.fitness_to_list(
         score_dicts, fitness_key='d_ams')
@@ -205,7 +206,7 @@ def run_pso(
         print('---- Iteration: ' + str(i) + '----')
         parameter_dicts = new_parameters
         print(' --- Compactness: ' + str(compactness) + ' ---')
-        score_dicts, pred_trains, pred_tests, feature_importances = ensemble_fitness(
+        score_dicts, pred_trains, pred_tests, feature_importances = calculate_result(
             parameter_dicts, data_dict, global_settings)
         fitnesses = universal.fitness_to_list(
             score_dicts, fitness_key='d_ams')
