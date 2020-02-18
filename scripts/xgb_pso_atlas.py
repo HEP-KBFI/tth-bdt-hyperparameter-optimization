@@ -41,7 +41,7 @@ def main():
     pso_settings = pm.read_weights(settings_dir)
     parameter_dicts = xt.prepare_run_params(
         value_dicts, pso_settings['sample_size'])
-    result_dict = pm.run_pso(
+    result_dict = at.run_pso(
         data_dict, value_dicts, sm.run_iteration, parameter_dicts,
         output_dir
     )
