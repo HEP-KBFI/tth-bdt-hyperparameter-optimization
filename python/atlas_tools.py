@@ -154,7 +154,7 @@ def ensemble_fitness(
 def run_pso(
         data_dict,
         value_dicts,
-        calculate_fitnesses,
+        calculate_result,
         parameter_dicts,
         output_dir
 ):
