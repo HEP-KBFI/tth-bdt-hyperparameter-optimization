@@ -4,6 +4,7 @@ import os
 import numpy as np
 import xgboost as xgb
 from tthAnalysis.bdtHyperparameterOptimization import universal
+from tthAnalysis.bdtHyperparameterOptimization import pso_main as pm
 
 
 def create_atlas_data_dict(path_to_file, global_settings):
@@ -216,7 +217,7 @@ def run_pso(
             'c1': pso_settings['c1'],
             'c2': pso_settings['c2'],
             'w': inertial_weight}
-        new_parameters, current_speeds = prepare_new_day(
+        new_parameters, current_speeds = pm.prepare_new_day(
             personal_bests, parameter_dicts,
             result_dict['best_parameters'],
             current_speeds, value_dicts,
