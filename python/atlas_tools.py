@@ -202,7 +202,7 @@ def run_pso(
     best_fitnesses = fitnesses
     current_speeds = pm.initialize_speeds(parameter_dicts)
     print('::::::::::: Optimizing ::::::::::')
-    while i <= iterations and compactness_threshold < compactness:
+    while i <= iterations and pso_settings['compactness_threshold'] < compactness:
         print('---- Iteration: ' + str(i) + '----')
         parameter_dicts = new_parameters
         print(' --- Compactness: ' + str(compactness) + ' ---')
