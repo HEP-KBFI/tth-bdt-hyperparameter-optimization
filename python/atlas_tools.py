@@ -252,8 +252,9 @@ def run_pso(
 
 def save_results(result_dict, output_dir):
     universal.save_feature_importances(result_dict, output_dir)
+    result_dict['d_ams'] = result_dict['best_fitnesses']
     universal.best_to_file(
-        result_dict['best_parameters'], output_dir, result_dict['score_dict'])
+        result_dict['best_parameters'], output_dir, {'d_ams': result_dict['best_fitness']})
     universal.plot_costfunction(
         result_dict['compactnesses'], output_dir, y_label='Compactness (cov)')
     save_extra_results(result_dict, output_dir)
