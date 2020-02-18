@@ -82,7 +82,7 @@ def find_steps(gradients, step_size):
     steps : dict
         Steps for all coordinates
     '''
-    angle = math.atan(gradients['y'] / gradients['x'])
+    angle = math.atan2(gradients['y'], gradients['x'])
     x_step = step_size * math.cos(angle)
     y_step = step_size * math.sin(angle)
     steps = {
@@ -112,7 +112,7 @@ def update_values(curr_values, gradients, step_size):
     new_values = {}
     steps = find_steps(gradients, step_size)
     for variable in curr_values:
-        new_values[variable] = curr_values[variable] + steps[variable]
+        new_values[variable] = curr_values[variable] - steps[variable]
     # # Classic method for gradient descent with learning rate
     # for variable in curr_values:
     #     new_values[variable] = (curr_values[variable]
