@@ -66,7 +66,7 @@ def AMS(s, b):
     where b_r = 10, b = background, s = signal, log is natural logarithm
     """
     br = 10.0
-    radicand = 2 *( (s+b+br) * math.log (1.0 + s/(b+br)) -s)
+    radicand = 2 *( (s+b+br) * np.log (1.0 + s/(b+br)) -s)
     if radicand < 0:
         print 'radicand is negative. Exiting'
         exit()
