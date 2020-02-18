@@ -1,9 +1,12 @@
 '''Tools for a gradient descent algorithm'''
+from __future__ import division
 import os
 import math
+import warnings
 import numpy as np
 import matplotlib.pyplot as plt
 from tthAnalysis.bdtHyperparameterOptimization import rosenbrock_tools as rt
+warnings.filterwarnings('ignore', category=FutureWarning)
 
 
 def rosenbrock(a, b=None, x=None, y=None, minimum=False):
@@ -64,31 +67,21 @@ def set_ranges(parameters):
     return x_range, y_range
 
 
-# def update_values(curr_values, gradients, learning_rate):
-#     '''Update variable values according to given gradients
-
-#     Parameters
-#     ----------
-#     curr_values : dict
-#         Current variable values
-#     gradients : dict
-#         Gradients corresponding to current variable values
-#     learning_rate : float
-#         Step size for updating values
-
-#     Returns
-#     -------
-#     new_values : dict
-#         Updated variable values
-#     '''
-#     new_values = {}
-#     for variable in curr_values:
-#         new_values[variable] = (curr_values[variable]
-#                                 - (learning_rate * gradients[variable]))
-#     return new_values
-
-
 def find_steps(gradients, step_size):
+    '''Calculates steps for x and y coordinates in case of a 2-dimensional function
+
+    Parameters
+    ----------
+    gradients : dict
+        Gradients corresponding to current variable values
+    step_size : float
+        Step size for updating values
+
+    Returns
+    -------
+    steps : dict
+        Steps for all coordinates
+    '''
     angle = math.atan(gradients['y'] / gradients['x'])
     x_step = step_size * math.cos(angle)
     y_step = step_size * math.sin(angle)
@@ -100,10 +93,30 @@ def find_steps(gradients, step_size):
 
 
 def update_values(curr_values, gradients, step_size):
+    '''Update variable values with a fixed step size according to given gradients
+
+    Parameters
+    ----------
+    curr_values : dict
+        Current variable values
+    gradients : dict
+        Gradients corresponding to current variable values
+    step_size : float
+        Step size for updating values
+
+    Returns
+    -------
+    new_values : dict
+        Updated variable values
+    '''
     new_values = {}
     steps = find_steps(gradients, step_size)
     for variable in curr_values:
         new_values[variable] = curr_values[variable] + steps[variable]
+    # # Classic method for gradient descent with learning rate
+    # for variable in curr_values:
+    #     new_values[variable] = (curr_values[variable]
+    #                             - (learning_rate * gradients[variable]))
     return new_values
 
 
@@ -172,7 +185,7 @@ def gradient_descent(
     result = {}
     # Choose random values
     value_set = initialize(parameters)
-    print(value_set)
+    dist = distance(true_values, value_set)
     while iteration <= settings['iterations'] or dist < 1e-8:
         if iteration % 10000 == 0:
             print('Iteration: ' + str(iteration))
@@ -185,13 +198,13 @@ def gradient_descent(
             result['list_of_old_bests'] = [curr_values]
             result['list_of_best_fitnesses'] = [fitness]
             result['best_fitness'] = fitness
-            result['best_parameters']= curr_values
+            result['best_parameters'] = curr_values
         else:
             result['list_of_old_bests'].append(curr_values)
             result['list_of_best_fitnesses'].append(fitness)
         if fitness < result['best_fitness']:
             result['best_fitness'] = fitness
-            result['best_parameters']= curr_values
+            result['best_parameters'] = curr_values
         # Calculate gradient
         gradient = calculate_gradient(
             curr_values, true_values, settings['h'], evaluate)
@@ -202,14 +215,13 @@ def gradient_descent(
         iteration += 1
     # Final evaluation
     fitness = evaluate(
-            value_set, true_values['a'], true_values['b'])
+        value_set, true_values['a'], true_values['b'])
     # Save data
     result['list_of_old_bests'].append(value_set)
     result['list_of_best_fitnesses'].append(fitness)
     if fitness < result['best_fitness']:
         result['best_fitness'] = fitness
         result['best_parameters'] = value_set
-    print(result['best_parameters'])
     return result
 
 
