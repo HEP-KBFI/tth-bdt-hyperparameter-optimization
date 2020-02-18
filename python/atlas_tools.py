@@ -58,7 +58,173 @@ def create_atlas_data_dict(path_to_file, global_settings):
     return data_dict
 
 
-def calculate_ams_score(signal, background, b_reg=10):
-    the_sum = (signal + background + b_reg)
-    log_part = 1 + (signal / (background + b_reg))
-    return np.sqrt(2*(the_sum * np.log(log_part)- signal))
+def AMS(s, b):
+    """ Approximate Median Significance defined as:
+        AMS = sqrt(
+                2 { (s + b + b_r) log[1 + (s/(b+b_r))] - s}
+              )        
+    where b_r = 10, b = background, s = signal, log is natural logarithm
+    """
+    br = 10.0
+    radicand = 2 *( (s+b+br) * math.log (1.0 + s/(b+br)) -s)
+    if radicand < 0:
+        print 'radicand is negative. Exiting'
+        exit()
+    else:
+        return np.sqrt(radicand)
+
+
+def try_different_thresholds(predicted, true_labels):
+    thresholds = np.arange(0, 1, 0.001)
+    ams_scores = []
+    predicted = pandas.Series([i[1] for i in predicted])
+    for threshold in thresholds:
+        th_prediction = pandas.Series(
+            [1 if pred >= threshold else 0 for pred in predicted])
+        signal, background = calculate_s_and_b(th_prediction, true_labels)
+        ams_score = AMS(signal, background)
+        ams_scores.append(ams_score)
+    max_score = max(ams_scores)
+    return max_score
+
+
+def calculate_s_and_b(prediction, labels):
+    labels = labels.reset_index(drop=True)
+    pred_signal_indices = prediction.index[prediction == 1]
+    pred_signal_labels = labels[pred_signal_indices]
+    signal = sum(pred_signal_labels == 1)
+    background = sum(pred_signal_labels == 0)
+    return signal, background
+
+
+def higgs_evaluation(parameter_dict, data_dict, nthread, num_class):
+    params = {
+        'silent': 1,
+        'objective': 'multi:softprob',
+        'num_class': num_class,
+        'nthread': nthread,
+        'seed': 1,
+    }
+    parameters = parameter_dict.copy()
+    num_boost_round = parameters.pop('num_boost_round')
+    parameters.update(params)
+    model = xgb.train(
+        parameters,
+        data_dict['dtrain'],
+        num_boost_round=int(num_boost_round),
+        verbose_eval=False
+    )
+    pred_train = model.predict(data_dict['dtrain'])
+    pred_test = model.predict(data_dict['dtest'])
+    d_ams = calculate_d_ams(pred_train, pred_test, data_dict)
+    feature_importance = model.get_score(importance_type='gain')
+    return score_dict, pred_train, pred_test, feature_importance
+
+
+def calculate_d_ams(pred_train, pred_test, data_dict, kappa=1.5):
+    train_score = try_different_thresholds(pred_train, data_dict['training_labels'])
+    test_score = try_different_thresholds(pred_test, data_dict['testing_labels'])
+    d_ams = universal.calculate_d_roc(train_score, test_score, kappa)
+    return d_ams
+
+
+def ensemble_fitness(
+        parameter_dicts,
+        data_dict,
+        global_settings
+):
+    scores = []
+    pred_tests = []
+    pred_trains = []
+    feature_importances = []
+    for parameter_dict in parameter_dicts:
+        score, pred_train, pred_test, feature_importance = higgs_evaluation(
+            parameter_dict, data_dict,
+            global_settings['nthread'], global_settings['num_class']
+        )
+        scores.append(score)
+        pred_trains.append(pred_train)
+        pred_tests.append(pred_test)
+        feature_importances.append(feature_importance)
+    return scores, pred_trains, pred_tests, feature_importances
+
+
+def run_pso(
+        parameter_dicts,
+        value_dicts,
+        global_settings,
+        plot_pso_location=False
+):
+    '''Performs the whole particle swarm optimization
+
+    Parameters:
+    ----------
+    global_settings : dict
+        Global settings for the run.
+    pso_settings : dict
+        Particle swarm settings for the run
+    parameter_dicts : list of dicts
+        The parameter-sets of all particles.
+
+    Returns:
+    -------
+    result_dict : dict
+        Dictionary that contains the results like best_parameters,
+        best_fitnesses, avg_scores, pred_train, pred_test, data_dict
+    '''
+    print(':::::::: Initializing :::::::::')
+    output_dir = os.path.expandvars(global_settings['output_dir'])
+    settings_dir = os.path.join(output_dir, 'run_settings')
+    global_settings = universal.read_settings(settings_dir, 'global')
+    pso_settings = universal.read_settings(settings_dir, 'pso')
+    inertial_weight, inertial_weight_step = pm.get_weight_step(pso_settings)
+    iterations = pso_settings['iterations']
+    i = 0
+    new_parameters = parameter_dicts
+    personal_bests = {}
+    fitnesses, pred_trains, pred_tests, feature_importances = ensemble_fitness(
+        parameter_dicts, data_dict, global_settings)
+    result_dict = {}
+    index = np.argmax(fitnesses)
+    result_dict['best_fitness'] = fitnesses[index]
+    result_dict['pred_test'] = pred_tests[index]
+    result_dict['pred_train'] = pred_trains[index]
+    result_dict['feature_importances'] = feature_importances[index]
+    result_dict['best_parameters'] = parameter_dicts[index]
+    result_dict['list_of_old_bests'] = [parameter_dicts[index]]
+    result_dict['list_of_best_fitnesses'] = [fitnesses[index]]
+    personal_bests = parameter_dicts
+    best_fitnesses = fitnesses
+    current_speeds = pm.initialize_speeds(parameter_dicts)
+    distance = check_distance(true_values, result_dict['best_parameters'])
+    print('::::::::::: Optimizing ::::::::::')
+    while i <= iterations and compactness_threshold < compactness:
+        print('---- Iteration: ' + str(i) + '----')
+        parameter_dicts = new_parameters
+        fitnesses, pred_trains, pred_tests, feature_importances = ensemble_fitness(
+            parameter_dicts, data_dict, global_settings)
+        best_fitnesses = pm.find_best_fitness(fitnesses, best_fitnesses)
+        personal_bests = pm.calculate_personal_bests(
+            fitnesses, best_fitnesses, parameter_dicts, personal_bests)
+        weight_dict = {
+            'c1': pso_settings['c1'],
+            'c2': pso_settings['c2'],
+            'w': inertial_weight}
+        new_parameters, current_speeds = prepare_new_day(
+            personal_bests, parameter_dicts,
+            result_dict['best_parameters'],
+            current_speeds, value_dicts,
+            weight_dict
+        )
+        if result_dict['best_fitness'] < max(fitnesses):
+            index = np.argmax(fitnesses)
+            result_dict['best_fitness'] = max(fitnesses)
+            result_dict['best_parameters'] = parameter_dicts[index]
+            result_dict['pred_test'] = pred_tests[index]
+            result_dict['pred_train'] = pred_trains[index]
+            result_dict['feature_importances'] = feature_importances[index]
+        distance = check_distance(true_values, result_dict['best_parameters'])
+        result_dict['list_of_best_fitnesses'].append(result_dict['best_fitness'])
+        inertial_weight += inertial_weight_step
+        i += 1
+    return result_dict

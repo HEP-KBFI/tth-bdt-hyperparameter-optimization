@@ -8,7 +8,7 @@ from tthAnalysis.bdtHyperparameterOptimization import pso_main as pm
 from tthAnalysis.bdtHyperparameterOptimization import xgb_tools as xt
 
 np.random.seed(1)
-path_to_file = "$HOME/atlas_higgs.csv"
+path_to_file = "$HOME/atlas_higgs_train.csv"
 
 def main():
     cmssw_base_path = os.path.expandvars('$CMSSW_BASE')
@@ -39,7 +39,7 @@ def main():
     )
     value_dicts = universal.read_parameters(param_file)
     pso_settings = pm.read_weights(settings_dir)
-    parameter_dicts = xt.prepare_run_params(
+    parameter_dicts = sm.prepare_run_params(
         value_dicts, pso_settings['sample_size'])
     result_dict = pm.run_pso(
         data_dict, value_dicts, xt.ensemble_fitnesses, parameter_dicts,
