@@ -1,5 +1,6 @@
 '''Tools for a gradient descent algorithm'''
 import os
+import math
 import numpy as np
 import matplotlib.pyplot as plt
 from tthAnalysis.bdtHyperparameterOptimization import rosenbrock_tools as rt
@@ -63,27 +64,46 @@ def set_ranges(parameters):
     return x_range, y_range
 
 
-def update_values(curr_values, gradients, learning_rate):
-    '''Update variable values according to given gradients
+# def update_values(curr_values, gradients, learning_rate):
+#     '''Update variable values according to given gradients
 
-    Parameters
-    ----------
-    curr_values : dict
-        Current variable values
-    gradients : dict
-        Gradients corresponding to current variable values
-    learning_rate : float
-        Step size for updating values
+#     Parameters
+#     ----------
+#     curr_values : dict
+#         Current variable values
+#     gradients : dict
+#         Gradients corresponding to current variable values
+#     learning_rate : float
+#         Step size for updating values
 
-    Returns
-    -------
-    new_values : dict
-        Updated variable values
-    '''
+#     Returns
+#     -------
+#     new_values : dict
+#         Updated variable values
+#     '''
+#     new_values = {}
+#     for variable in curr_values:
+#         new_values[variable] = (curr_values[variable]
+#                                 - (learning_rate * gradients[variable]))
+#     return new_values
+
+
+def find_steps(gradients, step_size):
+    angle = math.atan(gradients['y'] / gradients['x'])
+    x_step = step_size * math.cos(angle)
+    y_step = step_size * math.sin(angle)
+    steps = {
+        'x': x_step,
+        'y': y_step
+    }
+    return steps
+
+
+def update_values(curr_values, gradients, step_size):
     new_values = {}
+    steps = find_steps(gradients, step_size)
     for variable in curr_values:
-        new_values[variable] = (curr_values[variable]
-                                - (learning_rate * gradients[variable]))
+        new_values[variable] = curr_values[variable] + steps[variable]
     return new_values
 
 
@@ -152,6 +172,7 @@ def gradient_descent(
     result = {}
     # Choose random values
     value_set = initialize(parameters)
+    print(value_set)
     while iteration <= settings['iterations'] or dist < 1e-8:
         if iteration % 10000 == 0:
             print('Iteration: ' + str(iteration))
@@ -168,14 +189,14 @@ def gradient_descent(
         else:
             result['list_of_old_bests'].append(curr_values)
             result['list_of_best_fitnesses'].append(fitness)
-        if fitness > result['best_fitness']:
+        if fitness < result['best_fitness']:
             result['best_fitness'] = fitness
             result['best_parameters']= curr_values
         # Calculate gradient
         gradient = calculate_gradient(
             curr_values, true_values, settings['h'], evaluate)
         # Adjust values with gradients
-        value_set = update_values(curr_values, gradient, settings['gamma'])
+        value_set = update_values(curr_values, gradient, settings['step_size'])
         # Calculate distance
         dist = distance(true_values, value_set)
         iteration += 1
@@ -185,9 +206,10 @@ def gradient_descent(
     # Save data
     result['list_of_old_bests'].append(value_set)
     result['list_of_best_fitnesses'].append(fitness)
-    if fitness > result['best_fitness']:
+    if fitness < result['best_fitness']:
         result['best_fitness'] = fitness
-        result['best_parameters']= value_set
+        result['best_parameters'] = value_set
+    print(result['best_parameters'])
     return result
 
 
