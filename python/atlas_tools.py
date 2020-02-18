@@ -151,11 +151,11 @@ def ensemble_fitness(
 
 
 def run_pso(
-        parameter_dicts,
+        data_dict,
         value_dicts,
-        calculate_result,
-        global_settings,
-        plot_pso_location=False
+        calculate_fitnesses,
+        parameter_dicts,
+        output_dir
 ):
     '''Performs the whole particle swarm optimization
 

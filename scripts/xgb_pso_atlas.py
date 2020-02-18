@@ -43,7 +43,7 @@ def main():
         value_dicts, pso_settings['sample_size'])
     result_dict = at.run_pso(
         data_dict, value_dicts, sm.run_iteration, parameter_dicts,
-        global_settings
+        output_dir
     )
     return result_dict, output_dir
     # sm.run_iteration
