@@ -89,7 +89,7 @@ def find_steps(gradients, step_size):
         'x': x_step,
         'y': y_step
     }
-    return steps
+    return steps, angle
 
 
 def update_values(curr_values, gradients, step_size):
@@ -110,14 +110,14 @@ def update_values(curr_values, gradients, step_size):
         Updated variable values
     '''
     new_values = {}
-    steps = find_steps(gradients, step_size)
+    steps, angle = find_steps(gradients, step_size)
     for variable in curr_values:
         new_values[variable] = curr_values[variable] - steps[variable]
     # # Classic method for gradient descent with learning rate
     # for variable in curr_values:
     #     new_values[variable] = (curr_values[variable]
     #                             - (learning_rate * gradients[variable]))
-    return new_values
+    return new_values, angle
 
 
 def calculate_gradient(curr_values, true_values, h, evaluate):
@@ -172,6 +172,8 @@ def gradient_descent(
         Parameter values of the given function
     initialize : function
         Function for selecting the initial variable values
+    evaluate : function
+        Function for evaluating the given variable values and finding the function value
     distance : function
         Function for calculating the distance from the true global
         minimum
@@ -183,6 +185,7 @@ def gradient_descent(
     '''
     iteration = 0
     result = {}
+    angles = []
     # Choose random values
     value_set = initialize(parameters)
     dist = distance(true_values, value_set)
@@ -209,7 +212,8 @@ def gradient_descent(
         gradient = calculate_gradient(
             curr_values, true_values, settings['h'], evaluate)
         # Adjust values with gradients
-        value_set = update_values(curr_values, gradient, settings['step_size'])
+        value_set, angle = update_values(curr_values, gradient, settings['step_size'])
+        angles.append(angle)
         # Calculate distance
         dist = distance(true_values, value_set)
         iteration += 1
@@ -222,6 +226,7 @@ def gradient_descent(
     if fitness < result['best_fitness']:
         result['best_fitness'] = fitness
         result['best_parameters'] = value_set
+    result['angles'] = angles
     return result
 
 
@@ -279,5 +284,22 @@ def contourplot(
     plt.ylim(min(y_range), max(y_range))
     # Save plot
     plot_out = os.path.join(output_dir, 'contourplot.png')
+    plt.savefig(plot_out, bbox_inches='tight')
+    plt.close('all')
+
+
+def angle_plot(result_dict, output_dir):
+    '''Draws a plot of the gradient angles across all iterations
+
+    Parameters
+    ----------
+    result_dict : dict
+        Results of the gradient descent algorithm
+    output_dir : string
+        Path to the directory where to save the plot
+    '''
+    plt.plot(result_dict['angles'])
+    plt.ylim(-math.pi, math.pi)
+    plot_out = os.path.join(output_dir, 'angle_plot.png')
     plt.savefig(plot_out, bbox_inches='tight')
     plt.close('all')
