@@ -11,10 +11,11 @@ def create_atlas_data_dict(path_to_file, global_settings):
     print('::: Loading data from ' + path_to_file + ' :::')
     path_to_file = os.path.expandvars(path_to_file)
     labels_to_drop = ['Kaggle', 'EventId', 'Weight']
-    atlas_data_df = pandas.read_csv(path_to_file)
-    atlas_data_df['Label'] = atlas_data_df['Label'].replace(
+    atlas_data_original = pandas.read_csv(path_to_file)
+    atlas_data_df = atlas_data_original.copy()
+    atlas_data_original['Label'] = atlas_data_original['Label'].replace(
         to_replace='s', value=1)
-    atlas_data_df['Label'] = atlas_data_df['Label'].replace(
+    atlas_data_original['Label'] = atlas_data_original['Label'].replace(
         to_replace='b', value=0)
     for trainvar in atlas_data_df.columns:
         for label_to_drop in labels_to_drop:
@@ -31,7 +32,7 @@ def create_atlas_data_dict(path_to_file, global_settings):
         os.makedirs(info_dir)
     print(':::::::::::: Creating datasets ::::::::::::::::')
     train, test = train_test_split(
-        atlas_data_df, test_size=0.2, random_state=1)
+        atlas_data_original, test_size=0.2, random_state=1)
     training_labels = train['Label'].astype(int)
     testing_labels = test['Label'].astype(int)
     traindataset = np.array(train[trainvars].values)
@@ -39,13 +40,13 @@ def create_atlas_data_dict(path_to_file, global_settings):
     dtrain = xgb.DMatrix(
         traindataset,
         label=training_labels,
-        nthread=global_settings['nthread'],
+        nthread=8, # global_settings['nthread']
         feature_names=trainvars
     )
     dtest = xgb.DMatrix(
         testdataset,
         label=testing_labels,
-        nthread=global_settings['nthread'],
+        nthread=8, # global_settings['nthread']
         feature_names=trainvars
     )
     data_dict = {
@@ -53,7 +54,9 @@ def create_atlas_data_dict(path_to_file, global_settings):
         'dtest': dtest,
         'training_labels': training_labels,
         'testing_labels': testing_labels,
-        'trainvars': trainvars
+        'trainvars': trainvars,
+        'test_full': test,
+        'train_full': train
     }
     universal.write_data_dict_info(info_dir, data_dict)
     return data_dict
@@ -75,26 +78,35 @@ def AMS(s, b):
         return np.sqrt(radicand)
 
 
-def try_different_thresholds(predicted, true_labels):
+def try_different_thresholds(predicted, data_dict, label_type):
+    full_key = label_type + '_full'
+    label_key = label_type + 'ing_labels'
+    weights = data_dict[full_key]['Weight']
     thresholds = np.arange(0, 1, 0.001)
     ams_scores = []
     predicted = pandas.Series([i[1] for i in predicted])
     for threshold in thresholds:
         th_prediction = pandas.Series(
             [1 if pred >= threshold else 0 for pred in predicted])
-        signal, background = calculate_s_and_b(th_prediction, true_labels)
+        signal, background = calculate_s_and_b(th_prediction, data_dict[label_key], weights)
         ams_score = AMS(signal, background)
         ams_scores.append(ams_score)
     max_score = max(ams_scores)
     return max_score
 
 
-def calculate_s_and_b(prediction, labels):
-    labels = labels.reset_index(drop=True)
-    pred_signal_indices = prediction.index[prediction == 1]
-    pred_signal_labels = labels[pred_signal_indices]
-    signal = sum(pred_signal_labels == 1)
-    background = sum(pred_signal_labels == 0)
+def calculate_s_and_b(prediction, labels, weights):
+    signal = 0
+    background = 0
+    prediction = np.array(prediction)
+    labels = np.array(labels)
+    weights = np.array(weights)
+    for i in range(len(prediction)):
+        if prediction[i] == 1:
+            if labels[i] == 1:
+                signal += weights[i]
+            elif labels[i] == 0:
+                background += weights[i]
     return signal, background
 
 
@@ -124,8 +136,8 @@ def higgs_evaluation(parameter_dict, data_dict, nthread, num_class):
 
 
 def calculate_d_ams(pred_train, pred_test, data_dict, kappa=1.5):
-    train_score = try_different_thresholds(pred_train, data_dict['training_labels'])
-    test_score = try_different_thresholds(pred_test, data_dict['testing_labels'])
+    train_score = try_different_thresholds(pred_train, data_dict, 'train')
+    test_score = try_different_thresholds(pred_test, data_dict, 'test')
     d_ams = universal.calculate_d_roc(train_score, test_score, kappa)
     return d_ams
 
