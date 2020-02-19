@@ -80,7 +80,8 @@ def set_ranges(parameters):
 
 
 def find_steps(gradients, step_size):
-    '''Calculates steps for x and y coordinates in case of a 2-dimensional function
+    '''Calculates steps for x and y coordinates in case of a
+    2-dimensional function
 
     Parameters
     ----------
@@ -105,7 +106,8 @@ def find_steps(gradients, step_size):
 
 
 def update_values(curr_values, gradients, step_size):
-    '''Update variable values with a fixed step size according to given gradients
+    '''Update variable values with a fixed step size according to
+    given gradients
 
     Parameters
     ----------
@@ -164,8 +166,9 @@ def numerical_gradient(curr_values, true_values, h, evaluate):
 
 
 def analytical_gradient(curr_values, true_values):
-    '''Analytically calculate the gradient of the Rosenbrock function for given variable values
-    
+    '''Analytically calculate the gradient of the Rosenbrock function
+    for given variable values
+
     Parameters
     ----------
     curr_values : dict
@@ -190,8 +193,15 @@ def analytical_gradient(curr_values, true_values):
     return gradient
 
 
-def collect_history(iteration, curr_values, num_gradient, an_gradient, func_value):
-    '''Collects all information about the current iteration into a single dictionary
+def collect_history(
+        iteration,
+        curr_values,
+        num_gradient,
+        an_gradient,
+        func_value
+):
+    '''Collects all information about the current iteration into a
+    single dictionary
 
     Parameters
     ----------
@@ -246,7 +256,8 @@ def gradient_descent(
     initialize : function
         Function for selecting the initial variable values
     evaluate : function
-        Function for evaluating the given variable values and finding the function value
+        Function for evaluating the given variable values and finding
+        the function value
     distance : function
         Function for calculating the distance from the true global
         minimum
@@ -264,7 +275,8 @@ def gradient_descent(
     value_set = initialize(parameters)
     dist = distance(true_values, value_set)
     # dx, dy = rosenbrock_gradient(true_values)
-    while iteration <= settings['iterations'] and dist > settings['step_size']:
+    while (iteration <= settings['iterations']
+           and dist > settings['step_size']):
         if iteration % 10000 == 0:
             print('Iteration: ' + str(iteration))
         curr_values = value_set
@@ -288,7 +300,8 @@ def gradient_descent(
             curr_values, true_values, settings['h'], evaluate)
         an_gradient = analytical_gradient(curr_values, true_values)
         # Adjust values with gradients
-        value_set, angle = update_values(curr_values, gradient, settings['step_size'])
+        value_set, angle = update_values(
+            curr_values, gradient, settings['step_size'])
         angles.append(angle)
         # Calculate distance
         dist = distance(true_values, value_set)
@@ -310,7 +323,8 @@ def gradient_descent(
 
 
 def write_history(result_dict, output_dir):
-    '''Writes history of the run of the gradient descent algorithm into a json file
+    '''Writes history of the run of the gradient descent algorithm
+    into a json file
 
     Parameters
     ----------
