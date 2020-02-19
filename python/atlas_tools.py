@@ -129,17 +129,17 @@ def higgs_evaluation(parameter_dict, data_dict, nthread, num_class):
     )
     pred_train = model.predict(data_dict['dtrain'])
     pred_test = model.predict(data_dict['dtest'])
-    d_ams = calculate_d_ams(pred_train, pred_test, data_dict)
+    d_ams, test_ams = calculate_d_ams(pred_train, pred_test, data_dict)
     feature_importance = model.get_score(importance_type='gain')
-    score_dict = {'d_ams': d_ams}
+    score_dict = {'d_ams': d_ams, 'ams': test_ams}
     return score_dict, pred_train, pred_test, feature_importance
 
 
-def calculate_d_ams(pred_train, pred_test, data_dict, kappa=1.5):
+def calculate_d_ams(pred_train, pred_test, data_dict, kappa=0.3):
     train_score = try_different_thresholds(pred_train, data_dict, 'train')
     test_score = try_different_thresholds(pred_test, data_dict, 'test')
     d_ams = universal.calculate_d_roc(train_score, test_score, kappa)
-    return d_ams
+    return d_ams, test_ams
 
 
 def ensemble_fitness(
@@ -242,6 +242,12 @@ def run_pso(
             result_dict['pred_test'] = pred_tests[index]
             result_dict['pred_train'] = pred_trains[index]
             result_dict['feature_importances'] = feature_importances[index]
+            print(' ############### New bests ##################')
+            print('Parameters: ')
+            print(parameter_dicts[index])
+            print('Scores: ')
+            print(score_dicts[index])
+            print(' #############################################')
         compactness = universal.calculate_compactness(parameter_dicts)
         result_dict['best_fitnesses'].append(result_dict['best_fitness'])
         result_dict['compactnesses'].append(compactness)
