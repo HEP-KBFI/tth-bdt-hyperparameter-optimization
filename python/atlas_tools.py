@@ -139,7 +139,7 @@ def calculate_d_ams(pred_train, pred_test, data_dict, kappa=0.3):
     train_score = try_different_thresholds(pred_train, data_dict, 'train')
     test_score = try_different_thresholds(pred_test, data_dict, 'test')
     d_ams = universal.calculate_d_roc(train_score, test_score, kappa)
-    return d_ams, test_ams
+    return d_ams, test_score
 
 
 def ensemble_fitness(
