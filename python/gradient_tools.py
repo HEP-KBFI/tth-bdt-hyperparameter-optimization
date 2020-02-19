@@ -1,10 +1,12 @@
 '''Tools for a gradient descent algorithm'''
 from __future__ import division
 import os
+import json
 import math
 import warnings
 import numpy as np
 import matplotlib.pyplot as plt
+# from sympy import symbols
 from tthAnalysis.bdtHyperparameterOptimization import rosenbrock_tools as rt
 warnings.filterwarnings('ignore', category=FutureWarning)
 
@@ -36,6 +38,16 @@ def rosenbrock(a, b=None, x=None, y=None, minimum=False):
         return a, a ** 2
     z = ((a - x) ** 2) + (b * (y - x ** 2) ** 2)
     return z
+
+
+# def rosenbrock_gradient(true_values):
+#     a = true_values['a']
+#     b = true_values['b']
+#     x, y = symbols('x y')
+#     z = ((a - x) ** 2) + (b * (y - x ** 2) ** 2)
+#     dx = z.diff(x)
+#     dy = z.diff(y)
+#     return dx, dy
 
 
 def set_ranges(parameters):
@@ -120,8 +132,8 @@ def update_values(curr_values, gradients, step_size):
     return new_values, angle
 
 
-def calculate_gradient(curr_values, true_values, h, evaluate):
-    '''Calculate the gradient for given variable values
+def numerical_gradient(curr_values, true_values, h, evaluate):
+    '''Numerically calculate the gradient for given variable values
 
     Parameters
     ----------
@@ -149,6 +161,67 @@ def calculate_gradient(curr_values, true_values, h, evaluate):
             temp_values, true_values['a'], true_values['b'])
         gradient[variable] = (fxph - fxmh) / (2 * h)
     return gradient
+
+
+def analytical_gradient(curr_values, true_values):
+    '''Analytically calculate the gradient of the Rosenbrock function for given variable values
+    
+    Parameters
+    ----------
+    curr_values : dict
+        Given variable values
+    true_values : dict
+        Parameter values for the Rosenbrock function
+
+    Returns
+    -------
+    gradient : dict
+        Calculated gradient
+    '''
+    gradient = {}
+    a = true_values['a']
+    b = true_values['b']
+    x = curr_values['x']
+    y = curr_values['y']
+    gradient['x'] = -2*a - 4*b*x*(-x**2 + y) + 2*x
+    gradient['y'] = b*(-2*x**2 + 2*y)
+    # gradient['x'] = float(dx.subs('x', curr_values['x']).subs('y', curr_values['y']))
+    # gradient['y'] = float(dy.subs('x', curr_values['x']).subs('y', curr_values['y']))
+    return gradient
+
+
+def collect_history(iteration, curr_values, num_gradient, an_gradient, func_value):
+    '''Collects all information about the current iteration into a single dictionary
+
+    Parameters
+    ----------
+    iteration : int
+        Number of current iteration
+    curr_values : dict
+        Variable values
+    num_gradient : dict
+        Numerically calculated gradient
+    an_gradient : dict
+        Analytically calculated gradient
+    func_value : float
+        Function value for given variable values
+
+    Returns
+    -------
+    curr_iteration : dict
+        Dictionary with information about the current iteration
+    '''
+    curr_iteration = {
+        'iteration': iteration,
+        'x': curr_values['x'],
+        'y': curr_values['y'],
+        'z': func_value,
+        'num_grad_x': num_gradient['x'],
+        'num_grad_y': num_gradient['y'],
+        'an_grad_x': an_gradient['x'],
+        'an_grad_y': an_gradient['y']
+    }
+    return curr_iteration
 
 
 def gradient_descent(
@@ -185,11 +258,13 @@ def gradient_descent(
     '''
     iteration = 0
     result = {}
+    history = []
     angles = []
     # Choose random values
     value_set = initialize(parameters)
     dist = distance(true_values, value_set)
-    while iteration <= settings['iterations'] or dist < 1e-8:
+    # dx, dy = rosenbrock_gradient(true_values)
+    while iteration <= settings['iterations'] and dist > settings['step_size']:
         if iteration % 10000 == 0:
             print('Iteration: ' + str(iteration))
         curr_values = value_set
@@ -209,13 +284,16 @@ def gradient_descent(
             result['best_fitness'] = fitness
             result['best_parameters'] = curr_values
         # Calculate gradient
-        gradient = calculate_gradient(
+        gradient = numerical_gradient(
             curr_values, true_values, settings['h'], evaluate)
+        an_gradient = analytical_gradient(curr_values, true_values)
         # Adjust values with gradients
         value_set, angle = update_values(curr_values, gradient, settings['step_size'])
         angles.append(angle)
         # Calculate distance
         dist = distance(true_values, value_set)
+        history.append(collect_history(
+            iteration, curr_values, gradient, an_gradient, fitness))
         iteration += 1
     # Final evaluation
     fitness = evaluate(
@@ -227,7 +305,28 @@ def gradient_descent(
         result['best_fitness'] = fitness
         result['best_parameters'] = value_set
     result['angles'] = angles
+    result['history'] = history
     return result
+
+
+def write_history(result_dict, output_dir):
+    '''Writes history of the run of the gradient descent algorithm into a json file
+
+    Parameters
+    ----------
+    result_dict : dict
+        Results of the algorithm
+    output_dir : string
+        Path to the directory where to save the plot
+    '''
+    history = result_dict['history']
+    if not os.path.exists(output_dir):
+        os.makedirs(output_dir)
+    output_path = os.path.join(output_dir, 'iteration_history.json')
+    with open(output_path, 'w') as file:
+        for line in history:
+            json.dump(line, file)
+            file.write('\n')
 
 
 def contourplot(

@@ -44,6 +44,7 @@ def main():
         rt.check_distance
     )
     print(':::::::::: Saving results :::::::::::::')
+    gd.write_history(result_dict, output_dir)
     gd.contourplot(result_dict, true_values, param_dict, output_dir)
     gd.angle_plot(result_dict, output_dir)
     rt.plot_progress(result_dict, true_values, output_dir)
