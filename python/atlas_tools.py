@@ -129,17 +129,17 @@ def higgs_evaluation(parameter_dict, data_dict, nthread, num_class):
     )
     pred_train = model.predict(data_dict['dtrain'])
     pred_test = model.predict(data_dict['dtest'])
-    d_ams, test_ams = calculate_d_ams(pred_train, pred_test, data_dict)
+    d_ams, test_ams, train_ams = calculate_d_ams(pred_train, pred_test, data_dict)
     feature_importance = model.get_score(importance_type='gain')
-    score_dict = {'d_ams': d_ams, 'ams': test_ams}
+    score_dict = {'d_ams': d_ams, 'test_ams': test_ams, 'train_ams': train_ams}
     return score_dict, pred_train, pred_test, feature_importance
 
 
 def calculate_d_ams(pred_train, pred_test, data_dict, kappa=0.3):
-    train_score = try_different_thresholds(pred_train, data_dict, 'train')
-    test_score = try_different_thresholds(pred_test, data_dict, 'test')
+    train_ams = try_different_thresholds(pred_train, data_dict, 'train')
+    test_ams = try_different_thresholds(pred_test, data_dict, 'test')
     d_ams = universal.calculate_d_roc(train_score, test_score, kappa)
-    return d_ams, test_score
+    return d_ams, test_ams, train_ams
 
 
 def ensemble_fitness(
