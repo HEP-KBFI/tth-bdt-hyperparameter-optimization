@@ -138,7 +138,7 @@ def higgs_evaluation(parameter_dict, data_dict, nthread, num_class):
 def calculate_d_ams(pred_train, pred_test, data_dict, kappa=0.3):
     train_ams = try_different_thresholds(pred_train, data_dict, 'train')
     test_ams = try_different_thresholds(pred_test, data_dict, 'test')
-    d_ams = universal.calculate_d_roc(train_score, test_score, kappa)
+    d_ams = universal.calculate_d_roc(train_ams, test_ams, kappa)
     return d_ams, test_ams, train_ams
 
 
