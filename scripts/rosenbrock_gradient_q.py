@@ -47,6 +47,7 @@ def main():
     gd.write_history(result_dict, output_dir)
     gd.contourplot(result_dict, true_values, param_dict, output_dir)
     gd.angle_plot(result_dict, output_dir)
+    gd.step_plot(result_dict, output_dir)
     rt.plot_progress(result_dict, true_values, output_dir)
     rt.plot_distance_history(result_dict, true_values, output_dir)
     rt.plot_fitness_history(result_dict, output_dir)

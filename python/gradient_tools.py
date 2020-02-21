@@ -79,7 +79,7 @@ def set_ranges(parameters):
     return x_range, y_range
 
 
-def find_steps(gradients, step_size):
+def find_steps(gradient, step_size):
     '''Calculates steps for x and y coordinates in case of a
     2-dimensional function
 
@@ -95,7 +95,7 @@ def find_steps(gradients, step_size):
     steps : dict
         Steps for all coordinates
     '''
-    angle = math.atan2(gradients['y'], gradients['x'])
+    angle = math.atan2(gradient['y'], gradient['x'])
     x_step = step_size * math.cos(angle)
     y_step = step_size * math.sin(angle)
     steps = {
@@ -105,7 +105,7 @@ def find_steps(gradients, step_size):
     return steps, angle
 
 
-def update_values(curr_values, gradients, step_size):
+def update_values(curr_values, func_value, true_values, gradient, step_size, evaluate):
     '''Update variable values with a fixed step size according to
     given gradients
 
@@ -113,25 +113,46 @@ def update_values(curr_values, gradients, step_size):
     ----------
     curr_values : dict
         Current variable values
-    gradients : dict
+    func_value : float
+        Current function value
+    true_values : dict
+        Parameter values for the function
+    gradient : dict
         Gradients corresponding to current variable values
     step_size : float
         Step size for updating values
-
+    evaluate : function
+        Function for evaluating the given variable values and finding
+        the function value
     Returns
     -------
     new_values : dict
         Updated variable values
     '''
     new_values = {}
-    steps, angle = find_steps(gradients, step_size)
+    steps, angle = find_steps(gradient, step_size)
     for variable in curr_values:
         new_values[variable] = curr_values[variable] - steps[variable]
+    new_values, step_size = gradient_check(curr_values, func_value, new_values, true_values, gradient, step_size, evaluate)
     # # Classic method for gradient descent with learning rate
     # for variable in curr_values:
     #     new_values[variable] = (curr_values[variable]
     #                             - (learning_rate * gradients[variable]))
-    return new_values, angle
+    return new_values, angle, step_size
+
+
+def gradient_check(curr_values, func_value, new_values, true_values, gradient, step_size, evaluate):
+    '''Checks whether the
+    '''
+    expected_change = step_size * math.sqrt(gradient['x'] ** 2 + gradient['y'] ** 2)
+    new_z = evaluate(new_values, true_values['a'], true_values['b'])
+    actual_change = func_value - new_z
+    if actual_change < 0.5 * expected_change:
+        step_size /= 2
+        new_values, angle, step_size = update_values(curr_values, func_value, true_values, gradient, step_size, evaluate)
+        return new_values, step_size
+    else:
+        return new_values, step_size
 
 
 def numerical_gradient(curr_values, true_values, h, evaluate):
@@ -271,6 +292,7 @@ def gradient_descent(
     result = {}
     history = []
     angles = []
+    steps = []
     # Choose random values
     value_set = initialize(parameters)
     # value_set = {
@@ -304,9 +326,10 @@ def gradient_descent(
             curr_values, true_values, settings['h'], evaluate)
         an_gradient = analytical_gradient(curr_values, true_values)
         # Adjust values with gradients
-        value_set, angle = update_values(
-            curr_values, gradient, settings['step_size'])
+        value_set, angle, step_size = update_values(
+            curr_values, fitness, true_values, gradient, settings['step_size'], evaluate)
         angles.append(angle)
+        steps.append(step_size)
         # Calculate distance
         dist = distance(true_values, value_set)
         history.append(collect_history(
@@ -322,6 +345,7 @@ def gradient_descent(
         result['best_fitness'] = fitness
         result['best_parameters'] = value_set
     result['angles'] = angles
+    result['steps'] = steps
     result['history'] = history
     return result
 
@@ -418,5 +442,22 @@ def angle_plot(result_dict, output_dir):
     plt.plot(result_dict['angles'], '.', linestyle='')
     plt.ylim(-math.pi, math.pi)
     plot_out = os.path.join(output_dir, 'angle_plot.png')
+    plt.savefig(plot_out, bbox_inches='tight')
+    plt.close('all')
+
+
+def step_plot(result_dict, output_dir):
+    '''Draws a plot of the gradient angles across all iterations
+
+    Parameters
+    ----------
+    result_dict : dict
+        Results of the gradient descent algorithm
+    output_dir : string
+        Path to the directory where to save the plot
+    '''
+    plt.plot(result_dict['steps'], '.', linestyle='')
+    plt.yscale('log')
+    plot_out = os.path.join(output_dir, 'step_plot.png')
     plt.savefig(plot_out, bbox_inches='tight')
     plt.close('all')
