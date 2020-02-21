@@ -273,6 +273,10 @@ def gradient_descent(
     angles = []
     # Choose random values
     value_set = initialize(parameters)
+    # value_set = {
+    #     'x': 14.648220513748084,
+    #     'y': 214.66081018673745
+    # }
     dist = distance(true_values, value_set)
     # dx, dy = rosenbrock_gradient(true_values)
     while (iteration <= settings['iterations']
@@ -392,7 +396,7 @@ def contourplot(
     for values in result_dict['list_of_old_bests']:
         x_progress.append(values['x'])
         y_progress.append(values['y'])
-    plt.plot(x_progress, y_progress)
+    plt.plot(x_progress, y_progress, '.', linestyle='')
     plt.xlim(min(x_range), max(x_range))
     plt.ylim(min(y_range), max(y_range))
     # Save plot
@@ -411,7 +415,7 @@ def angle_plot(result_dict, output_dir):
     output_dir : string
         Path to the directory where to save the plot
     '''
-    plt.plot(result_dict['angles'])
+    plt.plot(result_dict['angles'], '.', linestyle='')
     plt.ylim(-math.pi, math.pi)
     plot_out = os.path.join(output_dir, 'angle_plot.png')
     plt.savefig(plot_out, bbox_inches='tight')
