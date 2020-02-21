@@ -82,7 +82,7 @@ def set_ranges(parameters):
 
 def find_steps(gradient, step_size):
     '''Calculates steps for x and y coordinates in case of a
-    2-dimensional function
+    3-dimensional function
 
     Parameters
     ----------
@@ -180,8 +180,10 @@ def gradient_check(curr_values, func_value, new_values, true_values, gradient, s
         Function for evaluating the given variable values and finding
         the function value
     '''
-    expected_change = step_size * math.sqrt(
-        gradient['x'] ** 2 + gradient['y'] ** 2)
+    expected_change = 0
+    for variable in gradient:
+        expected_change += gradient[variable] ** 2
+    expected_change = step_size * math.sqrt(expected_change)
     new_z = evaluate(new_values, true_values['a'], true_values['b'])
     actual_change = func_value - new_z
     if actual_change < 0.5 * expected_change:
@@ -498,7 +500,7 @@ def angle_plot(result_dict, output_dir):
 
 
 def step_plot(result_dict, output_dir):
-    '''Draws a plot of the gradient angles across all iterations
+    '''Draws a plot of the step sizes across all iterations
 
     Parameters
     ----------
