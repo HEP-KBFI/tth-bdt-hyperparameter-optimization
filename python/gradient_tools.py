@@ -13,7 +13,8 @@ warnings.filterwarnings('ignore', category=FutureWarning)
 
 def rosenbrock(a, b=None, x=None, y=None, minimum=False):
     '''Calculates the Rosenbrock function for given variables or
-    calculates its global minimum if the minimum option is set to True
+    calculates its global minimum if the minimum option is set
+    to True
 
     Parameters
     ----------
@@ -105,7 +106,14 @@ def find_steps(gradient, step_size):
     return steps, angle
 
 
-def update_values(curr_values, func_value, true_values, gradient, step_size, evaluate):
+def update_values(
+        curr_values,
+        func_value,
+        true_values,
+        gradient,
+        step_size,
+        evaluate
+):
     '''Update variable values with a fixed step size according to
     given gradients
 
@@ -133,7 +141,15 @@ def update_values(curr_values, func_value, true_values, gradient, step_size, eva
     steps, angle = find_steps(gradient, step_size)
     for variable in curr_values:
         new_values[variable] = curr_values[variable] - steps[variable]
-    new_values, step_size = gradient_check(curr_values, func_value, new_values, true_values, gradient, step_size, evaluate)
+    new_values, step_size = gradient_check(
+        curr_values,
+        func_value,
+        new_values,
+        true_values,
+        gradient,
+        step_size,
+        evaluate
+    )
     # # Classic method for gradient descent with learning rate
     # for variable in curr_values:
     #     new_values[variable] = (curr_values[variable]
@@ -142,14 +158,42 @@ def update_values(curr_values, func_value, true_values, gradient, step_size, eva
 
 
 def gradient_check(curr_values, func_value, new_values, true_values, gradient, step_size, evaluate):
-    '''Checks whether the
+    '''Checks whether the function value corresponds to the expected
+    value according to gradient to avoid getting stuck in one
+    location
+
+    Parameters
+    ----------
+    curr_values : dict
+        Current variable values
+    func_value : float
+        Current function value
+    new_values : dict
+        New variable values according to currently chosen step
+    true_values : dict
+        Parameter values for the function
+    gradient : dict
+        Gradients corresponding to current variable values
+    step_size : float
+        Step size for updating values
+    evaluate : function
+        Function for evaluating the given variable values and finding
+        the function value
     '''
-    expected_change = step_size * math.sqrt(gradient['x'] ** 2 + gradient['y'] ** 2)
+    expected_change = step_size * math.sqrt(
+        gradient['x'] ** 2 + gradient['y'] ** 2)
     new_z = evaluate(new_values, true_values['a'], true_values['b'])
     actual_change = func_value - new_z
     if actual_change < 0.5 * expected_change:
         step_size /= 2
-        new_values, angle, step_size = update_values(curr_values, func_value, true_values, gradient, step_size, evaluate)
+        new_values, angle, step_size = update_values(
+            curr_values,
+            func_value,
+            true_values,
+            gradient,
+            step_size,
+            evaluate
+        )
         return new_values, step_size
     else:
         return new_values, step_size
@@ -327,7 +371,13 @@ def gradient_descent(
         an_gradient = analytical_gradient(curr_values, true_values)
         # Adjust values with gradients
         value_set, angle, step_size = update_values(
-            curr_values, fitness, true_values, gradient, settings['step_size'], evaluate)
+            curr_values,
+            fitness,
+            true_values,
+            gradient,
+            settings['step_size'],
+            evaluate
+        )
         angles.append(angle)
         steps.append(step_size)
         # Calculate distance
@@ -379,7 +429,8 @@ def contourplot(
         function=rosenbrock
 ):
     '''Draws a contour plot of the function along with a marker for
-    the global minimum and a line showing the progress of the algorithm
+    the global minimum and a line showing the progress of the
+    algorithm
 
     Parameters
     ----------
