@@ -6,252 +6,253 @@ import math
 import warnings
 import numpy as np
 import matplotlib.pyplot as plt
+warnings.filterwarnings('ignore', category=FutureWarning)
 
 class Point:
-	'''A class used to represent a point of a given function
-	
-	Attributes
-	----------
-	real_coordinates : dict
-		Coordinates of the point on the default coordinate system
-	real_value : float
-		Value of the function on the given coordinates
-	temp_coordinates : dict
-		Coordinates of the point on a rotated coordinate system
-	matrix : array
-		Rotation matrix for convertion into the rotated system
-	gradient : dict
-		Gradient of the function at the given coordinates
-	'''
-	def __init__(self, coordinates):
-		self.real_coordinates = coordinates
-		self.real_value = None
-		self.temp_coordinates = None
-		self.matrix = None
-		self.gradient = None
-	def assign_value(self, value):
-		self.real_value = value
-	def assign_temp_coordinates(self, temp_coordinates):
-		self.temp_coordinates = temp_coordinates
-	def assign_matrix(self, matrix):
-		self.matrix = matrix
-	def assign_gradient(self, gradient):
-		self.gradient = gradient
+    '''A class used to represent a point of a given function
+
+    Attributes
+    ----------
+    real_coordinates : dict
+        Coordinates of the point on the default coordinate system
+    real_value : float
+        Value of the function on the given coordinates
+    temp_coordinates : dict
+        Coordinates of the point on a rotated coordinate system
+    matrix : array
+        Rotation matrix for convertion into the rotated system
+    gradient : dict
+        Gradient of the function at the given coordinates
+    '''
+    def __init__(self, coordinates):
+        self.real_coordinates = coordinates
+        self.real_value = None
+        self.temp_coordinates = None
+        self.matrix = None
+        self.gradient = None
+    def assign_value(self, value):
+        self.real_value = value
+    def assign_temp_coordinates(self, temp_coordinates):
+        self.temp_coordinates = temp_coordinates
+    def assign_matrix(self, matrix):
+        self.matrix = matrix
+    def assign_gradient(self, gradient):
+        self.gradient = gradient
 
 
 def real2temp(coordinates, matrix):
-	'''Calculates coordinates in a rotated coordinate system based on coordinates
-	in the default coordinate system
+    '''Calculates coordinates in a rotated coordinate system based on coordinates
+    in the default coordinate system
 
-	Parameters
-	----------
-	coordinates : dict
-		Coordinates of the point in the default coordinate system
-	matrix : array
-		Rotation matrix
+    Parameters
+    ----------
+    coordinates : dict
+        Coordinates of the point in the default coordinate system
+    matrix : array
+        Rotation matrix
 
-	Returns
-	-------
-	temp_coordinates : dict
-		Coordinates of the point in a rotated coordinate system
-	'''
-	real = np.array(
-		[coordinates['x']],
-		[coordinates['y']]
-	)
-	temp = np.matmul(matrix, real)
-	temp_coordinates = {
-		'x': temp[0][0],
-		'y': temp[1][0]
-	}
-	return temp_coordinates
+    Returns
+    -------
+    temp_coordinates : dict
+        Coordinates of the point in a rotated coordinate system
+    '''
+    real = np.array(
+        [coordinates['x']],
+        [coordinates['y']]
+    )
+    temp = np.matmul(matrix, real)
+    temp_coordinates = {
+        'x': temp[0][0],
+        'y': temp[1][0]
+    }
+    return temp_coordinates
 
 
 def temp2real(coordinates, matrix):
-	'''Calculates coordinates in the default coordinate system based on
-	coordinates in a rotated coordinate system
+    '''Calculates coordinates in the default coordinate system based on
+    coordinates in a rotated coordinate system
 
-	Parameters
-	---------
-	coordinates : dict
-		Coordinates of the point in a rotated coordinate system
-	matrix : array
-		Rotation matrix
+    Parameters
+    ---------
+    coordinates : dict
+        Coordinates of the point in a rotated coordinate system
+    matrix : array
+        Rotation matrix
 
-	Returns
-	-------
-	real_coordinates : dict
-		Coordinates of the point in the default coordinate system	
-	'''
-	temp = np.array(
-		[coordinates['x']],
-		[coordinates['y']]
-	)
-	real = np.matmul(temp, matrix.transpose())
-	real_coordinates = {
-		'x': real[0][0],
-		'y': real[1][0]
-	}
-	return real_coordinates
+    Returns
+    -------
+    real_coordinates : dict
+        Coordinates of the point in the default coordinate system
+    '''
+    temp = np.array(
+        [coordinates['x']],
+        [coordinates['y']]
+    )
+    real = np.matmul(temp, matrix.transpose())
+    real_coordinates = {
+        'x': real[0][0],
+        'y': real[1][0]
+    }
+    return real_coordinates
 
 
 def wiggle(coordinates, true_values, step, evaluate, rotated=False, matrix=None):
-	'''Finds a numerical gradient of a function at a given coordinate
-	by "wiggling" the coordinate values on each axis by a given step size
+    '''Finds a numerical gradient of a function at a given coordinate
+    by "wiggling" the coordinate values on each axis by a given step size
 
-	Parameters
-	----------
-	coordiantes : dict
-		Coordinates of the point
-	true_values : dict
-		Parameter values of the function
-	step : float
-		Step size of the "wiggle"
-	evaluate : function
-		Function for evaluating the function at the given coordinates
-	rotated : bool
-		Whether the current coordinate system is rotated
-	matrix : array
-		Rotation matrix in case the coordinate system is rotated
+    Parameters
+    ----------
+    coordiantes : dict
+        Coordinates of the point
+    true_values : dict
+        Parameter values of the function
+    step : float
+        Step size of the "wiggle"
+    evaluate : function
+        Function for evaluating the function at the given coordinates
+    rotated : bool
+        Whether the current coordinate system is rotated
+    matrix : array
+        Rotation matrix in case the coordinate system is rotated
 
-	Returns
-	-------
-	gradient : dict
-		Calculated gradient
-	'''
-	gradient = {}
-	for coordinate in coordinates:
-		temp_values = coordinates.copy()
-		temp_values[coordinate] += step
-		if rotated:
-			temp_values = temp2real(temp_values, matrix)
-		positive_wiggle = evaluate(
-			temp_values, true_values['a'], true_values['b'])
-		temp_values = point.coordinates.copy()
-		temp_values[coordinate] -= step
-		if rotated:
-			temp_values = temp2real(temp_values, matrix)
-		negative_wiggle = evaluate(
-			temp_values, true_values['a'], true_values['b'])
-		gradient[variable] = (positive_wiggle - negative_wiggle) / (2 * step)
-	return gradient
+    Returns
+    -------
+    gradient : dict
+        Calculated gradient
+    '''
+    gradient = {}
+    for coordinate in coordinates:
+        temp_values = coordinates.copy()
+        temp_values[coordinate] += step
+        if rotated:
+            temp_values = temp2real(temp_values, matrix)
+        positive_wiggle = evaluate(
+            temp_values, true_values['a'], true_values['b'])
+        temp_values = coordinates.copy()
+        temp_values[coordinate] -= step
+        if rotated:
+            temp_values = temp2real(temp_values, matrix)
+        negative_wiggle = evaluate(
+            temp_values, true_values['a'], true_values['b'])
+        gradient[coordinate] = (positive_wiggle - negative_wiggle) / (2 * step)
+    return gradient
 
 
 def numerical_gradient(point, true_values, step, evaluate):
-	'''Numerically calculates the gradient of the function at a given coordinate
-	with the direction of the x-axis determined by the previous gradient
+    '''Numerically calculates the gradient of the function at a given coordinate
+    with the direction of the x-axis determined by the previous gradient
 
-	Parameters
-	----------
-	point : Point
-		Object containing the current coordinates and coordinate system
-	true_values : dict
-		Parameter values of the function
-	step : float
-		Step size of the "wiggle"
-	evaluate : function
-		Function for evaluating the function at the given coordinates
+    Parameters
+    ----------
+    point : Point
+        Object containing the current coordinates and coordinate system
+    true_values : dict
+        Parameter values of the function
+    step : float
+        Step size of the "wiggle"
+    evaluate : function
+        Function for evaluating the function at the given coordinates
 
-	Returns
-	-------
-	point : Point
-		Point updated with the gradient
-	'''
-	gradient = {}
-	if not point.temp_coordinates:
-		gradient = wiggle(
-			point.real_coordinates,
-			true_values,
-			step,
-			evaluate
-		)
-	else:
-		gradient = wiggle(
-			point.temp_coordinates,
-			true_values,
-			step,
-			evaluate,
-			False,
-			point.matrix
-		)
-	point.assign_gradient(gradient)
-	return point
+    Returns
+    -------
+    point : Point
+        Point updated with the gradient
+    '''
+    gradient = {}
+    if not point.temp_coordinates:
+        gradient = wiggle(
+            point.real_coordinates,
+            true_values,
+            step,
+            evaluate
+        )
+    else:
+        gradient = wiggle(
+            point.temp_coordinates,
+            true_values,
+            step,
+            evaluate,
+            False,
+            point.matrix
+        )
+    point.assign_gradient(gradient)
+    return point
 
 
 def axes_rotation(point):
-	'''Rotates the axes of the coordinate system in such a way that the new x-axis
-	is directed in the opposite direction of the gradient
+    '''Rotates the axes of the coordinate system in such a way that the new x-axis
+    is directed in the opposite direction of the gradient
 
-	Parameters
-	----------
-	point : Point
-		Object containing the current coordinates and coordinate system
-	
-	Returns
-	-------
-	point : Point
-		Point updated with information about the rotated coordinate system
-	'''
-	angle = math.atan2(point.gradient['y'], point.gradient['x'])
-	if angle < math.pi:
-		angle += math.pi
-	else:
-		angle -= math.pi
-	matrix = np.array(
-		[math.cos(angle), math.sin(angle)],
-		[-1 * math.sin(angle), math.cos(angle)]
-	)
-	point.assign_matrix(matrix)
-	point.assign_temp_coordinates(real2temp(point.real_coordinates, point.matrix))
-	return point
+    Parameters
+    ----------
+    point : Point
+        Object containing the current coordinates and coordinate system
+
+    Returns
+    -------
+    point : Point
+        Point updated with information about the rotated coordinate system
+    '''
+    angle = math.atan2(point.gradient['y'], point.gradient['x'])
+    if angle < math.pi:
+        angle += math.pi
+    else:
+        angle -= math.pi
+    matrix = np.array(
+        [math.cos(angle), math.sin(angle)],
+        [-1 * math.sin(angle), math.cos(angle)]
+    )
+    point.assign_matrix(matrix)
+    point.assign_temp_coordinates(real2temp(point.real_coordinates, point.matrix))
+    return point
 
 
 def new_point(temp_coordinates, old_point):
-	'''Generates a new point based on the updated values of the previous point
+    '''Generates a new point based on the updated values of the previous point
 
-	Parameters
-	----------
-	temp_coordinates : dict
-		Coordinates of the point in a rotated coordinate system
-	old_point : Point
-		Object containing information about the previous point
+    Parameters
+    ----------
+    temp_coordinates : dict
+        Coordinates of the point in a rotated coordinate system
+    old_point : Point
+        Object containing information about the previous point
 
-	Returns
-	-------
-	point : Point
-		New point
-	'''
-	real_coordinates = temp2real(temp_coordinates, old_point.matrix)
-	point = Point(real_coordinates)
-	point.assign_matrix(old_point.matrix)
-	point.assign_temp_coordinates(old_point.temp_coordinates)
-	return point
+    Returns
+    -------
+    point : Point
+        New point
+    '''
+    real_coordinates = temp2real(temp_coordinates, old_point.matrix)
+    point = Point(real_coordinates)
+    point.assign_matrix(old_point.matrix)
+    point.assign_temp_coordinates(old_point.temp_coordinates)
+    return point
 
 
 def update_coordinates(point, step):
-	'''Moves the coordinates by a given step size in the direction of the x-axis
-	in the rotated coordinate system
+    '''Moves the coordinates by a given step size in the direction of the x-axis
+    in the rotated coordinate system
 
-	Parameters
-	----------
-	point : Point
-		Object containing information about the current point
-	step : float
-		Step size for moving the coordinates
+    Parameters
+    ----------
+    point : Point
+        Object containing information about the current point
+    step : float
+        Step size for moving the coordinates
 
-	Returns
-	-------
-	new_point : Point
-		Point with new coordinates
-	'''
-	new_values = {}
-	for variable in point.temp_coordinates:
-		if variable == 'x':
-			new_values[variable] = point.temp_coordinates[variable] + step
-		else:
-			new_values[variable] = point.temp_coordinates[variable]
-	new_point = new_point(new_values, point)
-	return new_point
+    Returns
+    -------
+    point : Point
+        Point with new coordinates
+    '''
+    new_values = {}
+    for variable in point.temp_coordinates:
+        if variable == 'x':
+            new_values[variable] = point.temp_coordinates[variable] + step
+        else:
+            new_values[variable] = point.temp_coordinates[variable]
+    point = new_point(new_values, point)
+    return point
 
 
 def collect_history(
@@ -291,14 +292,14 @@ def collect_history(
 
 
 def gradient_descent(
-		settings,
-		parameters,
-		true_values,
-		initialize,
-		evaluate,
-		distance
+        settings,
+        parameters,
+        true_values,
+        initialize,
+        evaluate,
+        distance
 ):
-	'''Performs the gradient descent optimization algorithm
+    '''Performs the gradient descent optimization algorithm
 
     Parameters
     ----------
@@ -323,23 +324,23 @@ def gradient_descent(
     result : dict
         Results of the algorithm
     '''
-	iteration = 0
-	result = {}
-	history = []
-	# Choose random initial values
-	value_set = initialize(parameters)
-	dist = distance(true_values, value_set)
-	# Set chosen values as coordinates
-	curr_point = Point(value_set)
-	while (iteration <= settings['iterations']
-		   and dist > settings['step_size']):
-		# Calculate funcion value at current coordinates
-		curr_values = curr_point.real_coordinates
-		fitness = evaluate(
-			curr_pvalues, true_values['a'], true_values['b'])
-		curr_point.assign_value(fitness)
-		# Save data
-		if iteration == 0:
+    iteration = 0
+    result = {}
+    history = []
+    # Choose random initial values
+    value_set = initialize(parameters)
+    dist = distance(true_values, value_set)
+    # Set chosen values as coordinates
+    curr_point = Point(value_set)
+    while (iteration <= settings['iterations']
+           and dist > settings['step_size']):
+        # Calculate funcion value at current coordinates
+        curr_values = curr_point.real_coordinates
+        fitness = evaluate(
+            curr_values, true_values['a'], true_values['b'])
+        curr_point.assign_value(fitness)
+        # Save data
+        if iteration == 0:
             result['list_of_old_bests'] = [curr_values]
             result['list_of_best_fitnesses'] = [fitness]
             result['best_fitness'] = fitness
@@ -352,11 +353,11 @@ def gradient_descent(
             result['best_parameters'] = curr_values
         # Calculate gradient
         gradient = numerical_gradient(
-        	curr_point, true_values, settings['step_size'], evaluate)
+            curr_point, true_values, settings['h'], evaluate)
         # Rotation of axes
         curr_point = axes_rotation(gradient)
         # Moving point by a designated step
-        curr_point = update_coordinates(curr_point)
+        curr_point = update_coordinates(curr_point, settings['step_size'])
         # Calculate distance to minimum
         dist = distance(true_values, curr_point.real_coordinates)
         history.append(collect_history(
@@ -424,6 +425,36 @@ def set_ranges(parameters):
                 parameter['range_end']
             )
     return x_range, y_range
+
+
+def rosenbrock(a, b=None, x=None, y=None, minimum=False):
+    '''Calculates the Rosenbrock function for given variables or
+    calculates its global minimum if the minimum option is set
+    to True
+
+    Parameters
+    ----------
+    a : float
+        Value of the parameter a
+    b : float
+        Value of the parameter b
+    x : float
+        Value of the variable x
+    y : float
+        Value of the variable y
+    minimum : bool
+        If True, calculate the global minimum of the function;
+        If False, calculate the function for given variable values
+
+    Returns
+    -------
+    z : float
+        Value of the function
+    '''
+    if minimum:
+        return a, a ** 2
+    z = ((a - x) ** 2) + (b * (y - x ** 2) ** 2)
+    return z
 
 
 def contourplot(
