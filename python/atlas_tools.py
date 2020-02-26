@@ -5,9 +5,13 @@ import numpy as np
 import xgboost as xgb
 from tthAnalysis.bdtHyperparameterOptimization import universal
 from tthAnalysis.bdtHyperparameterOptimization import pso_main as pm
+import matplotlib.pyplot as plt
+import matplotlib.ticker as ticker
 
+parameter_dict= {'eta':0.1, 'max_depth':8, 'min_child_weight':250, 'colsample_bytree':0.1, 'num_boost_round':450}
+path_to_file=os.path.expandvars('$HOME/training.csv')
 
-def create_atlas_data_dict(path_to_file, global_settings):
+def create_atlas_data_dict(path_to_file, global_settings, plot=False):
     print('::: Loading data from ' + path_to_file + ' :::')
     path_to_file = os.path.expandvars(path_to_file)
     labels_to_drop = ['Kaggle', 'EventId', 'Weight']
@@ -58,6 +62,9 @@ def create_atlas_data_dict(path_to_file, global_settings):
         'test_full': test,
         'train_full': train
     }
+    if plot:
+        output_dir = "$HOME/ams"
+        plot_bkg_weight_distrib(data_dict, output_dir)
     universal.write_data_dict_info(info_dir, data_dict)
     return data_dict
 
@@ -78,20 +85,43 @@ def AMS(s, b):
         return np.sqrt(radicand)
 
 
-def try_different_thresholds(predicted, data_dict, label_type):
+def try_different_thresholds(predicted, data_dict, label_type, plot=False):
+    output_dir = '$HOME/ams'
+    if label_type == 'train':
+        factor = 1.25
+    elif label_type == 'test':
+        factor = 5
+    else:
+        print("Error: wrong label_type")
     full_key = label_type + '_full'
     label_key = label_type + 'ing_labels'
-    weights = data_dict[full_key]['Weight']
+    weights = data_dict[full_key]['Weight']*factor
     thresholds = np.arange(0, 1, 0.001)
     ams_scores = []
+    signals = []
+    backgrounds = []
     predicted = pandas.Series([i[1] for i in predicted])
     for threshold in thresholds:
         th_prediction = pandas.Series(
             [1 if pred >= threshold else 0 for pred in predicted])
         signal, background = calculate_s_and_b(th_prediction, data_dict[label_key], weights)
+        signals.append(signal)
+        backgrounds.append(background)
         ams_score = AMS(signal, background)
         ams_scores.append(ams_score)
-    max_score = max(ams_scores)
+    max_score_index = np.argmax(ams_scores)
+    if plot:
+        best_threshold = thresholds[max_score_index]
+        best_prediction = pandas.Series(
+            [1 if pred >= threshold else 0 for pred in predicted])
+        plot_wrongly_classified(best_prediction, data_dict, label_type, output_dir)
+        plot_signal_bkg_yields(
+            signals, backgrounds, thresholds,
+            max_score_index, label_type, output_dir
+        )
+        plot_signal_thrs_vs_ams(
+            thresholds, ams_scores, max_score_index, label_type, output_dir)
+    max_score = ams_scores[max_score_index]
     return max_score
 
 
@@ -313,3 +343,106 @@ def create_extra_plots(result_dict, output_dir):
         keys1, result_dict, 'Scoring metrics', plot_out1)
     universal.plot_single_evolution(
         keys2, result_dict, 'Stopping criteria', plot_out2)
+
+
+def plot_signal_thrs_vs_ams(
+        thresholds, ams_scores, index, label_type, output_dir
+):
+    output_dir = os.path.expandvars(output_dir)
+    file_out = os.path.join(output_dir, label_type + '_ams_vs_threshold.png')
+    plt.plot(thresholds, ams_scores, label='AMS_score')
+    plt.axvline(thresholds[index])
+    plt.grid(True)
+    plt.xlabel("Threshold")
+    plt.ylabel("AMS_score")
+    plt.legend()
+    plt.yscale('log')
+    axis = plt.gca()
+    axis.set_aspect('auto', adjustable='box')
+    axis.xaxis.set_major_locator(ticker.AutoLocator())
+    plt.savefig(file_out, bbox_inches='tight')
+    plt.close('all')
+
+
+def plot_signal_bkg_yields(
+        signals, backgrounds, thresholds, index, label_type, output_dir
+):
+    output_dir = os.path.expandvars(output_dir)
+    file_out = os.path.join(output_dir, label_type + '_signal_bkg_yield.png')
+    plt.plot(thresholds, signals, label='signal yield')
+    plt.plot(thresholds, backgrounds, label='background yield')
+    plt.axvline(thresholds[index])
+    plt.grid(True)
+    plt.xlabel("Threshold")
+    plt.ylabel("AMS_score")
+    plt.yscale('log')
+    plt.legend()
+    axis = plt.gca()
+    axis.set_aspect('auto', adjustable='box')
+    axis.xaxis.set_major_locator(ticker.AutoLocator())
+    plt.savefig(file_out, bbox_inches='tight')
+    plt.close('all')
+
+
+def plot_bkg_weight_distrib(data_dict, output_dir):
+    output_dir = os.path.expandvars(output_dir)
+    file_out = os.path.join(output_dir, 'bkg_weight_distrib.png')
+    test_background = data_dict['test_full'].loc[data_dict['test_full']['Label'] == 0]
+    test_weights = test_background['Weight']
+    train_background = data_dict['train_full'].loc[data_dict['train_full']['Label'] == 0]
+    train_weights = train_background['Weight']
+    bins = plt.hist(
+        test_weights, normed=True,
+        histtype='step',
+        bins= int(np.ceil(np.sqrt(len(test_weights)))), label='test')[1]
+    plt.hist(train_weights, normed=True, histtype='step', label='train', bins=bins)
+    plt.xlabel("Weight")
+    plt.ylabel("Count")
+    plt.legend()
+    plt.savefig(file_out, bbox_inches='tight')
+    plt.close('all')
+
+
+def plot_wrongly_classified(predicted, data_dict, label_type, output_dir):
+    bad_signal_weights = []
+    bad_bkg_weights = []
+    labels = data_dict[label_type + 'ing_labels']
+    weights = data_dict[label_type + '_full']['Weight']
+    for pred, label, weight in zip(predicted, labels, weights):
+        if label == 1 and pred == 0:
+            bad_signal_weights.append(weight)
+        elif label == 0 and pred == 1:
+            bad_bkg_weights.append(weight)
+    print(bad_bkg_weights)
+    plot_false_classification_weights(
+        bad_signal_weights, bad_bkg_weights, label_type, output_dir)
+
+
+
+def plot_false_classification_weights(
+        bad_signal_weights,
+        bad_bkg_weights,
+        label_type,
+        output_dir
+):
+    output_dir = os.path.expandvars(output_dir)
+    file_out = os.path.join(
+        output_dir, label_type + '_false_classification_weigts.png')
+    nr_bins = int(np.ceil(np.sqrt(len(bad_signal_weights))))
+    bins = plt.hist(
+        bad_signal_weights, histtype='step',
+        bins=nr_bins,
+        label='Signal classified as background'
+    )[1]
+    plt.hist(
+        bad_bkg_weights,
+        histtype='step',
+        bins=bins,
+        label='Background classified as signal'
+    )
+    plt.yscale('log')
+    plt.xlabel("Weight")
+    plt.ylabel("Count")
+    plt.legend()
+    plt.savefig(file_out, bbox_inches='tight')
+    plt.close('all')
