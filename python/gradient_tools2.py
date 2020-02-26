@@ -56,10 +56,10 @@ def real2temp(coordinates, matrix):
     temp_coordinates : dict
         Coordinates of the point in a rotated coordinate system
     '''
-    real = np.array(
+    real = np.array([
         [coordinates['x']],
         [coordinates['y']]
-    )
+    ])
     temp = np.matmul(matrix, real)
     temp_coordinates = {
         'x': temp[0][0],
@@ -84,11 +84,11 @@ def temp2real(coordinates, matrix):
     real_coordinates : dict
         Coordinates of the point in the default coordinate system
     '''
-    temp = np.array(
+    temp = np.array([
         [coordinates['x']],
         [coordinates['y']]
-    )
-    real = np.matmul(temp, matrix.transpose())
+    ])
+    real = np.matmul(matrix.transpose(), temp)
     real_coordinates = {
         'x': real[0][0],
         'y': real[1][0]
@@ -124,17 +124,22 @@ def wiggle(coordinates, true_values, step, evaluate, rotated=False, matrix=None)
     for coordinate in coordinates:
         temp_values = coordinates.copy()
         temp_values[coordinate] += step
+        # print('Wiggle coordinates: ' + str(temp_values))
         if rotated:
             temp_values = temp2real(temp_values, matrix)
         positive_wiggle = evaluate(
             temp_values, true_values['a'], true_values['b'])
+        # print('Positive wiggle: ' + str(positive_wiggle))
         temp_values = coordinates.copy()
         temp_values[coordinate] -= step
+        # print('Wiggle coordinates: ' + str(temp_values))
         if rotated:
             temp_values = temp2real(temp_values, matrix)
         negative_wiggle = evaluate(
             temp_values, true_values['a'], true_values['b'])
+        # print('Negative wiggle: ' + str(negative_wiggle))
         gradient[coordinate] = (positive_wiggle - negative_wiggle) / (2 * step)
+    # print('Gradient: ' + str(gradient))
     return gradient
 
 
@@ -160,6 +165,7 @@ def numerical_gradient(point, true_values, step, evaluate):
     '''
     gradient = {}
     if not point.temp_coordinates:
+        # print('Default system')
         gradient = wiggle(
             point.real_coordinates,
             true_values,
@@ -167,12 +173,13 @@ def numerical_gradient(point, true_values, step, evaluate):
             evaluate
         )
     else:
+        # print('Rotated system')
         gradient = wiggle(
             point.temp_coordinates,
             true_values,
             step,
             evaluate,
-            False,
+            True,
             point.matrix
         )
     point.assign_gradient(gradient)
@@ -194,16 +201,21 @@ def axes_rotation(point):
         Point updated with information about the rotated coordinate system
     '''
     angle = math.atan2(point.gradient['y'], point.gradient['x'])
+    # print('Gradient angle: ' + str(angle))
     if angle < math.pi:
         angle += math.pi
     else:
         angle -= math.pi
-    matrix = np.array(
+    # print('Move angle: ' + str(angle))
+    matrix = np.array([
         [math.cos(angle), math.sin(angle)],
         [-1 * math.sin(angle), math.cos(angle)]
-    )
+    ])
+    # print('Rotation matrix:')
+    # print(matrix)
     point.assign_matrix(matrix)
     point.assign_temp_coordinates(real2temp(point.real_coordinates, point.matrix))
+    # print('Rotated coordinates: ' + str(point.temp_coordinates))
     return point
 
 
@@ -223,6 +235,7 @@ def new_point(temp_coordinates, old_point):
         New point
     '''
     real_coordinates = temp2real(temp_coordinates, old_point.matrix)
+    # print('New real coordinates: ' + str(real_coordinates))
     point = Point(real_coordinates)
     point.assign_matrix(old_point.matrix)
     point.assign_temp_coordinates(old_point.temp_coordinates)
@@ -251,6 +264,7 @@ def update_coordinates(point, step):
             new_values[variable] = point.temp_coordinates[variable] + step
         else:
             new_values[variable] = point.temp_coordinates[variable]
+    # print('New rotaeted coordinates: ' + str(new_values))
     point = new_point(new_values, point)
     return point
 
@@ -329,6 +343,7 @@ def gradient_descent(
     history = []
     # Choose random initial values
     value_set = initialize(parameters)
+    # print('Initial coordinates: ' + str(value_set))
     dist = distance(true_values, value_set)
     # Set chosen values as coordinates
     curr_point = Point(value_set)
@@ -336,9 +351,16 @@ def gradient_descent(
            and dist > settings['step_size']):
         # Calculate funcion value at current coordinates
         curr_values = curr_point.real_coordinates
+        # print('Initial coordinates: ' + str(curr_values))
         fitness = evaluate(
             curr_values, true_values['a'], true_values['b'])
+        # print('Fitness: ' + str(fitness))
         curr_point.assign_value(fitness)
+        # Calculate gradient
+        curr_point = numerical_gradient(
+            curr_point, true_values, settings['h'], evaluate)
+        # print('Cooridnates: ' + str(curr_point.real_coordinates))
+        # print('Gradient: ' + str(curr_point.gradient))
         # Save data
         if iteration == 0:
             result['list_of_old_bests'] = [curr_values]
@@ -351,17 +373,14 @@ def gradient_descent(
         if fitness < result['best_fitness']:
             result['best_fitness'] = fitness
             result['best_parameters'] = curr_values
-        # Calculate gradient
-        gradient = numerical_gradient(
-            curr_point, true_values, settings['h'], evaluate)
+        history.append(collect_history(
+            iteration, curr_values, curr_point.gradient, fitness))
         # Rotation of axes
-        curr_point = axes_rotation(gradient)
+        curr_point = axes_rotation(curr_point)
         # Moving point by a designated step
         curr_point = update_coordinates(curr_point, settings['step_size'])
         # Calculate distance to minimum
         dist = distance(true_values, curr_point.real_coordinates)
-        history.append(collect_history(
-            iteration, curr_values, gradient, fitness))
         iteration += 1
     value_set = curr_point.real_coordinates
     # Final evaluation
