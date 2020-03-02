@@ -242,7 +242,7 @@ def new_point(temp_coordinates, old_point):
     return point
 
 
-def update_coordinates(point, step):
+def update_coordinates(point, true_values, step, evaluate):
     '''Moves the coordinates by a given step size in the direction of the x-axis
     in the rotated coordinate system
 
@@ -250,12 +250,17 @@ def update_coordinates(point, step):
     ----------
     point : Point
         Object containing information about the current point
+    true_values : dict
+        Parameter values of the given function
     step : float
         Step size for moving the coordinates
+    evaluate : function
+        Function for evaluating the given variable values and finding
+        the function value
 
     Returns
     -------
-    point : Point
+    new_point : Point
         Point with new coordinates
     '''
     new_values = {}
@@ -265,8 +270,48 @@ def update_coordinates(point, step):
         else:
             new_values[variable] = point.temp_coordinates[variable]
     # print('New rotaeted coordinates: ' + str(new_values))
-    point = new_point(new_values, point)
-    return point
+    new_point = new_point(new_values, point)
+    new_point = gradient_check(point, new_point, true_values, step, evaluate)
+    return new_point
+
+
+def gradient_check(point, new_point, true_values, step, evaluate):
+    '''Checks whether the function value corresponds to the expected
+    value according to gradient to avoid getting stuck in one
+    location
+
+    Parameters
+    ----------
+    point : Point
+        Object containing information about the previous point
+    new_point : 
+        Object containing information about the new point
+    true_values : dict
+        Parameter values of the given function
+    step : float
+        Step size for moving the coordinates
+    evaluate : function
+        Function for evaluating the given variable values and finding
+        the function value
+
+    Returns
+    -------
+    new_point : Point
+        Object containing information about the new point
+    '''
+    expected_change = 0
+    for variable in point.gradient:
+        expected_change += point.gradient[variable] ** 2
+    expected_change = step * math.sqrt(expected_change)
+    new_point.assign_value(evaluate(
+        new_point.real_coordinates, true_values['a'], true_values['b']))
+    actual_change = point.real_value - new_point.real_value
+    if actual_change < 0.5 * expected_change:
+        step /= 2
+        new_point = update_coordinates(point, true_values, step, evaluate)
+        return new_point
+    else:
+        return new_point
 
 
 def collect_history(
