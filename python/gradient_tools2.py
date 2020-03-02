@@ -8,6 +8,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 warnings.filterwarnings('ignore', category=FutureWarning)
 
+
 class Point:
     '''A class used to represent a point of a given function
 
@@ -216,10 +217,10 @@ def axes_rotation(point):
     point.assign_matrix(matrix)
     point.assign_temp_coordinates(real2temp(point.real_coordinates, point.matrix))
     # print('Rotated coordinates: ' + str(point.temp_coordinates))
-    return point
+    return point, angle
 
 
-def new_point(temp_coordinates, old_point):
+def update_point(temp_coordinates, old_point):
     '''Generates a new point based on the updated values of the previous point
 
     Parameters
@@ -238,7 +239,7 @@ def new_point(temp_coordinates, old_point):
     # print('New real coordinates: ' + str(real_coordinates))
     point = Point(real_coordinates)
     point.assign_matrix(old_point.matrix)
-    point.assign_temp_coordinates(old_point.temp_coordinates)
+    point.assign_temp_coordinates(temp_coordinates)
     return point
 
 
@@ -269,8 +270,8 @@ def update_coordinates(point, true_values, step, evaluate):
             new_values[variable] = point.temp_coordinates[variable] + step
         else:
             new_values[variable] = point.temp_coordinates[variable]
-    # print('New rotaeted coordinates: ' + str(new_values))
-    new_point = new_point(new_values, point)
+    # print('New rotated coordinates: ' + str(new_values))
+    new_point = update_point(new_values, point)
     new_point = gradient_check(point, new_point, true_values, step, evaluate)
     return new_point
 
@@ -299,13 +300,20 @@ def gradient_check(point, new_point, true_values, step, evaluate):
     new_point : Point
         Object containing information about the new point
     '''
+    print('Step size: ' + str(step))
     expected_change = 0
     for variable in point.gradient:
         expected_change += point.gradient[variable] ** 2
     expected_change = step * math.sqrt(expected_change)
-    new_point.assign_value(evaluate(
-        new_point.real_coordinates, true_values['a'], true_values['b']))
+    # print('Expected change: ' + str(expected_change))
+    fitness = evaluate(
+        new_point.real_coordinates, true_values['a'], true_values['b'])
+    new_point.assign_value(fitness)
+    # print('Fitness: ' + str(fitness))
+    # new_point.assign_value(evaluate(
+    #     new_point.real_coordinates, true_values['a'], true_values['b']))
     actual_change = point.real_value - new_point.real_value
+    # print('Actual change: ' + str(actual_change))
     if actual_change < 0.5 * expected_change:
         step /= 2
         new_point = update_coordinates(point, true_values, step, evaluate)
@@ -386,6 +394,7 @@ def gradient_descent(
     iteration = 0
     result = {}
     history = []
+    angles = []
     # Choose random initial values
     value_set = initialize(parameters)
     # print('Initial coordinates: ' + str(value_set))
@@ -404,7 +413,7 @@ def gradient_descent(
         # Calculate gradient
         curr_point = numerical_gradient(
             curr_point, true_values, settings['h'], evaluate)
-        # print('Cooridnates: ' + str(curr_point.real_coordinates))
+        # print('Coordinates: ' + str(curr_point.real_coordinates))
         # print('Gradient: ' + str(curr_point.gradient))
         # Save data
         if iteration == 0:
@@ -421,9 +430,14 @@ def gradient_descent(
         history.append(collect_history(
             iteration, curr_values, curr_point.gradient, fitness))
         # Rotation of axes
-        curr_point = axes_rotation(curr_point)
+        curr_point, angle = axes_rotation(curr_point)
+        angles.append(angle)
+        # print('Rotation matrix: ')
+        # print(curr_point.matrix)
+        # print('Rotated coordinates: ' + str(curr_point.temp_coordinates))
         # Moving point by a designated step
-        curr_point = update_coordinates(curr_point, settings['step_size'])
+        curr_point = update_coordinates(
+            curr_point, true_values, settings['step_size'], evaluate)
         # Calculate distance to minimum
         dist = distance(true_values, curr_point.real_coordinates)
         iteration += 1
@@ -438,6 +452,7 @@ def gradient_descent(
         result['best_fitness'] = fitness
         result['best_parameters'] = value_set
     result['history'] = history
+    result['angles'] = angles
     return result
 
 
@@ -576,5 +591,22 @@ def contourplot(
     plt.ylim(min(y_range), max(y_range))
     # Save plot
     plot_out = os.path.join(output_dir, 'contourplot.png')
+    plt.savefig(plot_out, bbox_inches='tight')
+    plt.close('all')
+
+
+def angle_plot(result_dict, output_dir):
+    '''Draws a plot of the gradient angles across all iterations
+
+    Parameters
+    ----------
+    result_dict : dict
+        Results of the gradient descent algorithm
+    output_dir : string
+        Path to the directory where to save the plot
+    '''
+    plt.plot(result_dict['angles'], '.', linestyle='')
+    plt.ylim(0, 2 * math.pi)
+    plot_out = os.path.join(output_dir, 'angle_plot.png')
     plt.savefig(plot_out, bbox_inches='tight')
     plt.close('all')
