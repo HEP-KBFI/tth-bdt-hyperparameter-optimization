@@ -476,6 +476,9 @@ def contourplot(
     plt.plot(x_progress, y_progress, '.', linestyle='')
     plt.xlim(min(x_range), max(x_range))
     plt.ylim(min(y_range), max(y_range))
+    # Label axes
+    plt.xlabel('x')
+    plt.ylabel('y')
     # Save plot
     plot_out = os.path.join(output_dir, 'contourplot.png')
     plt.savefig(plot_out, bbox_inches='tight')
@@ -494,6 +497,8 @@ def angle_plot(result_dict, output_dir):
     '''
     plt.plot(result_dict['angles'], '.', linestyle='')
     plt.ylim(-math.pi, math.pi)
+    plt.xlabel('Iteration number / #')
+    plt.ylabel('Gradient angle')
     plot_out = os.path.join(output_dir, 'angle_plot.png')
     plt.savefig(plot_out, bbox_inches='tight')
     plt.close('all')
@@ -511,6 +516,8 @@ def step_plot(result_dict, output_dir):
     '''
     plt.plot(result_dict['steps'], '.', linestyle='')
     plt.yscale('log')
+    plt.xlabel('Iteration number / #')
+    plt.ylabel('Step size')
     plot_out = os.path.join(output_dir, 'step_plot.png')
     plt.savefig(plot_out, bbox_inches='tight')
     plt.close('all')
