@@ -6,9 +6,29 @@ import math
 import warnings
 import numpy as np
 import matplotlib.pyplot as plt
-# from sympy import symbols
-from tthAnalysis.bdtHyperparameterOptimization import rosenbrock_tools as rt
 warnings.filterwarnings('ignore', category=FutureWarning)
+
+
+class Point:
+    '''A class used to represent a point of a given function
+
+    Attributes
+    ----------
+    coordinates : dict
+        Coordinates of the point
+    value : float
+        Value of the function on the given coordinates
+    gradient : dict
+        Gradient of the function at the given coordinates
+    '''
+    def __init__(self, coordinates):
+        self.coordinates = coordinates
+        self.value = None
+        self.gradient = None
+    def assign_value(self, value):
+        self.value = value
+    def assign_gradient(self, gradient):
+        self.gradient = gradient
 
 
 def rosenbrock(a, b=None, x=None, y=None, minimum=False):
@@ -80,156 +100,185 @@ def set_ranges(parameters):
     return x_range, y_range
 
 
-def find_steps(gradient, step_size):
+def calculate_steps(point, step):
     '''Calculates steps for x and y coordinates in case of a
     3-dimensional function
 
     Parameters
     ----------
-    gradients : dict
-        Gradients corresponding to current variable values
-    step_size : float
-        Step size for updating values
+    point : Point
+        Current point and its information
+    step : float
+        Step size for updating coordinates
 
     Returns
     -------
     steps : dict
         Steps for all coordinates
+    angle : float
+        Direction of the gradient
     '''
-    angle = math.atan2(gradient['y'], gradient['x'])
-    x_step = step_size * math.cos(angle)
-    y_step = step_size * math.sin(angle)
-    steps = {
-        'x': x_step,
-        'y': y_step
-    }
+    steps = {}
+    angle = math.atan2(point.gradient['y'], point.gradient['x'])
+    steps['x'] = step * math.cos(angle)
+    steps['y'] = step * math.sin(angle)
     return steps, angle
 
 
-def update_values(
-        curr_values,
-        func_value,
-        true_values,
-        gradient,
-        step_size,
-        evaluate
-):
-    '''Update variable values with a fixed step size according to
-    given gradients
+def update_coordinates(point, true_values, step, evaluate):
+    '''Update coordinates with a maximum step size according to
+    its gradients
 
     Parameters
     ----------
-    curr_values : dict
-        Current variable values
-    func_value : float
-        Current function value
+    point : Point
+        Current point and its information
     true_values : dict
         Parameter values for the function
-    gradient : dict
-        Gradients corresponding to current variable values
-    step_size : float
-        Step size for updating values
+    step : float
+        Maximum step size for updating values
     evaluate : function
         Function for evaluating the given variable values and finding
         the function value
     Returns
     -------
+    new_point : Point
+        New point and its information
+    angle : float
+        Direction of the gradient
+    step : float
+        Size of the step that was taken
     new_values : dict
         Updated variable values
     '''
-    new_values = {}
-    steps, angle = find_steps(gradient, step_size)
-    for variable in curr_values:
-        new_values[variable] = curr_values[variable] - steps[variable]
-    new_values, step_size = gradient_check(
-        curr_values,
-        func_value,
-        new_values,
-        true_values,
-        gradient,
-        step_size,
-        evaluate
-    )
-    # # Classic method for gradient descent with learning rate
-    # for variable in curr_values:
-    #     new_values[variable] = (curr_values[variable]
-    #                             - (learning_rate * gradients[variable]))
-    return new_values, angle, step_size
+    new_coordinates = {}
+    steps, angle = calculate_steps(point, step)
+    for coordinate in point.coordinates:
+        new_coordinates[coordinate] = point.coordinates[coordinate] - steps[coordinate]
+    new_point = Point(new_coordinates)
+    new_point, step = step_adjustment_check(point, new_point, true_values, step, evaluate)
+    return new_point, angle, step
 
 
-def gradient_check(curr_values, func_value, new_values, true_values, gradient, step_size, evaluate):
+def step_adjustment_check(point, new_point, true_values, step, evaluate):
     '''Checks whether the function value corresponds to the expected
     value according to gradient to avoid getting stuck in one
     location
 
     Parameters
     ----------
-    curr_values : dict
-        Current variable values
-    func_value : float
-        Current function value
-    new_values : dict
-        New variable values according to currently chosen step
+    point : Point
+        Current point and its information
+    new_point : Point
+        New point according to currently chosen step
     true_values : dict
         Parameter values for the function
-    gradient : dict
-        Gradients corresponding to current variable values
-    step_size : float
-        Step size for updating values
+    step : float
+        Current step size
     evaluate : function
         Function for evaluating the given variable values and finding
         the function value
-    '''
-    expected_change = 0
-    for variable in gradient:
-        expected_change += gradient[variable] ** 2
-    expected_change = step_size * math.sqrt(expected_change)
-    new_z = evaluate(new_values, true_values['a'], true_values['b'])
-    actual_change = func_value - new_z
-    if actual_change < 0.5 * expected_change:
-        step_size /= 2
-        new_values, angle, step_size = update_values(
-            curr_values,
-            func_value,
-            true_values,
-            gradient,
-            step_size,
-            evaluate
-        )
-        return new_values, step_size
-    else:
-        return new_values, step_size
-
-
-def numerical_gradient(curr_values, true_values, h, evaluate):
-    '''Numerically calculate the gradient for given variable values
-
-    Parameters
-    ----------
-    curr_values : dict
-        Given variable values
-    true_values : dict
-        Parameter values for the function
-    h : float
-        Step size for for numerically computing derivatives
 
     Returns
     -------
-    gradient : dict
-        Calculated gradient
+    new_point : Point
+        New point according to chosen step size
+    step : float
+        Chosen step size
+    '''
+    expected_change = 0
+    for variable in point.gradient:
+        expected_change += point.gradient[variable] ** 2
+    expected_change = step * math.sqrt(expected_change)
+    actual_value = evaluate(new_point.coordinates, true_values['a'], true_values['b'])
+    actual_change = point.value - actual_value
+    if actual_change < 0.5 * expected_change:
+        step /= 2
+        new_point, angle, step = update_coordinates(
+            point, true_values, step, evaluate)
+        return new_point, step
+    else:
+        new_point.assign_value(actual_value)
+        return new_point, step
+
+
+def gradient_wiggle(
+        coordinates,
+        curr_coordinate,
+        true_values,
+        step,
+        evaluate,
+        positive=True
+):
+    '''Evaluates how much does the function value change when changing the value of
+    one of the coordinates
+    
+    Parameters
+    ----------
+    coordinates : dict
+        Coordinates of the point
+    curr_coordinate : string
+        Coordinate whose value to change
+    true_values : dict
+        Parameter values of the function
+    step : float
+        Step size for changing the value of the coordinate
+    evaluate : function
+        Function for evaluating the given variable values and finding
+        the function value
+    positive : bool
+       True for changing the coordinate value in the positive direction,
+       False for changing the coordinate value in the negative direction
+
+    Returns
+    -------
+    wiggle : float
+        Function value at changed coordinates
+    '''
+    temp_values = coordinates.copy()
+    if positive:
+        temp_values[curr_coordinate] += step
+    else:
+        temp_values[curr_coordinate] -= step
+    wiggle = evaluate(
+        temp_values, true_values['a'], true_values['b'])
+    return wiggle
+
+
+def numerical_gradient(
+        point,
+        true_values,
+        step,
+        evaluate
+):
+    '''Numerically calculates the gradient for given point
+
+    Parameters
+    ----------
+    point : Point
+        Current point and its information
+    true_values : dict
+        Parameter values for the function
+    step : float
+        Step size for numerically computing derivatives
+    evaluate : function
+        Function for evaluating the given variable values and finding
+        the function value
+
+    Returns
+    -------
+    point : Point
+        Current point with its gradient added
     '''
     gradient = {}
-    for variable in curr_values:
-        temp_values = curr_values.copy()
-        temp_values[variable] += h
-        fxph = evaluate(
-            temp_values, true_values['a'], true_values['b'])
-        temp_values = curr_values.copy()
-        temp_values[variable] -= h
-        fxmh = evaluate(
-            temp_values, true_values['a'], true_values['b'])
-        gradient[variable] = (fxph - fxmh) / (2 * h)
-    return gradient
+    for coordinate in point.coordinates:
+        positive_wiggle = gradient_wiggle(
+            point.coordinates, coordinate, true_values, step, evaluate)
+        negative_wiggle = gradient_wiggle(
+            point.coordinates, coordinate, true_values, step, evaluate, False)
+        gradient[coordinate] = (positive_wiggle - negative_wiggle) / (2 * step)
+    point.assign_gradient(gradient)
+    return point
 
 
 def analytical_gradient(curr_values, true_values):
@@ -260,13 +309,7 @@ def analytical_gradient(curr_values, true_values):
     return gradient
 
 
-def collect_history(
-        iteration,
-        curr_values,
-        num_gradient,
-        an_gradient,
-        func_value
-):
+def collect_history(iteration, point):
     '''Collects all information about the current iteration into a
     single dictionary
 
@@ -274,14 +317,8 @@ def collect_history(
     ----------
     iteration : int
         Number of current iteration
-    curr_values : dict
-        Variable values
-    num_gradient : dict
-        Numerically calculated gradient
-    an_gradient : dict
-        Analytically calculated gradient
-    func_value : float
-        Function value for given variable values
+    point : Point
+        Current point and its information
 
     Returns
     -------
@@ -290,13 +327,11 @@ def collect_history(
     '''
     curr_iteration = {
         'iteration': iteration,
-        'x': curr_values['x'],
-        'y': curr_values['y'],
-        'z': func_value,
-        'num_grad_x': num_gradient['x'],
-        'num_grad_y': num_gradient['y'],
-        'an_grad_x': an_gradient['x'],
-        'an_grad_y': an_gradient['y']
+        'x': point.coordinates['x'],
+        'y': point.coordinates['y'],
+        'z': point.value,
+        'grad_x': point.gradient['x'],
+        'grad_y': point.gradient['y']
     }
     return curr_iteration
 
@@ -305,9 +340,9 @@ def gradient_descent(
         settings,
         parameters,
         true_values,
-        initialize=rt.initialize_values,
-        evaluate=rt.parameter_evaluation,
-        distance=rt.check_distance
+        initialize,
+        evaluate,
+        distance
 ):
     '''Performs the gradient descent optimization algorithm
 
@@ -340,62 +375,53 @@ def gradient_descent(
     angles = []
     steps = []
     # Choose random values
-    value_set = initialize(parameters)
-    # value_set = {
-    #     'x': 14.648220513748084,
-    #     'y': 214.66081018673745
-    # }
-    dist = distance(true_values, value_set)
-    # dx, dy = rosenbrock_gradient(true_values)
+    coordinates = initialize(parameters)
+    curr_point = Point(coordinates)
+    # Calculate distance from true minimum
+    dist = distance(true_values, coordinates)
+    # Algorithm loop
     while (iteration <= settings['iterations']
            and dist > settings['step_size']):
         if iteration % 10000 == 0:
             print('Iteration: ' + str(iteration))
-        curr_values = value_set
-        # Evaluate current values
-        fitness = evaluate(
-            curr_values, true_values['a'], true_values['b'])
+        # Calculate function value at current coordinates
+        if not curr_point.value:
+            fitness = evaluate(curr_point.coordinates, true_values['a'], true_values['b'])
+            curr_point.assign_value(fitness)
         # Save data
         if iteration == 0:
-            result['list_of_old_bests'] = [curr_values]
-            result['list_of_best_fitnesses'] = [fitness]
-            result['best_fitness'] = fitness
-            result['best_parameters'] = curr_values
+            result['list_of_old_bests'] = [curr_point.coordinates]
+            result['list_of_best_fitnesses'] = [curr_point.value]
+            result['best_fitness'] = curr_point.value
+            result['best_parameters'] = curr_point.coordinates
         else:
-            result['list_of_old_bests'].append(curr_values)
-            result['list_of_best_fitnesses'].append(fitness)
-        if fitness < result['best_fitness']:
-            result['best_fitness'] = fitness
-            result['best_parameters'] = curr_values
+            result['list_of_old_bests'].append(curr_point.coordinates)
+            result['list_of_best_fitnesses'].append(curr_point.value)
+        if curr_point.value < result['best_fitness']:
+            result['best_fitness'] = curr_point.value
+            result['best_parameters'] = curr_point.coordinates
         # Calculate gradient
-        gradient = numerical_gradient(
-            curr_values, true_values, settings['h'], evaluate)
-        an_gradient = analytical_gradient(curr_values, true_values)
-        # Adjust values with gradients
-        value_set, angle, step_size = update_values(
-            curr_values,
-            fitness,
-            true_values,
-            gradient,
-            settings['step_size'],
-            evaluate
-        )
+        curr_point = numerical_gradient(
+            curr_point, true_values, settings['h'], evaluate)
+        # Move point by step size
+        new_point, angle, step_size = update_coordinates(
+            curr_point, true_values, settings['step_size'], evaluate)
+        # Finalize iteration
         angles.append(angle)
         steps.append(step_size)
-        # Calculate distance
-        dist = distance(true_values, value_set)
-        history.append(collect_history(
-            iteration, curr_values, gradient, an_gradient, fitness))
+        dist = distance(true_values, curr_point.coordinates)
+        history.append(collect_history(iteration, curr_point))
+        curr_point = new_point
         iteration += 1
     # Final evaluation
     fitness = evaluate(
-        value_set, true_values['a'], true_values['b'])
+        curr_point.coordinates, true_values['a'], true_values['b'])
     # Save data
-    result['list_of_old_bests'].append(value_set)
+    result['list_of_old_bests'].append(curr_point.coordinates)
     result['list_of_best_fitnesses'].append(fitness)
     if fitness < result['best_fitness']:
         result['best_fitness'] = fitness
-        result['best_parameters'] = value_set
+        result['best_parameters'] = curr_point.coordinates
     result['angles'] = angles
     result['steps'] = steps
     result['history'] = history
