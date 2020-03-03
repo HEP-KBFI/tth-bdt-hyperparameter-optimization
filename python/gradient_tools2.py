@@ -125,22 +125,17 @@ def wiggle(coordinates, true_values, step, evaluate, rotated=False, matrix=None)
     for coordinate in coordinates:
         temp_values = coordinates.copy()
         temp_values[coordinate] += step
-        # print('Wiggle coordinates: ' + str(temp_values))
         if rotated:
             temp_values = temp2real(temp_values, matrix)
         positive_wiggle = evaluate(
             temp_values, true_values['a'], true_values['b'])
-        # print('Positive wiggle: ' + str(positive_wiggle))
         temp_values = coordinates.copy()
         temp_values[coordinate] -= step
-        # print('Wiggle coordinates: ' + str(temp_values))
         if rotated:
             temp_values = temp2real(temp_values, matrix)
         negative_wiggle = evaluate(
             temp_values, true_values['a'], true_values['b'])
-        # print('Negative wiggle: ' + str(negative_wiggle))
         gradient[coordinate] = (positive_wiggle - negative_wiggle) / (2 * step)
-    # print('Gradient: ' + str(gradient))
     return gradient
 
 

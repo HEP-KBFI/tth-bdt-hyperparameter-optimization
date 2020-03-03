@@ -31,177 +31,6 @@ class Point:
         self.gradient = gradient
 
 
-def rosenbrock(a, b=None, x=None, y=None, minimum=False):
-    '''Calculates the Rosenbrock function for given variables or
-    calculates its global minimum if the minimum option is set
-    to True
-
-    Parameters
-    ----------
-    a : float
-        Value of the parameter a
-    b : float
-        Value of the parameter b
-    x : float
-        Value of the variable x
-    y : float
-        Value of the variable y
-    minimum : bool
-        If True, calculate the global minimum of the function;
-        If False, calculate the function for given variable values
-
-    Returns
-    -------
-    z : float
-        Value of the function
-    '''
-    if minimum:
-        return a, a ** 2
-    z = ((a - x) ** 2) + (b * (y - x ** 2) ** 2)
-    return z
-
-
-# def rosenbrock_gradient(true_values):
-#     a = true_values['a']
-#     b = true_values['b']
-#     x, y = symbols('x y')
-#     z = ((a - x) ** 2) + (b * (y - x ** 2) ** 2)
-#     dx = z.diff(x)
-#     dy = z.diff(y)
-#     return dx, dy
-
-
-def set_ranges(parameters):
-    '''Set ranges for axis according to given parameters
-
-    Parameters
-    ----------
-    parameters : list
-        List of dictionaries of parameters for variables
-
-    Returns
-    -------
-    x_range : range
-        Range for the x-axis
-    y_range : range
-        Range for the y-axis
-    '''
-    for parameter in parameters:
-        if parameter['p_name'] == 'x':
-            x_range = range(
-                parameter['range_start'],
-                parameter['range_end']
-            )
-        if parameter['p_name'] == 'y':
-            y_range = range(
-                parameter['range_start'],
-                parameter['range_end']
-            )
-    return x_range, y_range
-
-
-def calculate_steps(point, step):
-    '''Calculates steps for x and y coordinates in case of a
-    3-dimensional function
-
-    Parameters
-    ----------
-    point : Point
-        Current point and its information
-    step : float
-        Step size for updating coordinates
-
-    Returns
-    -------
-    steps : dict
-        Steps for all coordinates
-    angle : float
-        Direction of the gradient
-    '''
-    steps = {}
-    angle = math.atan2(point.gradient['y'], point.gradient['x'])
-    steps['x'] = step * math.cos(angle)
-    steps['y'] = step * math.sin(angle)
-    return steps, angle
-
-
-def update_coordinates(point, true_values, step, evaluate):
-    '''Update coordinates with a maximum step size according to
-    its gradients
-
-    Parameters
-    ----------
-    point : Point
-        Current point and its information
-    true_values : dict
-        Parameter values for the function
-    step : float
-        Maximum step size for updating values
-    evaluate : function
-        Function for evaluating the given variable values and finding
-        the function value
-    Returns
-    -------
-    new_point : Point
-        New point and its information
-    angle : float
-        Direction of the gradient
-    step : float
-        Size of the step that was taken
-    new_values : dict
-        Updated variable values
-    '''
-    new_coordinates = {}
-    steps, angle = calculate_steps(point, step)
-    for coordinate in point.coordinates:
-        new_coordinates[coordinate] = point.coordinates[coordinate] - steps[coordinate]
-    new_point = Point(new_coordinates)
-    new_point, step = step_adjustment_check(point, new_point, true_values, step, evaluate)
-    return new_point, angle, step
-
-
-def step_adjustment_check(point, new_point, true_values, step, evaluate):
-    '''Checks whether the function value corresponds to the expected
-    value according to gradient to avoid getting stuck in one
-    location
-
-    Parameters
-    ----------
-    point : Point
-        Current point and its information
-    new_point : Point
-        New point according to currently chosen step
-    true_values : dict
-        Parameter values for the function
-    step : float
-        Current step size
-    evaluate : function
-        Function for evaluating the given variable values and finding
-        the function value
-
-    Returns
-    -------
-    new_point : Point
-        New point according to chosen step size
-    step : float
-        Chosen step size
-    '''
-    expected_change = 0
-    for variable in point.gradient:
-        expected_change += point.gradient[variable] ** 2
-    expected_change = step * math.sqrt(expected_change)
-    actual_value = evaluate(new_point.coordinates, true_values['a'], true_values['b'])
-    actual_change = point.value - actual_value
-    if actual_change < 0.5 * expected_change:
-        step /= 2
-        new_point, angle, step = update_coordinates(
-            point, true_values, step, evaluate)
-        return new_point, step
-    else:
-        new_point.assign_value(actual_value)
-        return new_point, step
-
-
 def gradient_wiggle(
         coordinates,
         curr_coordinate,
@@ -210,9 +39,9 @@ def gradient_wiggle(
         evaluate,
         positive=True
 ):
-    '''Evaluates how much does the function value change when changing the value of
-    one of the coordinates
-    
+    '''Evaluates how much does the function value change when changing
+    the value of one of the coordinates
+
     Parameters
     ----------
     coordinates : dict
@@ -227,8 +56,9 @@ def gradient_wiggle(
         Function for evaluating the given variable values and finding
         the function value
     positive : bool
-       True for changing the coordinate value in the positive direction,
-       False for changing the coordinate value in the negative direction
+       True for changing the coordinate value in the positive
+       direction, False for changing the coordinate value in the
+       negative direction
 
     Returns
     -------
@@ -275,38 +105,122 @@ def numerical_gradient(
         positive_wiggle = gradient_wiggle(
             point.coordinates, coordinate, true_values, step, evaluate)
         negative_wiggle = gradient_wiggle(
-            point.coordinates, coordinate, true_values, step, evaluate, False)
-        gradient[coordinate] = (positive_wiggle - negative_wiggle) / (2 * step)
+            point.coordinates,
+            coordinate,
+            true_values,
+            step,
+            evaluate,
+            False
+        )
+        gradient[coordinate] = ((positive_wiggle - negative_wiggle)
+                                / (2 * step))
     point.assign_gradient(gradient)
     return point
 
 
-def analytical_gradient(curr_values, true_values):
-    '''Analytically calculate the gradient of the Rosenbrock function
-    for given variable values
+def calculate_steps(point, step):
+    '''Calculates steps for x and y coordinates in case of a
+    3-dimensional function
 
     Parameters
     ----------
-    curr_values : dict
-        Given variable values
-    true_values : dict
-        Parameter values for the Rosenbrock function
+    point : Point
+        Current point and its information
+    step : float
+        Step size for updating coordinates
 
     Returns
     -------
-    gradient : dict
-        Calculated gradient
+    steps : dict
+        Steps for all coordinates
+    angle : float
+        Direction of the gradient
     '''
-    gradient = {}
-    a = true_values['a']
-    b = true_values['b']
-    x = curr_values['x']
-    y = curr_values['y']
-    gradient['x'] = -2*a - 4*b*x*(-x**2 + y) + 2*x
-    gradient['y'] = b*(-2*x**2 + 2*y)
-    # gradient['x'] = float(dx.subs('x', curr_values['x']).subs('y', curr_values['y']))
-    # gradient['y'] = float(dy.subs('x', curr_values['x']).subs('y', curr_values['y']))
-    return gradient
+    steps = {}
+    angle = math.atan2(point.gradient['y'], point.gradient['x'])
+    steps['x'] = step * math.cos(angle)
+    steps['y'] = step * math.sin(angle)
+    return steps, angle
+
+
+def step_adjustment_check(point, new_point, true_values, step, evaluate):
+    '''Checks whether the function value corresponds to the expected
+    value according to gradient to avoid getting stuck in one
+    location
+
+    Parameters
+    ----------
+    point : Point
+        Current point and its information
+    new_point : Point
+        New point according to currently chosen step
+    true_values : dict
+        Parameter values for the function
+    step : float
+        Current step size
+    evaluate : function
+        Function for evaluating the given variable values and finding
+        the function value
+
+    Returns
+    -------
+    new_point : Point
+        New point according to chosen step size
+    step : float
+        Chosen step size
+    '''
+    expected_change = 0
+    for variable in point.gradient:
+        expected_change += point.gradient[variable] ** 2
+    expected_change = step * math.sqrt(expected_change)
+    actual_value = evaluate(
+        new_point.coordinates, true_values['a'], true_values['b'])
+    actual_change = point.value - actual_value
+    if actual_change < 0.5 * expected_change:
+        step /= 2
+        new_point, angle, step = update_coordinates(
+            point, true_values, step, evaluate)
+        return new_point, step
+    new_point.assign_value(actual_value)
+    return new_point, step
+
+
+def update_coordinates(point, true_values, step, evaluate):
+    '''Update coordinates with a maximum step size according to
+    its gradients
+
+    Parameters
+    ----------
+    point : Point
+        Current point and its information
+    true_values : dict
+        Parameter values for the function
+    step : float
+        Maximum step size for updating values
+    evaluate : function
+        Function for evaluating the given variable values and finding
+        the function value
+
+    Returns
+    -------
+    new_point : Point
+        New point and its information
+    angle : float
+        Direction of the gradient
+    step : float
+        Size of the step that was taken
+    new_values : dict
+        Updated variable values
+    '''
+    new_coordinates = {}
+    steps, angle = calculate_steps(point, step)
+    for coordinate in point.coordinates:
+        new_coordinates[coordinate] = (point.coordinates[coordinate]
+                                       - steps[coordinate])
+    new_point = Point(new_coordinates)
+    new_point, step = step_adjustment_check(
+        point, new_point, true_values, step, evaluate)
+    return new_point, angle, step
 
 
 def collect_history(iteration, point):
@@ -386,7 +300,8 @@ def gradient_descent(
             print('Iteration: ' + str(iteration))
         # Calculate function value at current coordinates
         if not curr_point.value:
-            fitness = evaluate(curr_point.coordinates, true_values['a'], true_values['b'])
+            fitness = evaluate(
+                curr_point.coordinates, true_values['a'], true_values['b'])
             curr_point.assign_value(fitness)
         # Save data
         if iteration == 0:
@@ -447,6 +362,65 @@ def write_history(result_dict, output_dir):
         for line in history:
             json.dump(line, file)
             file.write('\n')
+
+
+def set_ranges(parameters):
+    '''Set ranges for axis according to given parameters
+
+    Parameters
+    ----------
+    parameters : list
+        List of dictionaries of parameters for variables
+
+    Returns
+    -------
+    x_range : range
+        Range for the x-axis
+    y_range : range
+        Range for the y-axis
+    '''
+    for parameter in parameters:
+        if parameter['p_name'] == 'x':
+            x_range = range(
+                parameter['range_start'],
+                parameter['range_end']
+            )
+        if parameter['p_name'] == 'y':
+            y_range = range(
+                parameter['range_start'],
+                parameter['range_end']
+            )
+    return x_range, y_range
+
+
+def rosenbrock(a, b=None, x=None, y=None, minimum=False):
+    '''Calculates the Rosenbrock function for given variables or
+    calculates its global minimum if the minimum option is set
+    to True
+
+    Parameters
+    ----------
+    a : float
+        Value of the parameter a
+    b : float
+        Value of the parameter b
+    x : float
+        Value of the variable x
+    y : float
+        Value of the variable y
+    minimum : bool
+        If True, calculate the global minimum of the function;
+        If False, calculate the function for given variable values
+
+    Returns
+    -------
+    z : float
+        Value of the function
+    '''
+    if minimum:
+        return a, a ** 2
+    z = ((a - x) ** 2) + (b * (y - x ** 2) ** 2)
+    return z
 
 
 def contourplot(
