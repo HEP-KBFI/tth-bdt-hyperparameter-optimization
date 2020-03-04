@@ -332,7 +332,7 @@ def run_pso(
             result_dict['pred_test'] = pred_tests[index]
             result_dict['pred_train'] = pred_trains[index]
             result_dict['feature_importances'] = feature_importances[index]
-            result_dict['score_dict'] = score_dict[index]
+            result_dict['score_dict'] = score_dicts[index]
             print(' ############### New bests ##################')
             print('Parameters: ')
             print(parameter_dicts[index])
