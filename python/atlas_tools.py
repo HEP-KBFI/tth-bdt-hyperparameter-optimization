@@ -299,7 +299,7 @@ def run_pso(
     result_dict['best_parameters'] = parameter_dicts[index]
     result_dict['best_fitnesses'] = [fitnesses[index]]
     result_dict['compactnesses'] = [compactness]
-    result_dict['score_dict'] = score_dict[index]
+    result_dict['score_dict'] = score_dicts[index]
     personal_bests = parameter_dicts
     best_fitnesses = fitnesses
     current_speeds = pm.initialize_speeds(parameter_dicts)
