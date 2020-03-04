@@ -53,3 +53,7 @@ if __name__ == '__main__':
     result_dict, output_dir = main()
     at.save_results(result_dict, output_dir)
     print("Results saved to " + str(output_dir))
+    score_path = os.path.join(output_dir, 'score.json')
+    score_dict = result_dict['score_dict']
+    with open(score_path, 'w') as file:
+        json.dump(score_dict, file)
