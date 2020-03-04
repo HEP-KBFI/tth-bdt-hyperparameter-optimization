@@ -8,7 +8,7 @@ from tthAnalysis.bdtHyperparameterOptimization import pso_main as pm
 from tthAnalysis.bdtHyperparameterOptimization import xgb_tools as xt
 
 np.random.seed(1)
-path_to_file = "/foo/bar"
+path_to_file = "$HOME/training.csv"
 
 def main():
     cmssw_base_path = os.path.expandvars('$CMSSW_BASE')
@@ -41,13 +41,19 @@ def main():
     pso_settings = pm.read_weights(settings_dir)
     parameter_dicts = xt.prepare_run_params(
         value_dicts, pso_settings['sample_size'])
-    result_dict = pm.run_pso(
+    result_dict = at.run_pso(
         data_dict, value_dicts, sm.run_iteration, parameter_dicts,
         output_dir
     )
-    universal.save_results(result_dict, output_dir, plot_extras=True)
-    print("Results saved to " + str(output_dir))
+    return result_dict, output_dir
+    # sm.run_iteration
 
 
 if __name__ == '__main__':
-    main()
+    result_dict, output_dir = main()
+    at.save_results(result_dict, output_dir)
+    print("Results saved to " + str(output_dir))
+    score_path = os.path.join(output_dir, 'score.json')
+    score_dict = result_dict['score_dict']
+    with open(score_path, 'w') as file:
+        json.dump(score_dict, file)
