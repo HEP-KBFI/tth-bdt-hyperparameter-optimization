@@ -29,6 +29,8 @@ class Point:
         self.value = value
     def assign_gradient(self, gradient):
         self.gradient = gradient
+    def assign_an_gradient(self, gradient):
+        self.an_gradient = gradient
 
 
 def gradient_wiggle(
@@ -115,6 +117,33 @@ def numerical_gradient(
         gradient[coordinate] = ((positive_wiggle - negative_wiggle)
                                 / (2 * step))
     point.assign_gradient(gradient)
+    return point
+
+
+def analytical_gradient(point, true_values):
+    '''Analytically calculate the gradient of the Rosenbrock function
+    for given variable values
+
+    Parameters
+    ----------
+    point : Point
+        Current point and its information
+    true_values : dict
+        Parameter values for the Rosenbrock function
+
+    Returns
+    -------
+    point : Point
+        Current point with its analytical gradient added
+    '''
+    gradient = {}
+    a = true_values['a']
+    b = true_values['b']
+    x = curr_values['x']
+    y = curr_values['y']
+    gradient['x'] = -2*a - 4*b*x*(-x**2 + y) + 2*x
+    gradient['y'] = b*(-2*x**2 + 2*y)
+    point.assign_an_gradient(gradient)
     return point
 
 
@@ -244,8 +273,10 @@ def collect_history(iteration, point):
         'x': point.coordinates['x'],
         'y': point.coordinates['y'],
         'z': point.value,
-        'grad_x': point.gradient['x'],
-        'grad_y': point.gradient['y']
+        'num_grad_x': point.gradient['x'],
+        'num_grad_y': point.gradient['y'],
+        'an_grad_x': point.an_gradient['x'],
+        'an_grad_y': point.an_gradient['y'],
     }
     return curr_iteration
 
@@ -315,9 +346,11 @@ def gradient_descent(
         if curr_point.value < result['best_fitness']:
             result['best_fitness'] = curr_point.value
             result['best_parameters'] = curr_point.coordinates
-        # Calculate gradient
+        # Calculate numerical gradient
         curr_point = numerical_gradient(
             curr_point, true_values, settings['h'], evaluate)
+        # Calculate analytical gradient
+        curr_point = analytical_gradient(curr_point, true_values)
         # Move point by step size
         new_point, angle, step_size = update_coordinates(
             curr_point, true_values, settings['step_size'], evaluate)
