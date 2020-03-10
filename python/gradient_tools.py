@@ -25,6 +25,7 @@ class Point:
         self.coordinates = coordinates
         self.value = None
         self.gradient = None
+        self.an_gradient = None
     def assign_value(self, value):
         self.value = value
     def assign_gradient(self, gradient):
@@ -139,8 +140,8 @@ def analytical_gradient(point, true_values):
     gradient = {}
     a = true_values['a']
     b = true_values['b']
-    x = curr_values['x']
-    y = curr_values['y']
+    x = point.coordinates['x']
+    y = point.coordinates['y']
     gradient['x'] = -2*a - 4*b*x*(-x**2 + y) + 2*x
     gradient['y'] = b*(-2*x**2 + 2*y)
     point.assign_an_gradient(gradient)
