@@ -173,46 +173,60 @@ def calculate_steps(point, step):
     return steps, angle
 
 
-def step_adjustment_check(point, new_point, true_values, step, evaluate):
-    '''Checks whether the function value corresponds to the expected
-    value according to gradient to avoid getting stuck in one
-    location
+# def step_adjustment_check(point, true_values, steps, evaluate):
+#     '''Checks whether the function value corresponds to the expected
+#     value according to gradient to avoid getting stuck in one
+#     location
 
-    Parameters
-    ----------
-    point : Point
-        Current point and its information
-    new_point : Point
-        New point according to currently chosen step
-    true_values : dict
-        Parameter values for the function
-    step : float
-        Current step size
-    evaluate : function
-        Function for evaluating the given variable values and finding
-        the function value
+#     Parameters
+#     ----------
+#     point : Point
+#         Current point and its information
+#     new_point : Point
+#         New point according to currently chosen step
+#     true_values : dict
+#         Parameter values for the function
+#     step : float
+#         Current step size
+#     evaluate : function
+#         Function for evaluating the given variable values and finding
+#         the function value
 
-    Returns
-    -------
-    new_point : Point
-        New point according to chosen step size
-    step : float
-        Chosen step size
-    '''
-    expected_change = 0
-    for variable in point.gradient:
-        expected_change += point.gradient[variable] ** 2
-    expected_change = step * math.sqrt(expected_change)
-    actual_value = evaluate(
-        new_point.coordinates, true_values['a'], true_values['b'])
-    actual_change = point.value - actual_value
-    if actual_change < 0.5 * expected_change:
-        step /= 2
-        new_point, angle, step = update_coordinates(
-            point, true_values, step, evaluate)
-        return new_point, step
-    new_point.assign_value(actual_value)
-    return new_point, step
+#     Returns
+#     -------
+#     new_point : Point
+#         New point according to chosen step size
+#     step : float
+#         Chosen step size
+#     '''
+#     has_converged = False
+#     while not has_converged:
+#         expected_change = 0 
+#         # for variable in point.gradient:
+#         #     expected_change += point.gradient[variable] ** 2
+#         # expected_change = step * math.sqrt(expected_change)
+#         new_point = move_coordinates(point, steps)
+#         for variable in point.gradient:
+#             expected_change += point.gradient[variable] * steps[variable]
+#         actual_value = evaluate(
+#             new_point.coordinates, true_values['a'], true_values['b'])
+#         actual_change = point.value - actual_value
+#         if actual_change < 0.5 * expected_change:
+#             for variable in steps:
+#                 steps[variable] /= 2
+#         else:
+#             has_converged = True
+#             new_point.assign_value(actual_value)
+#     return new_point, steps
+
+
+def move_coordinates(point, steps):
+    new_coordinates = {}
+    for coordinate in point.coordinates:
+        new_coordinates[coordinate] = (point.coordinates[coordinate]
+                                       - steps[coordinate])
+    new_point = Point(new_coordinates)
+    return new_point   
 
 
 def update_coordinates(point, true_values, step, evaluate):
@@ -239,21 +253,27 @@ def update_coordinates(point, true_values, step, evaluate):
         Direction of the gradient
     step : float
         Size of the step that was taken
-    new_values : dict
-        Updated variable values
     '''
-    new_coordinates = {}
     steps, angle = calculate_steps(point, step)
-    for coordinate in point.coordinates:
-        new_coordinates[coordinate] = (point.coordinates[coordinate]
-                                       - steps[coordinate])
-    new_point = Point(new_coordinates)
-    new_point, step = step_adjustment_check(
-        point, new_point, true_values, step, evaluate)
-    return new_point, angle, step
+    has_converged = False
+    while not has_converged:
+        expected_change = 0 
+        new_point = move_coordinates(point, steps)
+        for variable in point.gradient:
+            expected_change += point.gradient[variable] * steps[variable]
+        actual_value = evaluate(
+            new_point.coordinates, true_values['a'], true_values['b'])
+        actual_change = point.value - actual_value
+        if actual_change < 0.5 * expected_change:
+            for variable in steps:
+                steps[variable] /= 2
+        else:
+            has_converged = True
+            new_point.assign_value(actual_value)
+    return new_point, angle, steps
 
 
-def collect_history(iteration, point):
+def collect_history(iteration, point, step):
     '''Collects all information about the current iteration into a
     single dictionary
 
@@ -269,6 +289,11 @@ def collect_history(iteration, point):
     curr_iteration : dict
         Dictionary with information about the current iteration
     '''
+    for variable in step:
+        temp = 0
+        for variable in step:
+            temp += step[variable] ** 2
+    step_size = math.sqrt(temp)
     curr_iteration = {
         'iteration': iteration,
         'x': point.coordinates['x'],
@@ -278,6 +303,7 @@ def collect_history(iteration, point):
         'num_grad_y': point.gradient['y'],
         'an_grad_x': point.an_gradient['x'],
         'an_grad_y': point.an_gradient['y'],
+        'step': step_size
     }
     return curr_iteration
 
@@ -359,7 +385,7 @@ def gradient_descent(
         angles.append(angle)
         steps.append(step_size)
         dist = distance(true_values, curr_point.coordinates)
-        history.append(collect_history(iteration, curr_point))
+        history.append(collect_history(iteration, curr_point, step_size))
         curr_point = new_point
         iteration += 1
     # Final evaluation
@@ -548,7 +574,18 @@ def step_plot(result_dict, output_dir):
     output_dir : string
         Path to the directory where to save the plot
     '''
-    plt.plot(result_dict['steps'], '.', linestyle='')
+    steps = []
+    for step in result_dict['steps']:
+        temp = 0
+        for variable in step:
+            temp += step[variable] ** 2
+        steps.append(math.sqrt(temp))
+    # steps_x = []
+    # steps_y = []
+    # for step in result_dict['steps']:
+    #     steps_x.append(step['x'])
+    #     steps_y.append(step['y'])
+    plt.plot(steps, '.', linestyle='')
     plt.yscale('log')
     plt.xlabel('Iteration number / #')
     plt.ylabel('Step size')
