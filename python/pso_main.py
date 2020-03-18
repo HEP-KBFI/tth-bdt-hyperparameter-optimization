@@ -165,6 +165,10 @@ def calculate_new_position(
                     parameter_dict[key] + current_speed[key]))
             else:
                 new_value[key] = parameter_dict[key] + current_speed[key]
+            if parameter['range_start'] > new_value[key]:
+                new_value[key] = parameter['range_start']
+            elif parameter['range_end'] < new_value[key]:
+                new_value[key] = parameter['range_end']
         new_values.append(new_value)
     return new_values
 

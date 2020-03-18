@@ -515,7 +515,7 @@ def plot_3d_contour(
         ax.plot3D(
             [parameter_dict['x']],
             [parameter_dict['y']],
-            [parameter_evaluation(parameter_dict)]
+            [parameter_evaluation(parameter_dict)],
             color='k',
             marker='o')
     plt.savefig(plot_out)
@@ -553,7 +553,7 @@ def plot_2d_contour(
         plt.plot(
             [parameter_dict['x']],
             [parameter_dict['y']],
-            [parameter_evaluation(parameter_dict)]
+            [parameter_evaluation(parameter_dict)],
             color='k',
             marker='o')
     plt.grid(True)
