@@ -332,7 +332,7 @@ def move_previous_files(output_dir, previous_files_dir):
     '''
     iter_nr = find_iter_number(previous_files_dir)
     samples_dir = os.path.join(output_dir, 'samples')
-    iter_dir = os.path.join(previous_files_dir, 'iteration_' + str(iter_nr))
+    iter_dir = os.path.join(previous_files_dir, ' ' + str(iter_nr))
     shutil.copytree(samples_dir, iter_dir)
     shutil.rmtree(samples_dir)
     wild_card_path = os.path.join(output_dir, 'parameter_*.sh')
