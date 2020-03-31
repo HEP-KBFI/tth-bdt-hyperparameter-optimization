@@ -296,7 +296,7 @@ def run_pso(
     pso_settings = universal.read_settings(settings_dir, 'pso')
     inertial_weight, inertial_weight_step = pm.get_weight_step(pso_settings)
     iterations = pso_settings['iterations']
-    i = 0
+    i = 1
     new_parameters = parameter_dicts
     personal_bests = {}
     score_dicts, pred_trains, pred_tests, feature_importances = calculate_result(
