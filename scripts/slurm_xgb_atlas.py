@@ -34,7 +34,7 @@ def main(parameter_file, output_dir):
     data_dict = at.create_atlas_data_dict(path_to_file, global_settings)
     path = Path(parameter_file)
     saveDir = str(path.parent)
-    score, pred_train, pred_test, feature_importance, model = at.higgs_evaluation(
+    score, pred_train, pred_test, feature_importance = at.higgs_evaluation(
         parameter_dict, data_dict, nthread, num_classes)
     universal.save_info(
         score, pred_train, pred_test, saveDir, feature_importance)
