@@ -222,7 +222,7 @@ def higgs_evaluation(parameter_dict, data_dict, nthread, num_class, threshold=No
         pred_train, pred_test, data_dict, threshold=threshold)
     feature_importance = model.get_score(importance_type='gain')
     score_dict = {'d_ams': d_ams, 'test_ams': test_ams, 'train_ams': train_ams}
-    return score_dict, pred_train, pred_test, feature_importance, model
+    return score_dict, pred_train, pred_test, feature_importance
 
 
 def calculate_d_ams(
@@ -255,7 +255,7 @@ def ensemble_fitness(
     pred_trains = []
     feature_importances = []
     for parameter_dict in parameter_dicts:
-        score, pred_train, pred_test, feature_importance, model = higgs_evaluation(
+        score, pred_train, pred_test, feature_importance = higgs_evaluation(
             parameter_dict, data_dict,
             global_settings['nthread'], global_settings['num_class']
         )
@@ -299,7 +299,7 @@ def run_pso(
     i = 0
     new_parameters = parameter_dicts
     personal_bests = {}
-    score_dicts, pred_trains, pred_tests, feature_importances, model = calculate_result(
+    score_dicts, pred_trains, pred_tests, feature_importances = calculate_result(
         parameter_dicts, data_dict, global_settings)
     fitnesses = universal.fitness_to_list(
         score_dicts, fitness_key='d_ams')
@@ -322,7 +322,7 @@ def run_pso(
         print('---- Iteration: ' + str(i) + '----')
         parameter_dicts = new_parameters
         print(' --- Compactness: ' + str(compactness) + ' ---')
-        score_dicts, pred_trains, pred_tests, feature_importances, model = calculate_result(
+        score_dicts, pred_trains, pred_tests, feature_importances = calculate_result(
             parameter_dicts, data_dict, global_settings)
         fitnesses = universal.fitness_to_list(
             score_dicts, fitness_key='d_ams')
@@ -807,4 +807,4 @@ def nn_parameter_evaluation(
     pred_train = k_model.predict_proba(data_dict['train'])
     pred_test = k_model.predict_proba(data_dict['test'])
     score_dict = universal.get_scores_dict(pred_train, pred_test, data_dict)
-    return score_dict, pred_train, pred_test, feature_importance, k_model
+    return score_dict, pred_train, pred_test, feature_importance

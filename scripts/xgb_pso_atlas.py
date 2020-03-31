@@ -47,7 +47,6 @@ def main():
         output_dir
     )
     return result_dict, output_dir
-    # sm.run_iteration
 
 
 if __name__ == '__main__':
