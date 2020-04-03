@@ -6,7 +6,6 @@ import xgboost as xgb
 from tthAnalysis.bdtHyperparameterOptimization import universal
 from tthAnalysis.bdtHyperparameterOptimization import pso_main as pm
 import matplotlib.pyplot as plt
-import matplotlib.ticker as ticker
 from sklearn.model_selection import KFold
 from tthAnalysis.bdtHyperparameterOptimization import nn_tools as nnt
 from keras.wrappers.scikit_learn import KerasClassifier
