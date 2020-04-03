@@ -6,10 +6,12 @@ import xgboost as xgb
 from tthAnalysis.bdtHyperparameterOptimization import universal
 from tthAnalysis.bdtHyperparameterOptimization import pso_main as pm
 import matplotlib.pyplot as plt
-import matplotlib.ticker as ticker
+from sklearn.model_selection import KFold
+from tthAnalysis.bdtHyperparameterOptimization import nn_tools as nnt
+from keras.wrappers.scikit_learn import KerasClassifier
+from keras import backend as K
+import tensorflow as tf
 
-# parameter_dict= {'eta':0.1, 'max_depth':8, 'min_child_weight':250, 'colsample_bytree':0.1, 'num_boost_round':450}
-# path_to_file=os.path.expandvars('$HOME/training.csv')
 
 def create_atlas_data_dict(path_to_file, global_settings, plot=False):
     print('::: Loading data from ' + path_to_file + ' :::')
@@ -89,7 +91,6 @@ def AMS(s, b):
 def try_different_thresholds(
         predicted, data_dict, label_type, threshold=None, plot=False
 ):
-    output_dir = '$HOME/ams'
     if label_type == 'train':
         factor = 1.25
     elif label_type == 'test':
@@ -119,7 +120,7 @@ def try_different_thresholds(
         signal, background = calculate_s_and_b(
             th_prediction, data_dict[label_key], weights)
         ams_score = AMS(signal, background)
-        return ams_score
+        return ams_score, threshold
     else:
         for threshold1 in thresholds:
             th_prediction = pandas.Series(
@@ -145,11 +146,11 @@ def try_different_thresholds(
             ams_score = AMS(signal, background)
             ams_scores.append(ams_score)
         max_score_index = np.argmax(ams_scores)
+        if threshold != None:
+            best_threshold = threshold
+        else:
+            best_threshold = thresholds[max_score_index]
         if plot:
-            if threshold != None:
-                best_threshold = threshold
-            else:
-                best_threshold = thresholds[max_score_index]
             best_prediction = pandas.Series(
                 [1 if pred >= best_threshold else 0 for pred in predicted])
             plot_wrongly_classified(
@@ -197,7 +198,7 @@ def calculate_s_and_b(prediction, labels, weights, weighed=True):
     return signal, background
 
 
-def higgs_evaluation(parameter_dict, data_dict, nthread, num_class):
+def higgs_evaluation(parameter_dict, data_dict, nthread, num_class, threshold=None):
     params = {
         'silent': 1,
         'objective': 'multi:softprob',
@@ -216,18 +217,30 @@ def higgs_evaluation(parameter_dict, data_dict, nthread, num_class):
     )
     pred_train = model.predict(data_dict['dtrain'])
     pred_test = model.predict(data_dict['dtest'])
-    d_ams, test_ams, train_ams = calculate_d_ams(pred_train, pred_test, data_dict)
+    d_ams, test_ams, train_ams = calculate_d_ams(
+        pred_train, pred_test, data_dict, threshold=threshold)
     feature_importance = model.get_score(importance_type='gain')
     score_dict = {'d_ams': d_ams, 'test_ams': test_ams, 'train_ams': train_ams}
     return score_dict, pred_train, pred_test, feature_importance
 
 
-def calculate_d_ams(pred_train, pred_test, data_dict, kappa=0.3):
+def calculate_d_ams(
+        pred_train,
+        pred_test,
+        data_dict,
+        kappa=0.3,
+        plot=False,
+        threshold=None
+):
     train_ams, best_threshold = try_different_thresholds(
-        pred_train, data_dict, 'train', plot=True)
-    test_ams = try_different_thresholds(
-        pred_test, data_dict, 'test', threshold=best_threshold, plot=True)[0]
+        pred_train, data_dict, 'train', threshold=threshold, plot=plot)
+    test_ams, best_threshold = try_different_thresholds(
+        pred_test, data_dict, 'test', threshold=best_threshold, plot=plot)
     d_ams = universal.calculate_d_roc(train_ams, test_ams, kappa)
+    print("best_threshold: " + str(best_threshold))
+    print("train ams: " + str(train_ams))
+    print("test_ams: " + str(test_ams))
+    print("d_ams: " + str(d_ams))
     return d_ams, test_ams, train_ams
 
 
@@ -282,7 +295,7 @@ def run_pso(
     pso_settings = universal.read_settings(settings_dir, 'pso')
     inertial_weight, inertial_weight_step = pm.get_weight_step(pso_settings)
     iterations = pso_settings['iterations']
-    i = 0
+    i = 1
     new_parameters = parameter_dicts
     personal_bests = {}
     score_dicts, pred_trains, pred_tests, feature_importances = calculate_result(
@@ -630,4 +643,167 @@ def plot_processes(
     plt.legend(loc='best')
     plt.savefig(file_out, bbox_inches='tight')
     plt.close('all')
- 
+
+
+def kfold_higgs(threshold=0.83):
+    parameter_dict = {"colsample_bytree": 1, "learning_rate": 0.3, "min_child_weight": 323.5587724023121, "subsample": 0.8301660741414597, "num_boost_round": 153, "max_depth": 4, "gamma": 3.860449103544768}
+    fulltest_path = os.path.expandvars("$HOME/full_test.csv")
+    train_path = os.path.expandvars("$HOME/training.csv")
+    output_dir = os.path.expandvars("$HOME/kfold_output")
+    if not os.path.exists(output_dir):
+        os.makedirs(output_dir)
+    training = pandas.read_csv(train_path)
+    training['Label'] = training['Label'].replace(
+        to_replace='s', value=1)
+    training['Label'] = training['Label'].replace(
+        to_replace='b', value=0)
+    fulltest = pandas.read_csv(fulltest_path)
+    atlas_data_df = fulltest.copy()
+    for trainvar in atlas_data_df.columns:
+        for label_to_drop in labels_to_drop:
+            if label_to_drop in trainvar:
+                try:
+                    atlas_data_df = atlas_data_df.drop(trainvar, axis=1)
+                except:
+                    continue
+    trainvars = list(atlas_data_df.columns)
+    trainvars.remove('Label')
+    fulltest_labels = fulltest['Label'].astype(int)
+    fulltestdataset = np.array(fulltest[trainvars].values)
+    dfulltest = xgb.DMatrix(
+            fulltestdataset,
+            label=fulltest_labels,
+            nthread=8, # global_settings['nthread']
+            feature_names=trainvars
+    )
+    kfold = KFold(n_splits=5, shuffle=True, random_state=1)
+    score_dicts = []
+    ams_scores = []
+    for train_index, test_index in kfold.split(training):
+        train = training.iloc[train_index]
+        test = training.iloc[test_index]
+        traindataset = np.array(train[trainvars].values)
+        testdataset = np.array(test[trainvars].values)
+        training_labels = train['Label'].astype(int)
+        testing_labels = test['Label'].astype(int)
+        dtrain = xgb.DMatrix(
+            traindataset,
+            label=training_labels,
+            nthread=8, # global_settings['nthread']
+            feature_names=trainvars
+        )
+        dtest = xgb.DMatrix(
+            testdataset,
+            label=testing_labels,
+            nthread=8, # global_settings['nthread']
+            feature_names=trainvars
+        )
+        data_dict = {
+            'dtrain': dtrain,
+            'dtest': dtest,
+            'training_labels': training_labels,
+            'testing_labels': testing_labels,
+            'trainvars': trainvars,
+            'test_full': test,
+            'train_full': train,
+        }
+        score_dict, pred_train, pred_test, feature_importance, model = higgs_evaluation(
+            parameter_dict, data_dict, 8, 2, threshold=threshold)
+        pred_fulltest = model.predict(dfulltest)
+        weights = fulltest['Weight']*818240/550000
+        pred_full = [i[1] for i in pred_fulltest]
+        th_prediction = pandas.Series([1 if pred >=threshold else 0 for pred in pred_full])
+        signal, background = calculate_s_and_b(th_prediction, fulltest_labels, weights)
+        ams_score = AMS(signal, background)
+        ams_scores.append(ams_score)
+        score_dicts.append(score_dict)
+    conclude_kfold_results(ams_scores, score_dicts, output_dir)
+
+
+def conclude_kfold_results(ams_scores, score_dicts, output_dir):
+    fulltest_stdev = np.std(ams_scores)
+    fulltest_avg = np.mean(ams_scores)
+    test_amss = [score_dict['test_ams'] for score_dict in score_dicts]
+    train_amss = [score_dict['train_ams'] for score_dict in score_dicts]
+    d_amss = [score_dict['d_ams'] for score_dict in score_dicts]
+    test_stdev = np.std(test_amss)
+    train_stdev = np.std(train_amss)
+    test_avg = np.mean(test_amss)
+    train_avg = np.mean(train_amss)
+    d_ams_avg = np.mean(d_amss)
+    d_ams_stdev = np.std(d_amss)
+    plot_kfold('d_ams', d_ams_avg, d_ams_stdev, d_amss, output_dir)
+    plot_kfold('kaggle_test', fulltest_avg, fulltest_stdev, ams_scores, output_dir)
+    plot_kfold('test', test_avg, test_stdev, test_amss, output_dir)
+    plot_kfold('train', train_avg, train_stdev, train_amss, output_dir)
+
+
+
+def plot_kfold(name, avg, stdev, values, output_dir):
+    print(values)
+    out_path = os.path.join(output_dir, name + '_kfold_stability')
+    x_values = np.arange(len(values))
+    plt.plot(x_values, values, linestyle='', marker='o', color='r')
+    plt.hlines(avg, 0, len(values)-1, label='mean')
+    plt.fill_between(
+        [0, len(values)-1],
+        avg + stdev,
+        avg - stdev,
+        color='gray',
+        label='values',
+        alpha=0.1
+    )
+    plt.title(name + '_variation')
+    plt.xticks(x_values)
+    plt.title(r'%s ($\mu=%.3f$, $\sigma=%.3f$)'%(name, avg, stdev))
+    plt.savefig(out_path, bbox_inches='tight')
+    plt.close('all')
+
+
+def nn_parameter_evaluation(
+        nn_hyperparameters,
+        data_dict,
+        nthread,
+        num_class,
+        return_true_feature_importances=False
+):
+    K.set_session(
+        tf.Session(
+            config=tf.ConfigProto(
+                intra_op_parallelism_threads=nthread,
+                inter_op_parallelism_threads=nthread,
+                allow_soft_placement=True,
+            )
+        )
+    )
+    nr_trainvars = len(data_dict['train'][0])
+    number_samples = len(data_dict['train'])
+    nn_model = nnt.create_nn_model(
+        nn_hyperparameters, nr_trainvars, num_class, number_samples)
+    k_model  = KerasClassifier(
+        build_fn=nnt.create_nn_model,
+        epochs=nn_hyperparameters['epochs'],
+        batch_size=nn_hyperparameters['batch_size'],
+        verbose=2,
+        nn_hyperparameters=nn_hyperparameters,
+        nr_trainvars=nr_trainvars,
+        num_class=num_class,
+        number_samples=number_samples
+    )
+    fit_result = k_model.fit(
+        data_dict['train'],
+        data_dict['training_labels'],
+        validation_data=(
+            data_dict['test'],
+            data_dict['testing_labels']
+        )
+    )
+    if return_true_feature_importances:
+        feature_importance = nnt.get_feature_importances(
+            k_model, data_dict)
+    else:
+        feature_importance = {}
+    pred_train = k_model.predict_proba(data_dict['train'])
+    pred_test = k_model.predict_proba(data_dict['test'])
+    score_dict = universal.get_scores_dict(pred_train, pred_test, data_dict)
+    return score_dict, pred_train, pred_test, feature_importance
