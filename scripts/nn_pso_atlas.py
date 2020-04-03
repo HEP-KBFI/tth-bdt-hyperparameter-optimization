@@ -6,10 +6,12 @@ from tthAnalysis.bdtHyperparameterOptimization import slurm_main as sm
 from tthAnalysis.bdtHyperparameterOptimization import atlas_tools as at
 from tthAnalysis.bdtHyperparameterOptimization import universal
 from tthAnalysis.bdtHyperparameterOptimization import pso_main as pm
-from tthAnalysis.bdtHyperparameterOptimization import xgb_tools as xt
+from tthAnalysis.bdtHyperparameterOptimization import nn_tools as nnt
 
 np.random.seed(1)
 path_to_file = "$HOME/training.csv"
+
+# don't forget to change ml_method to nn and "sample_type" to "atlas" in global settings
 
 def main():
     cmssw_base_path = os.path.expandvars('$CMSSW_BASE')
@@ -40,13 +42,14 @@ def main():
     )
     value_dicts = universal.read_parameters(param_file)
     pso_settings = pm.read_weights(settings_dir)
-    parameter_dicts = xt.prepare_run_params(
+    parameter_dicts = nnt.prepare_run_params(
         value_dicts, pso_settings['sample_size'])
     result_dict = at.run_pso(
         data_dict, value_dicts, sm.run_iteration, parameter_dicts,
         output_dir
     )
     return result_dict, output_dir
+    # sm.run_iteration
 
 
 if __name__ == '__main__':
