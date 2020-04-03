@@ -1,21 +1,15 @@
-'''
-Particle swarm optimization for the hyperparameters optimization of XGBoost.
-(MNIST numbers). Version for slurm.
-Call with 'python'
-
-Usage: slurm_pso_mnist.py
-'''
 import numpy as np
 import os
 import warnings
+import json
 from tthAnalysis.bdtHyperparameterOptimization import slurm_main as sm
-from tthAnalysis.bdtHyperparameterOptimization import mnist_filereader  as mf
+from tthAnalysis.bdtHyperparameterOptimization import atlas_tools as at
 from tthAnalysis.bdtHyperparameterOptimization import universal
 from tthAnalysis.bdtHyperparameterOptimization import pso_main as pm
 from tthAnalysis.bdtHyperparameterOptimization import xgb_tools as xt
 
 np.random.seed(1)
-
+path_to_file = "$HOME/training.csv"
 
 def main():
     cmssw_base_path = os.path.expandvars('$CMSSW_BASE')
@@ -33,8 +27,7 @@ def main():
         os.makedirs(output_dir)
     universal.save_run_settings(output_dir)
     print("::::::: Loading data ::::::::")
-    data_dict = mf.create_datasets(
-        global_settings)
+    data_dict = at.create_atlas_data_dict(path_to_file, global_settings)
     print("::::::: Reading parameters :::::::")
     cmssw_base_path = os.path.expandvars('$CMSSW_BASE')
     param_file = os.path.join(
@@ -49,13 +42,18 @@ def main():
     pso_settings = pm.read_weights(settings_dir)
     parameter_dicts = xt.prepare_run_params(
         value_dicts, pso_settings['sample_size'])
-    result_dict = pm.run_pso(
+    result_dict = at.run_pso(
         data_dict, value_dicts, sm.run_iteration, parameter_dicts,
         output_dir
     )
-    universal.save_results(result_dict, output_dir, plot_extras=True)
-    print("Results saved to " + str(output_dir))
+    return result_dict, output_dir
 
 
 if __name__ == '__main__':
-    main()
+    result_dict, output_dir = main()
+    at.save_results(result_dict, output_dir)
+    print("Results saved to " + str(output_dir))
+    score_path = os.path.join(output_dir, 'score.json')
+    score_dict = result_dict['score_dict']
+    with open(score_path, 'w') as file:
+        json.dump(score_dict, file)

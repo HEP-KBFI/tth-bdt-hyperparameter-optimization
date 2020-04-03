@@ -9,7 +9,6 @@ Options:
 
 
 '''
-from __future__ import division
 import numpy as np
 from tthAnalysis.bdtHyperparameterOptimization import universal
 from tthAnalysis.bdtHyperparameterOptimization import mnist_filereader as mf
@@ -34,7 +33,7 @@ def main(parameter_file, output_dir):
     saveDir = str(path.parent)
     score, pred_train, pred_test, feature_importance = xt.parameter_evaluation(
         parameter_dict, data_dict, nthread, num_classes)
-    univerasl.save_info(
+    universal.save_info(
         score, pred_train, pred_test, saveDir, feature_importance)
 
 

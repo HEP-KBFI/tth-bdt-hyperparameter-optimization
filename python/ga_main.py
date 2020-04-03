@@ -53,14 +53,19 @@ class Individual:
         return self.values == other.values
 
     def add_result(
-            self, score, pred_train, pred_test, feature_importance, fitness):
+            self,
+            fitness,
+            score=None,
+            pred_train=None,
+            pred_test=None,
+            feature_importance=None):
         '''Adds the the evaluation results as attributes to the
         individual'''
+        self.fitness = fitness
         self.score = score
         self.pred_train = pred_train
         self.pred_test = pred_test
         self.feature_importance = feature_importance
-        self.fitness = fitness
 
     def merge(self):
         '''Assignes the subpopulation number to be 0'''
@@ -245,6 +250,26 @@ def population_list(population):
     return value_list
 
 
+def rosenbrock_fitnesses(fitnesses):
+    '''Turn rosenbrock fitness score into an appropriate score for genetic algorithm
+
+    Parameters
+    ----------
+    fitnesses : list
+        List of fitness scores for the population
+
+    Returns
+    -------
+    new_fitnesses : list
+        List of appropriate fitness scores for the population
+    '''
+    new_fitnesses = []
+    for fitness in fitnesses:
+        fitness = np.log10(fitness) / 38
+        new_fitnesses.append(1 - fitness)
+    return new_fitnesses
+
+
 def fitness_calculation(population, settings, data, evaluate):
     '''Calculate the fitness scores of the given generation
 
@@ -269,23 +294,29 @@ def fitness_calculation(population, settings, data, evaluate):
     # Evaluate unevaluated members of population
     if eval_pop:
         args = inspect.getargspec(evaluate)
-        if len(args[0]) == 3:
-            scores, pred_trains, pred_tests, feature_importances = evaluate(
-                population_list(eval_pop), data, settings)
-        elif len(args[0]) == 4:
-            scores, pred_trains, pred_tests, feature_importances = evaluate(
-                population_list(eval_pop), data, settings, len(eval_pop))
-        fitnesses = universal.fitness_to_list(
-            scores, fitness_key=settings['fitness_fn'])
-        # Assign scores to the individuals
-        for i, member in enumerate(eval_pop):
-            member.add_result(
-                scores[i],
-                pred_trains[i],
-                pred_tests[i],
-                feature_importances[i],
-                fitnesses[i]
-            )
+        if len(args[0]) == 2: #rosenbrock function optimization
+            fitnesses = evaluate(population_list(eval_pop), data)
+            fitnesses = rosenbrock_fitnesses(fitnesses)
+            for i, member in enumerate(eval_pop):
+                member.add_result(fitnesses[i])
+        else: #hyperparameter optimization
+            if len(args[0]) == 3:
+                scores, pred_trains, pred_tests, feature_importances = evaluate(
+                    population_list(eval_pop), data, settings)
+            elif len(args[0]) == 4:
+                scores, pred_trains, pred_tests, feature_importances = evaluate(
+                    population_list(eval_pop), data, settings, len(eval_pop))
+            fitnesses = universal.fitness_to_list(
+                scores, fitness_key=settings['fitness_fn'])
+            # Assign scores to the individuals
+            for i, member in enumerate(eval_pop):
+                member.add_result(
+                    fitnesses[i],
+                    scores[i],
+                    pred_trains[i],
+                    pred_tests[i],
+                    feature_importances[i],
+                )
         # Reunite population
         population = eval_pop + rest_pop
     return population
@@ -416,7 +447,7 @@ def new_population(
     # Generate offspring to fill the new generation
     while len(offsprings) < (len(population) - len(next_population)):
         parents = select.tournament(population_list(population), fitnesses)
-        offspring = gc.kpoint_crossover(
+        offspring = gc.uniform_crossover(
             parents, parameters, settings['mut_chance'])
         # No duplicate members
         if offspring not in next_population:
@@ -474,7 +505,7 @@ def merge_subpopulations(subpopulations):
 
 def finish_subpopulation(subpopulations, finished_subpopulations, improvements, threshold):
     '''Separate out a subpopulation that has reached the improvement threshold
-    
+
     Parameters
     ----------
     subpopulations : list
@@ -734,7 +765,7 @@ def finalize_result(output, data):
 
 
 def evolution(settings, parameters, data, create_set, evaluate):
-    '''Evolution of the parameter values
+    '''Evolution of the parameter values for hyperparameter optimization
 
     Parameters
     ----------
@@ -760,4 +791,131 @@ def evolution(settings, parameters, data, create_set, evaluate):
         population, settings, parameters, data, create_set, evaluate)
     print('\n::::: Finalizing results :::::')
     result = finalize_result(output, data)
+    return result
+
+
+def evolution_rosenbrock(settings, parameters, data, create_set, evaluate):
+    '''Evolution of the parameter values for the Rosenbrock function
+
+    Parameters
+    ----------
+    settings : dict
+        Settings of the genetic algorithm
+    parameters: dict
+        Descriptions of the xgboost parameters
+    data: dict
+        Parameter values for the Rosenbrock function
+    create_set : function
+        Function used to generate a population
+    evaluate : function
+        Function used to calculate scores
+
+    Returns
+    -------
+    result : dict
+        Result of the run of the genetic algorithm
+    '''
+    print('\n::::: Generating initial population :::::')
+    population = create_population(settings, parameters, create_set)
+
+    iteration = 0
+    curr_improvement = []
+    improvements = {}
+    avg_scores = {}
+
+    result = {}
+
+    # Evolution loop for subpopulations
+    if settings['sub_pops'] > 1:
+        finished_subpopulations = []
+        while (iteration <= settings['iterations']
+               and population):
+            # Generate a new population
+            if iteration != 0:
+                print('::::: Iteration:     ' + str(iteration) + ' :::::')
+                new_subpopulations = []
+                for subpopulation in subpopulations:
+                    new_subpopulation = new_population(
+                        subpopulation,
+                        settings,
+                        parameters,
+                        data,
+                        create_set,
+                        evaluate,
+                        subpopulation[0].subpop
+                    )
+                    new_subpopulations.append(new_subpopulation)
+                population = unite_subpopulations(new_subpopulations)
+            # Calculate fitness scores
+            population = fitness_calculation(
+                population, settings, data, evaluate)
+            subpopulations = separate_subpopulations(population, settings)
+            # Track results and calculate stopping criteria
+            curr_improvements = []
+            for i, subpopulation in enumerate(subpopulations):
+                index = subpopulation[0].subpop
+                fitnesses = fitness_list(subpopulation)
+                if iteration == 0:
+                    avg_scores[index] = []
+                    improvements[index] = []
+                    result['best_fitness'] = max(fitnesses)
+                    result['best_parameters'] = population_list(subpopulation)[np.argmax(fitnesses)]
+                    result['list_of_old_bests'] = [result['best_parameters']]
+                    result['list_of_best_fitnesses'] = [result['best_fitness']]
+                avg_scores[index].append(np.mean(fitnesses))
+                improvements[index], curr_improvement = \
+                    universal.calculate_improvement_wAVG(
+                        avg_scores[index],
+                        improvements[index],
+                        settings['threshold']
+                    )
+                curr_improvements.append(curr_improvement)
+                if max(fitnesses) > result['best_fitness']:
+                    result['best_fitness'] = max(fitnesses)
+                    result['best_parameters'] = population_list(subpopulation)[np.argmax(fitnesses)]
+                    result['list_of_old_bests'].append(result['best_parameters'])
+                    result['list_of_best_fitnesses'].append(result['best_fitness'])
+            # Remove a subpopulation that has reached a stopping
+            # criterium
+            finished_subpopulations, subpopulations = finish_subpopulation(
+                subpopulations, finished_subpopulations, curr_improvements, settings['threshold'])
+            population = unite_subpopulations(subpopulations)
+            iteration += 1
+        # Merge subpopulations into one
+        print('::::: Merging subpopulations :::::')
+        subpopulations += finished_subpopulations
+        population = merge_subpopulations(subpopulations)
+        iteration = 0
+
+    improvement = 1
+    improvements = []
+    avg_scores = []
+
+    # Evolution loop for single population or merged population
+    while (iteration <= settings['iterations']
+           and improvement > settings['threshold']):
+        # Generate new population
+        if iteration != 0:
+            print('::::: Iteration:     ' + str(iteration) + ' :::::')
+            population = new_population(
+                population, settings, parameters, data, create_set, evaluate)
+        # Calculate fitness scores
+        population = fitness_calculation(
+            population, settings, data, evaluate)
+        # Track scores and calculate stopping criteria
+        fitnesses = fitness_list(population)
+        avg_scores.append(np.mean(fitnesses))
+        improvements, improvement = \
+            universal.calculate_improvement_wAVG(
+                avg_scores,
+                improvements,
+                settings['threshold']
+            )
+        if max(fitnesses) > result['best_fitness']:
+            result['best_fitness'] = max(fitnesses)
+            result['best_parameters'] = population_list(population)[np.argmax(fitnesses)]
+            result['list_of_old_bests'].append(result['best_parameters'])
+            result['list_of_best_fitnesses'].append(result['best_fitness'])
+        iteration += 1
+
     return result

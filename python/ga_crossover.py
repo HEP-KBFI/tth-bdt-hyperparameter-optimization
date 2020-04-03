@@ -193,7 +193,10 @@ def chromosome_mutate(chromosome, mutation_chance):
     # Random mutation based on mutation_chance
     for gene in chromosome:
         if random.random() < mutation_chance:
-            mutated_chromosome += str(abs(int(gene) - 1))
+            try:
+                mutated_chromosome += str(abs(int(gene) - 1))
+            except ValueError:
+                pass
         else:
             mutated_chromosome += gene
 
@@ -272,8 +275,14 @@ def mutation_fix(offspring, parameters):
         # Current parameter
         key = parameter['p_name']
 
+        # Cheks parameter settings
+        if 'exp' not in parameter:
+            parameter['exp'] = 0
+        if 'true_int' not in parameter:
+            parameter['true_int'] = 0
+
         # Forces exp parameters to have values between 0 and 1
-        if parameter['exp'] == 1: 
+        if parameter['exp'] == 1:
             if offspring[key] > 1:
                 offspring[key] = 1
             elif offspring[key] < 0:
@@ -392,7 +401,10 @@ def encode_parent(parent, parameters):
     # Encoding values in parent
     for parameter in parameters:
         key = parameter['p_name']
-        true_int = parameter['true_int']
+        try:
+            true_int = parameter['true_int']
+        except KeyError:
+            true_int = 0
         if true_int == 1:
             encoded_parent[key] = int_encoding(parent[key])
         else:
@@ -423,7 +435,10 @@ def decode_offspring(offspring, parameters):
     # Decoding values in offspring
     for parameter in parameters:
         key = parameter['p_name']
-        true_int = parameter['true_int']
+        try:
+            true_int = parameter['true_int']
+        except KeyError:
+            true_int = 0
         if true_int == 1:
             decoded_offspring[key] = int_decoding(offspring[key])
         else:

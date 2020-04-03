@@ -1,6 +1,5 @@
 '''Universal functions to be used in evolutionary algorithms
 '''
-from __future__ import division
 import warnings
 import itertools
 import json
@@ -861,7 +860,7 @@ def plot_roc_curve(
     plt.close('all')
 
 
-def plot_costfunction(avg_scores, output_dir):
+def plot_costfunction(avg_scores, output_dir, y_label='Fitness score'):
     '''Creates a plot of the cost function
 
     Parameters:
@@ -906,12 +905,11 @@ def plot_costfunction(avg_scores, output_dir):
         plt.xticks(np.arange(n_gens_final - 1))
     finally:
         plt.xlabel('Generation')
-        plt.ylabel('Fitness score')
+        plt.ylabel(y_label)
         axis = plt.gca()
         axis.set_aspect('auto', adjustable='box')
         axis.xaxis.set_major_locator(ticker.AutoLocator())
         plt.grid(True)
-        plt.title('Average fitness over iterations')
         plt.tick_params(top=True, right=True, direction='in')
         plt.savefig(plot_out)
         plt.close('all')
@@ -1039,6 +1037,8 @@ def save_info(
     -------
     Nothing
     '''
+    if not os.path.exists(save_dir):
+        os.makedirs(save_dir)
     train_path = os.path.join(save_dir, 'pred_train.lst')
     test_path = os.path.join(save_dir, 'pred_test.lst')
     score_path = os.path.join(save_dir, 'score.json')

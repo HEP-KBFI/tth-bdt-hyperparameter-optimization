@@ -5,7 +5,6 @@ Call with 'python'
 
 Usage: quasar_ga_mnist.py
 '''
-from __future__ import division
 import os
 from tthAnalysis.bdtHyperparameterOptimization import universal
 from tthAnalysis.bdtHyperparameterOptimization import mnist_filereader as mf

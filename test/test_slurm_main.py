@@ -1,7 +1,7 @@
 from __future__ import division
 from tthAnalysis.bdtHyperparameterOptimization import slurm_main as sm
 import numpy as np
-import os 
+import os
 import shutil
 import urllib
 import gzip
