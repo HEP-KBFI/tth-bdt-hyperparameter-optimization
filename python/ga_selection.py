@@ -5,7 +5,7 @@ import random
 import numpy as np
 
 
-def tournament(population, fitnesses, t_size=2, t_prob=0.7):
+def tournament(population, fitnesses, t_size=3, t_prob=0.7):
     '''Tournament selection
 
     Parameters
@@ -168,7 +168,6 @@ def wheel_parents(population, probabilities):
     # Select parents from wheel
     while len(parents) < 2:
         select = random.random()
-        print(select)
         for i, slot in enumerate(wheel):
             if select < slot:
                 parents.append(population[i])

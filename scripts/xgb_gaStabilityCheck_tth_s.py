@@ -77,7 +77,7 @@ def main():
         keys, best_parameter_dicts)
     sct.stability_check_main(dict_of_parameter_lists, output_dir)
     sct.plot_all_radar_charts(best_parameter_dicts, output_dir)
-    sct.plot_score_stability(result_dicts, output_dir)    
+    sct.plot_score_stability(result_dicts, output_dir)
 
 
 if __name__ == '__main__':
