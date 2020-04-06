@@ -234,6 +234,7 @@ def update_coordinates(point, true_values, step, evaluate):
     has_converged = False
     print("######################")
     while not has_converged:
+        expected_change = 0
         new_point = move_coordinates(point, steps)
         for variable in point.gradient:
             expected_change += point.gradient[variable] * steps[variable]
