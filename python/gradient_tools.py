@@ -248,6 +248,7 @@ def update_coordinates(point, true_values, step, evaluate):
             biggest_gradient_value_variable = None
             for variable in point.gradient:
                 biggest_gradient_value = 0
+                biggest_gradient_value_variable = variable
                 if abs(point.gradient[variable] > biggest_gradient_value):
                     biggest_gradient_value_variable = variable
                     biggest_gradient_value = point.gradient[variable]
