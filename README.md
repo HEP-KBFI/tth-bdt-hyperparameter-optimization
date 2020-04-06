@@ -22,6 +22,12 @@ Also in order for feature importances to work with NN, eli5 package is needed:
 pip install --user eli5
 ````
 
+Older versions of matplot lib do not include mpl_tools, which are used for plotting rosenbrock's gradient descent. Upgrade matplotlib package with
+
+````console
+pip install --upgrade matplotlib --user
+````
+
 ### Wiki
 
 For more detailed information visit the [wiki](https://github.com/HEP-KBFI/tth-bdt-hyperparameter-optimization/wiki)
