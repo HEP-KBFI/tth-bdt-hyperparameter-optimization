@@ -245,10 +245,12 @@ def update_coordinates(point, true_values, step, evaluate):
         print("expected_change" + str(expected_change))
         print("----------------------------")
         if actual_change < 0.5 * expected_change:
-            biggest_gradient_value_variable = 0
+            biggest_gradient_value_variable = None
             for variable in point.gradient:
-                if abs(point.gradient[variable] > biggest_gradient_value_variable):
+                biggest_gradient_value = 0
+                if abs(point.gradient[variable] > biggest_gradient_value):
                     biggest_gradient_value_variable = variable
+                    biggest_gradient_value = point.gradient[variable]
             steps[biggest_gradient_value_variable] /= 2
         else:
             has_converged = True
