@@ -253,7 +253,7 @@ def update_coordinates(point, true_values, step, evaluate):
         else:
             has_converged = True
             new_point.assign_value(actual_value)
-    return new_point
+    return new_point, angle, steps
 
 # def update_coordinates(point, true_values, step, evaluate):
 #     '''Update coordinates with a maximum step size according to
