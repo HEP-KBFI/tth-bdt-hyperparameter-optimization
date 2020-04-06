@@ -230,76 +230,47 @@ def move_coordinates(point, steps):
 
 
 def update_coordinates(point, true_values, step, evaluate):
+    '''Update coordinates with a maximum step size according to
+    its gradients
+
+    Parameters
+    ----------
+    point : Point
+        Current point and its information
+    true_values : dict
+        Parameter values for the function
+    step : float
+        Maximum step size for updating values
+    evaluate : function
+        Function for evaluating the given variable values and finding
+        the function value
+
+    Returns
+    -------
+    new_point : Point
+        New point and its information
+    angle : float
+        Direction of the gradient
+    step : float
+        Size of the step that was taken
+    '''
     steps, angle = calculate_steps(point, step)
     has_converged = False
-    print("######################")
     while not has_converged:
-        expected_change = 0
+        expected_change = 0 
         new_point = move_coordinates(point, steps)
         for variable in point.gradient:
             expected_change += point.gradient[variable] * steps[variable]
         actual_value = evaluate(
             new_point.coordinates, true_values['a'], true_values['b'])
         actual_change = point.value - actual_value
-        print("actual_change " + str(actual_change))
-        print("expected_change" + str(expected_change))
-        print("----------------------------")
         if actual_change < 0.5 * expected_change:
-            biggest_gradient_value_variable = None
-            for variable in point.gradient:
-                biggest_gradient_value = 0
-                biggest_gradient_value_variable = variable
-                if point.gradient[variable] > biggest_gradient_value:
-                    biggest_gradient_value_variable = variable
-                    biggest_gradient_value = point.gradient[variable]
-            steps[biggest_gradient_value_variable] /= 2
+            for variable in steps:
+                steps[variable] /= 2
         else:
             has_converged = True
             new_point.assign_value(actual_value)
     return new_point, angle, steps
-
-# def update_coordinates(point, true_values, step, evaluate):
-#     '''Update coordinates with a maximum step size according to
-#     its gradients
-
-#     Parameters
-#     ----------
-#     point : Point
-#         Current point and its information
-#     true_values : dict
-#         Parameter values for the function
-#     step : float
-#         Maximum step size for updating values
-#     evaluate : function
-#         Function for evaluating the given variable values and finding
-#         the function value
-
-#     Returns
-#     -------
-#     new_point : Point
-#         New point and its information
-#     angle : float
-#         Direction of the gradient
-#     step : float
-#         Size of the step that was taken
-#     '''
-#     steps, angle = calculate_steps(point, step)
-#     has_converged = False
-#     while not has_converged:
-#         expected_change = 0 
-#         new_point = move_coordinates(point, steps)
-#         for variable in point.gradient:
-#             expected_change += point.gradient[variable] * steps[variable]
-#         actual_value = evaluate(
-#             new_point.coordinates, true_values['a'], true_values['b'])
-#         actual_change = point.value - actual_value
-#         if actual_change < 0.5 * expected_change:
-#             for variable in steps:
-#                 steps[variable] /= 2
-#         else:
-#             has_converged = True
-#             new_point.assign_value(actual_value)
-#     return new_point, angle, steps
 
 
 def collect_history(iteration, point, step):
