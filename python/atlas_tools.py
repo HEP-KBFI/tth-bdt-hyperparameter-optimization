@@ -72,6 +72,53 @@ def create_atlas_data_dict(path_to_file, global_settings, plot=False):
     return data_dict
 
 
+def create_nn_atlas_data_dict(path_to_file, global_settings, plot=False):
+    print('::: Loading data from ' + path_to_file + ' :::')
+    path_to_file = os.path.expandvars(path_to_file)
+    labels_to_drop = ['Kaggle', 'EventId', 'Weight']
+    atlas_data_original = pandas.read_csv(path_to_file)
+    atlas_data_df = atlas_data_original.copy()
+    atlas_data_original['Label'] = atlas_data_original['Label'].replace(
+        to_replace='s', value=1)
+    atlas_data_original['Label'] = atlas_data_original['Label'].replace(
+        to_replace='b', value=0)
+    for trainvar in atlas_data_df.columns:
+        for label_to_drop in labels_to_drop:
+            if label_to_drop in trainvar:
+                try:
+                    atlas_data_df = atlas_data_df.drop(trainvar, axis=1)
+                except:
+                    continue
+    trainvars = list(atlas_data_df.columns)
+    trainvars.remove('Label')
+    output_dir = os.path.expandvars(global_settings['output_dir'])
+    info_dir = os.path.join(output_dir, 'previous_files', 'data_dict')
+    if not os.path.exists(info_dir):
+        os.makedirs(info_dir)
+    print(':::::::::::: Creating datasets ::::::::::::::::')
+    train, test = train_test_split(
+        atlas_data_original, test_size=0.2, random_state=1)
+    training_labels = train['Label'].astype(int)
+    testing_labels = test['Label'].astype(int)
+    traindataset = np.array(train[trainvars].values)
+    testdataset = np.array(test[trainvars].values)
+    data_dict = {
+        'train': traindataset,
+        'test': testdataset,
+        'training_labels': training_labels,
+        'testing_labels': testing_labels,
+        'trainvars': trainvars,
+        'test_full': test,
+        'train_full': train,
+        'atlas_data_original': atlas_data_original
+    }
+    if plot:
+        output_dir = "$HOME/ams"
+        plot_bkg_weight_distrib(data_dict, output_dir)
+    universal.write_data_dict_info(info_dir, data_dict)
+    return data_dict
+
+
 def AMS(s, b):
     """ Approximate Median Significance defined as:
         AMS = sqrt(

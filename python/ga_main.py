@@ -904,6 +904,14 @@ def evolution_rosenbrock(settings, parameters, data, create_set, evaluate):
             population, settings, data, evaluate)
         # Track scores and calculate stopping criteria
         fitnesses = fitness_list(population)
+        index = np.argmax(fitnesses)
+        if iteration == 0:
+            avg_scores = []
+            improvements = []
+            result['best_fitness'] = max(fitnesses)
+            result['best_parameters'] = population_list(population)[np.argmax(fitnesses)]
+            result['list_of_old_bests'] = [result['best_parameters']]
+            result['list_of_best_fitnesses'] = [result['best_fitness']]
         avg_scores.append(np.mean(fitnesses))
         improvements, improvement = \
             universal.calculate_improvement_wAVG(

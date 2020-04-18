@@ -31,7 +31,7 @@ def main(parameter_file, output_dir):
     sample_dir = global_settings['sample_dir']
     nthread = global_settings['nthread']
     parameter_dict = universal.read_parameters(parameter_file)[0]
-    data_dict = at.create_atlas_data_dict(path_to_file, global_settings)
+    data_dict = at.create_nn_atlas_data_dict(path_to_file, global_settings)
     path = Path(parameter_file)
     saveDir = str(path.parent)
     score, pred_train, pred_test, feature_importance, model = at.nn_parameter_evaluation(
