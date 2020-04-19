@@ -45,7 +45,7 @@ def main():
     settings.update(global_settings)
     parameter_dicts = nnt.prepare_run_params(
         value_dicts, settings['sample_size'])
-    result_dict = gm.evolve(
+    result_dict = gm.evolution(
         parameter_dicts, settings, value_dicts, data_dict,
         nnt.prepare_run_params, sm.run_iteration
     )

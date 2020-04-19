@@ -43,7 +43,7 @@ def main():
     settings.update(global_settings)
     parameter_dicts = xt.prepare_run_params(
         value_dicts, settings['sample_size'])
-    result_dict = gm.evolve(
+    result_dict = gm.evolution(
         parameter_dicts, settings, value_dicts, data_dict,
         xt.prepare_run_params, sm.run_iteration
     )
