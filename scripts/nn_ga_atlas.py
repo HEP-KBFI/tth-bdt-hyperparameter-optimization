@@ -5,7 +5,7 @@ import json
 from tthAnalysis.bdtHyperparameterOptimization import slurm_main as sm
 from tthAnalysis.bdtHyperparameterOptimization import atlas_tools as at
 from tthAnalysis.bdtHyperparameterOptimization import universal
-from tthAnalysis.bdtHyperparameterOptimization import pso_main as pm
+from tthAnalysis.bdtHyperparameterOptimization import ga_main as gm
 from tthAnalysis.bdtHyperparameterOptimization import nn_tools as nnt
 
 np.random.seed(1)
@@ -41,15 +41,15 @@ def main():
         'nn_parameters.json'
     )
     value_dicts = universal.read_parameters(param_file)
-    pso_settings = pm.read_weights(settings_dir)
+    settings = universal.read_settings(settings_dir, 'ga')
+    settings.update(global_settings)
     parameter_dicts = nnt.prepare_run_params(
-        value_dicts, pso_settings['sample_size'])
-    result_dict = at.run_pso(
-        data_dict, value_dicts, sm.run_iteration, parameter_dicts,
-        output_dir
+        value_dicts, settings['sample_size'])
+    result_dict = gm.evolve(
+        parameter_dicts, settings, value_dicts, data_dict,
+        nnt.prepare_run_params, sm.run_iteration
     )
     return result_dict, output_dir
-    # sm.run_iteration
 
 
 if __name__ == '__main__':
