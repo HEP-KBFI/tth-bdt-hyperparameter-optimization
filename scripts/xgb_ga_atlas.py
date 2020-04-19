@@ -44,7 +44,7 @@ def main():
     parameter_dicts = xt.prepare_run_params(
         value_dicts, settings['sample_size'])
     result_dict = gm.evolution(
-        parameter_dicts, settings, value_dicts, data_dict,
+        settings, value_dicts, data_dict,
         xt.prepare_run_params, sm.run_iteration
     )
     return result_dict, output_dir
