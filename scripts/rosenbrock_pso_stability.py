@@ -33,6 +33,7 @@ def main():
         value_dicts, pso_settings['sample_size'])
     true_values = {'a': 1, 'b': 100}
     output_dir = os.path.expandvars(global_settings['output_dir'])
+    best_parameters_list = []
     for i in range(1000):
         np.random.seed(i)
         global_settings['output_dir'] = os.path.join(output_dir, str(i))
