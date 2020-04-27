@@ -25,7 +25,6 @@ def main():
     output_dir = os.path.expandvars(global_settings['output_dir'])
     if not os.path.isdir(output_dir):
         os.makedirs(output_dir)
-    universal.save_run_settings(output_dir)
     pso_settings = pm.read_weights(settings_dir)
     print("::::::: Reading parameters :::::::")
     param_file = os.path.join(settings_dir, 'rosenbrock_parameters.json')
@@ -33,9 +32,11 @@ def main():
     parameter_dicts = rt.prepare_run_params(
         value_dicts, pso_settings['sample_size'])
     true_values = {'a': 1, 'b': 100}
+    output_dir = os.path.expandvars(settings_dict['output_dir'])
     for i in range(1000):
         np.random.seed(i)
         global_settings['output_dir'] = os.path.join(output_dir, str(i))
+        universal.save_run_settings(global_settings['output_dir'])
         if not os.path.exists(global_settings['output_dir']):
             os.makedirs(global_settings['output_dir'])
         print(global_settings['output_dir'])
