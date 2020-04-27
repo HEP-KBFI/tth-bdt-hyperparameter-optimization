@@ -9,6 +9,7 @@ import numpy as np
 from tthAnalysis.bdtHyperparameterOptimization import universal
 from tthAnalysis.bdtHyperparameterOptimization import ga_main as ga
 from tthAnalysis.bdtHyperparameterOptimization import rosenbrock_tools as rt
+import numpy as np
 
 
 def main():
@@ -34,7 +35,7 @@ def main():
     output_dir = os.path.expandvars(settings_dict['output_dir'])
     true_values = {'a': 1, 'b': 100}
     best_parameters_list = []
-    for i in range(100):
+    for i in range(1000):
         np.random.seed(i)
         settings_dict['output_dir'] = os.path.join(output_dir, str(i))
         if not os.path.exists(settings_dict['output_dir']):
@@ -50,6 +51,8 @@ def main():
         best_parameters_list.append(result['best_parameters'])
         rt.save_results(result, settings_dict['output_dir'])
     best_fitnesses_list = create_fitness_list(best_parameters_list)
+    produce_stability_plots(
+        best_parameters_list, best_fitnesses_list, output_dir)
     return best_parameters_list, best_parameters_list
 
 
@@ -60,5 +63,35 @@ def create_fitness_list(best_parameters_list):
     return best_fitnesses_list
 
 
+def produce_stability_plots(
+        best_parameters_list,
+        best_fitnesses_list,
+        output_dir
+):
+    x_distances = np.array([np.abs(i['x'] - 1) for i in best_parameters_list])
+    y_distances = np.array([np.abs(i['y'] - 1) for i in best_parameters_list])
+    absolute_distances = np.sqrt(x_distances**2 + y_distances**2)
+    plot_absolute_distances(absolute_distances, output_dir)
+    plot_fitness_values(best_fitnesses_list, output_dir)
+
+
+def plot_absolute_distances(absolute_distances, output_dir):
+    plt.hist(absolute_distances, histtype='step')
+    plt.title("Absolute distance from minimum")
+    plt.xlabel("Distance")
+    plt.ylabel("# cases")
+    output_path = os.path.join(output_dir, 'absolute_distances.png')
+    plt.savefig(output_path, bbox_inches='tight')
+
+
+def plot_fitness_values(best_fitnesses_list, output_dir):
+    plt.hist(best_fitnesses_list, histtype='step')
+    plt.title("Fitness values")
+    plt.xlabel("Found minimum value")
+    plt.ylabel("# cases")
+    output_path = os.path.join(output_dir, 'fitness_values.png')
+    plt.savefig(output_path, bbox_inches='tight')
+
+
 if __name__ == '__main__':
-    best_parameters_list, best_parameters_list = main()
+    best_parameters_list, best_fitnesses_list = main()
