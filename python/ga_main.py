@@ -7,7 +7,8 @@ from tthAnalysis.bdtHyperparameterOptimization import ga_selection as select
 from tthAnalysis.bdtHyperparameterOptimization import ga_crossover as gc
 
 
-KEYS = ['g_score', 'f1_score', 'd_score', 'test_auc', 'train_auc']
+# KEYS = ['g_score', 'f1_score', 'd_score', 'test_auc', 'train_auc']
+KEYS = ['d_ams']
 
 
 class Individual:
@@ -746,6 +747,7 @@ def finalize_result(output, data):
     '''
     index = np.argmax(output['fitnesses'])
     result = {
+        'best_fitness': max(output['fitnesses']),
         'best_parameters': population_list(output['population'])[index],
         'best_fitnesses': find_result(output['scores'], 'best_fitnesses'),
         'avg_scores': find_result(output['scores'], 'avg_scores'),

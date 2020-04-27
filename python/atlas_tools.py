@@ -812,7 +812,8 @@ def nn_parameter_evaluation(
         data_dict,
         nthread,
         num_class,
-        return_true_feature_importances=False
+        return_true_feature_importances=False,
+        threshold=None
 ):
     K.set_session(
         tf.Session(
@@ -852,5 +853,7 @@ def nn_parameter_evaluation(
         feature_importance = {}
     pred_train = k_model.predict_proba(data_dict['train'])
     pred_test = k_model.predict_proba(data_dict['test'])
-    score_dict = universal.get_scores_dict(pred_train, pred_test, data_dict)
+    d_ams, test_ams, train_ams = calculate_d_ams(
+        pred_train, pred_test, data_dict, threshold=threshold)
+    score_dict = {'d_ams': d_ams, 'test_ams': test_ams, 'train_ams': train_ams}
     return score_dict, pred_train, pred_test, feature_importance
