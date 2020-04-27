@@ -31,12 +31,14 @@ def main():
     param_file = os.path.join(
         settings_dir, 'rosenbrock_parameters.json')
     param_dict = universal.read_parameters(param_file)
-    output_dir = settings_dict['output_dir']
+    output_dir = os.path.expandvars(settings_dict['output_dir'])
     true_values = {'a': 1, 'b': 100}
     best_parameters_list = []
     for i in range(100):
         np.random.seed(i)
         settings_dict['output_dir'] = os.path.join(output_dir, str(i))
+        if not os.path.exists(settings_dict['output_dir']):
+            os.makedirs(settings_dict['output_dir'])
         print(settings_dict['output_dir'])
         result = ga.evolution_rosenbrock(
             settings_dict,
