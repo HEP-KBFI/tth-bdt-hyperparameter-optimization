@@ -8,7 +8,7 @@ import os
 from tthAnalysis.bdtHyperparameterOptimization import universal
 from tthAnalysis.bdtHyperparameterOptimization import pso_main as pm
 from tthAnalysis.bdtHyperparameterOptimization import rosenbrock_tools as rt
-np.random.seed(1)
+import matplotlib.pyplot as plt
 
 
 def main():
@@ -51,7 +51,7 @@ def main():
         )
         print(':::::::::: Saving results of iteration %s :::::::::::::') %i
         best_parameters_list.append(result['best_parameters'])
-        rt.save_results(result, global_settings['output_dir'])
+        # rt.save_results(result, global_settings['output_dir'])
     best_fitnesses_list = create_fitness_list(best_parameters_list)
     produce_stability_plots(
         best_parameters_list, best_fitnesses_list, output_dir)

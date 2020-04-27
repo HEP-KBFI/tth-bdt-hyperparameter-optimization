@@ -9,6 +9,7 @@ import numpy as np
 from tthAnalysis.bdtHyperparameterOptimization import universal
 from tthAnalysis.bdtHyperparameterOptimization import ga_main as ga
 from tthAnalysis.bdtHyperparameterOptimization import rosenbrock_tools as rt
+import matplotlib.pyplot as plt
 
 
 def main():
@@ -48,7 +49,7 @@ def main():
             rt.ensemble_fitness)
         print(':::::::::: Saving results of iteration %s :::::::::::::') %i
         best_parameters_list.append(result['best_parameters'])
-        rt.save_results(result, settings_dict['output_dir'])
+        # rt.save_results(result, settings_dict['output_dir'])
     best_fitnesses_list = create_fitness_list(best_parameters_list)
     produce_stability_plots(
         best_parameters_list, best_fitnesses_list, output_dir)
