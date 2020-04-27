@@ -84,6 +84,7 @@ def plot_absolute_distances(absolute_distances, output_dir):
     plt.ylabel("# cases")
     output_path = os.path.join(output_dir, 'absolute_distances.png')
     plt.savefig(output_path, bbox_inches='tight')
+    plt.close('all')
 
 
 def plot_fitness_values(best_fitnesses_list, output_dir):
@@ -93,6 +94,7 @@ def plot_fitness_values(best_fitnesses_list, output_dir):
     plt.ylabel("# cases")
     output_path = os.path.join(output_dir, 'fitness_values.png')
     plt.savefig(output_path, bbox_inches='tight')
+    plt.close('all')
 
 
 if __name__ == '__main__':
