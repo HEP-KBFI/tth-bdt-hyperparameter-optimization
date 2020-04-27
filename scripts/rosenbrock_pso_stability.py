@@ -32,7 +32,7 @@ def main():
     parameter_dicts = rt.prepare_run_params(
         value_dicts, pso_settings['sample_size'])
     true_values = {'a': 1, 'b': 100}
-    output_dir = os.path.expandvars(settings_dict['output_dir'])
+    output_dir = os.path.expandvars(global_settings['output_dir'])
     for i in range(1000):
         np.random.seed(i)
         global_settings['output_dir'] = os.path.join(output_dir, str(i))
