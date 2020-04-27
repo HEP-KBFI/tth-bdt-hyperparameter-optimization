@@ -1,18 +1,17 @@
 '''
-Testing the genetic algorithm via finding the global minimum of the Rosenbrock function.
-Call with 'python'
+PSO stability check based on Rosenbrock function.
 
-Usage: rosenbrock_ga_q.py
+Call with 'python'
 '''
-import os
 import numpy as np
+import os
 from tthAnalysis.bdtHyperparameterOptimization import universal
-from tthAnalysis.bdtHyperparameterOptimization import ga_main as ga
+from tthAnalysis.bdtHyperparameterOptimization import pso_main as pm
 from tthAnalysis.bdtHyperparameterOptimization import rosenbrock_tools as rt
+np.random.seed(1)
 
 
 def main():
-    print('::::::: Reading settings and parameters :::::::')
     cmssw_base_path = os.path.expandvars('$CMSSW_BASE')
     main_dir = os.path.join(
         cmssw_base_path,
@@ -26,26 +25,28 @@ def main():
     output_dir = os.path.expandvars(global_settings['output_dir'])
     if not os.path.isdir(output_dir):
         os.makedirs(output_dir)
-    settings_dict = universal.read_settings(settings_dir, 'ga')
-    settings_dict.update(global_settings)
-    param_file = os.path.join(
-        settings_dir, 'rosenbrock_parameters.json')
-    param_dict = universal.read_parameters(param_file)
-    output_dir = os.path.expandvars(settings_dict['output_dir'])
+    universal.save_run_settings(output_dir)
+    pso_settings = pm.read_weights(settings_dir)
+    print("::::::: Reading parameters :::::::")
+    param_file = os.path.join(settings_dir, 'rosenbrock_parameters.json')
+    value_dicts = universal.read_parameters(param_file)
+    parameter_dicts = rt.prepare_run_params(
+        value_dicts, pso_settings['sample_size'])
     true_values = {'a': 1, 'b': 100}
-    best_parameters_list = []
     for i in range(1000):
         np.random.seed(i)
         settings_dict['output_dir'] = os.path.join(output_dir, str(i))
         if not os.path.exists(settings_dict['output_dir']):
             os.makedirs(settings_dict['output_dir'])
         print(settings_dict['output_dir'])
-        result = ga.evolution_rosenbrock(
-            settings_dict,
-            param_dict,
+        result = rt.run_pso(
+            parameter_dicts,
             true_values,
-            rt.prepare_run_params,
-            rt.ensemble_fitness)
+            value_dicts,
+            output_dir,
+            global_settings,
+            plot_pso_location=False
+        )
         print(':::::::::: Saving results of iteration %s :::::::::::::') %i
         best_parameters_list.append(result['best_parameters'])
         rt.save_results(result, settings_dict['output_dir'])
