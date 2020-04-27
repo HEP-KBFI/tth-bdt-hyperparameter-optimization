@@ -35,10 +35,10 @@ def main():
     true_values = {'a': 1, 'b': 100}
     for i in range(1000):
         np.random.seed(i)
-        settings_dict['output_dir'] = os.path.join(output_dir, str(i))
-        if not os.path.exists(settings_dict['output_dir']):
-            os.makedirs(settings_dict['output_dir'])
-        print(settings_dict['output_dir'])
+        global_settings['output_dir'] = os.path.join(output_dir, str(i))
+        if not os.path.exists(global_settings['output_dir']):
+            os.makedirs(global_settings['output_dir'])
+        print(global_settings['output_dir'])
         result = rt.run_pso(
             parameter_dicts,
             true_values,
@@ -49,7 +49,7 @@ def main():
         )
         print(':::::::::: Saving results of iteration %s :::::::::::::') %i
         best_parameters_list.append(result['best_parameters'])
-        rt.save_results(result, settings_dict['output_dir'])
+        rt.save_results(result, global_settings['output_dir'])
     best_fitnesses_list = create_fitness_list(best_parameters_list)
     produce_stability_plots(
         best_parameters_list, best_fitnesses_list, output_dir)
