@@ -81,7 +81,7 @@ def plot_absolute_distances(absolute_distances, output_dir):
     plt.hist(
         absolute_distances,
         histtype='step',
-        bins=sqrt(len(absolute_distances))
+        bins=int(np.ceil(np.sqrt(len(absolute_distances))))
     )
     plt.title("Absolute distance from minimum")
     plt.xlabel("Distance")
@@ -95,7 +95,7 @@ def plot_fitness_values(best_fitnesses_list, output_dir):
     plt.hist(
         best_fitnesses_list,
         histtype='step',
-        bins=sqrt(len(absolute_distances))
+        bins=int(np.ceil(np.sqrt(len(best_fitnesses_list))))
     )
     plt.title("Fitness values")
     plt.xlabel("Found minimum value")

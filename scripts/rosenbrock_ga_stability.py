@@ -76,7 +76,11 @@ def produce_stability_plots(
 
 
 def plot_absolute_distances(absolute_distances, output_dir):
-    plt.hist(absolute_distances, histtype='step')
+    plt.hist(
+        absolute_distances,
+        histtype='step',
+        bins=int(np.ceil(np.sqrt(len(absolute_distances))))
+    )
     plt.title("Absolute distance from minimum")
     plt.xlabel("Distance")
     plt.ylabel("# cases")
@@ -86,13 +90,18 @@ def plot_absolute_distances(absolute_distances, output_dir):
 
 
 def plot_fitness_values(best_fitnesses_list, output_dir):
-    plt.hist(best_fitnesses_list, histtype='step')
+    plt.hist(
+        best_fitnesses_list,
+        histtype='step',
+        bins=int(np.ceil(np.sqrt(len(best_fitnesses_list))))
+    )
     plt.title("Fitness values")
     plt.xlabel("Found minimum value")
     plt.ylabel("# cases")
     output_path = os.path.join(output_dir, 'fitness_values.png')
     plt.savefig(output_path, bbox_inches='tight')
     plt.close('all')
+
 
 
 if __name__ == '__main__':
