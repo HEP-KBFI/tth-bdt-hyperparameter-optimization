@@ -29,7 +29,7 @@ def main():
         os.makedirs(output_dir)
     universal.save_run_settings(output_dir)
     print("::::::: Loading data ::::::::")
-    data_dict = at.create_atlas_data_dict(path_to_file, global_settings)
+    data_dict = at.create_nn_atlas_data_dict(path_to_file, global_settings)
     print("::::::: Reading parameters :::::::")
     cmssw_base_path = os.path.expandvars('$CMSSW_BASE')
     param_file = os.path.join(

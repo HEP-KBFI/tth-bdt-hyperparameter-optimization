@@ -89,8 +89,9 @@ def create_nn_atlas_data_dict(path_to_file, global_settings, plot=False):
                     atlas_data_df = atlas_data_df.drop(trainvar, axis=1)
                 except:
                     continue
-    trainvars = list(atlas_data_df.columns)
-    trainvars.remove('Label')
+    trainvars = ['DER_mass_MMC', 'DER_mass_transverse_met_lep', 'DER_deltaeta_jet_jet', 'DER_mass_vis', 'PRI_tau_pt']
+    # trainvars = list(atlas_data_df.columns)
+    # trainvars.remove('Label')
     output_dir = os.path.expandvars(global_settings['output_dir'])
     info_dir = os.path.join(output_dir, 'previous_files', 'data_dict')
     if not os.path.exists(info_dir):

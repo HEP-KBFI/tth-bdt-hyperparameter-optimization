@@ -448,7 +448,7 @@ def new_population(
     # Generate offspring to fill the new generation
     while len(offsprings) < (len(population) - len(next_population)):
         parents = select.tournament(population_list(population), fitnesses)
-        offspring = gc.uniform_crossover(
+        offspring = gc.kpoint_crossover(
             parents, parameters, settings['mut_chance'])
         # No duplicate members
         if offspring not in next_population:
@@ -826,11 +826,13 @@ def evolution_rosenbrock(settings, parameters, data, create_set, evaluate):
     avg_scores = {}
 
     result = {}
+    subpopulation_iterations = int(np.ceil(0.9 * settings['iterations']))
+    merged_iterations = settings['iterations'] - subpopulation_iterations
 
     # Evolution loop for subpopulations
     if settings['sub_pops'] > 1:
         finished_subpopulations = []
-        while (iteration <= settings['iterations']
+        while (iteration <= subpopulation_iterations
                and population):
             # Generate a new population
             if iteration != 0:
@@ -879,23 +881,23 @@ def evolution_rosenbrock(settings, parameters, data, create_set, evaluate):
                     result['list_of_best_fitnesses'].append(result['best_fitness'])
             # Remove a subpopulation that has reached a stopping
             # criterium
-            finished_subpopulations, subpopulations = finish_subpopulation(
-                subpopulations, finished_subpopulations, curr_improvements, settings['threshold'])
+            # finished_subpopulations, subpopulations = finish_subpopulation(
+            #     subpopulations, finished_subpopulations, curr_improvements, settings['threshold'])
             population = unite_subpopulations(subpopulations)
             iteration += 1
         # Merge subpopulations into one
         print('::::: Merging subpopulations :::::')
-        subpopulations += finished_subpopulations
+        # subpopulations += finished_subpopulations
         population = merge_subpopulations(subpopulations)
-        iteration = 0
 
+    iteration = 0
     improvement = 1
     improvements = []
     avg_scores = []
 
     # Evolution loop for single population or merged population
-    while (iteration <= settings['iterations']
-           and improvement > settings['threshold']):
+    while (iteration <= merge_subpopulations):
+           # and improvement > settings['threshold']):
         # Generate new population
         if iteration != 0:
             print('::::: Iteration:     ' + str(iteration) + ' :::::')

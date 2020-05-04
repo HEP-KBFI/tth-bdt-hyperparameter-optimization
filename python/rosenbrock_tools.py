@@ -268,11 +268,15 @@ def plot_fitness_history(
 
 def save_results(result_dict, output_dir):
     best_parameters_path = os.path.join(output_dir, 'best_parameters.json')
+    best_fitnesses_path = os.path.join(output_dir, 'best_fitnesses.json')
     best_parameter_history_path = os.path.join(output_dir, 'history.json')
     with open(best_parameters_path, 'w') as file:
         json.dump(result_dict['best_parameters'], file)
+        json.dump(result_dict['best_fitness'], file)
     with open(best_parameter_history_path, 'w') as file:
         json.dump(result_dict['list_of_old_bests'], file)
+    with open(best_fitnesses_path, 'w') as file:
+        json.dump(result_dict['list_of_best_fitnesses'], file)
 
 
 def initialize_values(value_dicts):
@@ -290,7 +294,7 @@ def initialize_values(value_dicts):
     '''
     sample = {}
     for parameters in value_dicts:
-         sample[str(parameters['p_name'])] = np.random.randint(
+         sample[str(parameters['p_name'])] = np.random.uniform(
             low=parameters['range_start'],
             high=parameters['range_end']
         )
@@ -559,3 +563,11 @@ def plot_2d_contour(
     plt.grid(True)
     plt.savefig(plot_out)
     plt.close('all')
+
+
+def calculate_distances_and_fitnesses(list_of_dicts, a=1, b=100):
+    x_distances = [abs(1- d['x']) for d in list_of_dicts]
+    y_distances = [abs(1- d['y']) for d in list_of_dicts]
+    fitnesses = [parameter_evaluation(d, a, b) for d in list_of_dicts]
+    abs_distances = [np.sqrt(x**2 + y**2) for x, y in zip(x_distances, y_distances)]
+    return fitnesses, abs_distances
