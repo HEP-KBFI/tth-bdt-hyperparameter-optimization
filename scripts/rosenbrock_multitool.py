@@ -60,8 +60,8 @@ def main(choice, method, output_dir):
                 value_dicts,
                 method
         )
-        plot_performance_main(result_dict, 'distance', output_dir)
-        plot_performance_main(result_dict, 'fitness', output_dir)
+        plot_performance_main(result_dict, 'distance', output_dir, value_dicts)
+        plot_performance_main(result_dict, 'fitness', output_dir, value_dicts)
     elif choice == stability or choice == 'both':
         i = 0
         result_dicts = []
@@ -234,7 +234,7 @@ def plot_fitness_values(best_fitnesses_list, rnd, label):
 
 #####################################################################
 
-def plot_performance_main(result_dict, to_plot, output_dir):
+def plot_performance_main(result_dict, to_plot, output_dir, value_dicts):
     random_result = result_dict['random_result']
     plotting_main(random_result, to_plot, rnd=True)
     if method == 'ga' or method == 'all':
@@ -249,7 +249,7 @@ def plot_performance_main(result_dict, to_plot, output_dir):
     plt.close('all')
     if method == 'gd' or method == 'all':
         gd_result = result_dict['gd_result']
-        plot_gd(gd_result, output_dir)
+        plot_gd(gd_result, output_dir, value_dicts)
 
 
 def plotting_main(result_dict, to_plot, rnd=False):
@@ -302,12 +302,13 @@ def plot_distances(result_dict, rnd):
 
 #####################################
 
-def plot_gd(result_dict, output_dir):
+def plot_gd(result_dict, output_dir, value_dicts):
+    true_values = {'a': 1, 'b': 100}
     output_dir = os.path.join(output_dir, 'gradiend_descent')
     if not os.path.exists(output_dir):
         os.makedirs(output_dir)
     gd.write_history(result_dict, output_dir)
-    gd.contourplot(result_dict, true_values, param_dict, output_dir)
+    gd.contourplot(result_dict, true_values, value_dicts, output_dir)
     gd.angle_plot(result_dict, output_dir)
     gd.step_plot(result_dict, output_dir)
     rt.plot_progress(result_dict, true_values, output_dir)
