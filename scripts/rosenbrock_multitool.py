@@ -142,7 +142,7 @@ def plot_stabilities_main(
             rnd_best_fitnesses,
             output_dir,
             to_plot,
-            'RND',
+            'Rnd',
             rnd=True
     )
     if method == 'ga' or method == 'all':
@@ -178,6 +178,8 @@ def plot_stabilities_main(
                 to_plot,
                 'Gradient descent'
         )
+    plt.legend()
+    plt.yscale('log')
     output_path = os.path.join(output_dir, 'best_' + to_plot + '_stability.png')
     plt.savefig(output_path, bbox_inches='tight')
     plt.close('all')
@@ -218,8 +220,6 @@ def plot_absolute_distances(absolute_distances, rnd, label):
         plt.title("Absolute distance from minimum")
         plt.xlabel("Distance")
         plt.ylabel("# cases")
-        plt.legend()
-        plt.yscale('log')
 
 
 def plot_fitness_values(best_fitnesses_list, rnd, label):
@@ -233,8 +233,6 @@ def plot_fitness_values(best_fitnesses_list, rnd, label):
         plt.title("Fitness values")
         plt.xlabel("Found minimum value")
         plt.ylabel("# cases")
-        plt.legend()
-        plt.yscale('log')
 
 
 #####################################################################
