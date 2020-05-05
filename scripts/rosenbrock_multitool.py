@@ -142,6 +142,7 @@ def plot_stabilities_main(
             rnd_best_fitnesses,
             output_dir,
             to_plot,
+            label,
             rnd=True
     )
     if method == 'ga' or method == 'all':
