@@ -204,8 +204,7 @@ def plot_absolute_distances(absolute_distances, rnd, label):
     plt.hist(
         absolute_distances,
         histtype='step',
-        bins=int(np.ceil(np.sqrt(len(absolute_distances))))
-        histtype='step',
+        bins=int(np.ceil(np.sqrt(len(absolute_distances)))),
         label=label
     )
     if rnd:
@@ -218,7 +217,8 @@ def plot_fitness_values(best_fitnesses_list, rnd, label):
     plt.hist(
         best_fitnesses_list,
         histtype='step',
-        bins=int(np.ceil(np.sqrt(len(best_fitnesses_list))))
+        bins=int(np.ceil(np.sqrt(len(best_fitnesses_list)))),
+        label=label
     )
     if rnd:
         plt.title("Fitness values")
