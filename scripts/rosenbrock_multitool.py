@@ -236,7 +236,7 @@ def plot_fitness_values(best_fitnesses_list, rnd, label):
 
 def plot_performance_main(result_dict, to_plot, output_dir):
     random_result = result_dict['random_result']
-    plotting_main(result_dict, to_plot, rnd=True)
+    plotting_main(random_result, to_plot, rnd=True)
     if method == 'ga' or method == 'all':
         ga_result = result_dict['ga_result']
         plotting_main(ga_result, to_plot)
