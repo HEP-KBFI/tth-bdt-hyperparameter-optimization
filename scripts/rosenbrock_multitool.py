@@ -259,18 +259,18 @@ def plot_performance_main(result_dict, to_plot, output_dir, value_dicts):
 
 def plotting_main(result_dict, to_plot, label, rnd=False):
     if to_plot == 'distance':
-        plot_distances(result_dict, rnd)
+        plot_distances(result_dict, rnd, label)
     elif to_plot == 'fitness':
-        plot_fitnesses_history(result_dict, rnd)
+        plot_fitnesses_history(result_dict, rnd, label)
 
 
-def plot_fitnesses_history(result_dict, rnd):
+def plot_fitnesses_history(result_dict, rnd, label):
     old_fitnesses = result_dict['list_of_best_fitnesses']
     x_values = np.arange(len(old_fitnesses))
     plt.plot(
         x_values,
         old_fitnesses,
-        label='Best fitness'
+        label=label
     )
     if rnd:
         plt.xlabel('Iteration number / #')
@@ -279,12 +279,13 @@ def plot_fitnesses_history(result_dict, rnd):
         axis.set_aspect('auto', adjustable='box')
         axis.xaxis.set_major_locator(ticker.AutoLocator())
         plt.grid(True)
+        plt.title('Best fitness')
         plt.legend()
         plt.yscale('log')
         plt.tick_params(top=True, right=True, direction='in')
 
 
-def plot_distances(result_dict, rnd):
+def plot_distances(result_dict, rnd, label):
     best_parameters_list = result_dict['list_of_old_bests']
     x_distances = np.array([np.abs(i['x'] - 1) for i in best_parameters_list])
     y_distances = np.array([np.abs(i['y'] - 1) for i in best_parameters_list])
@@ -293,7 +294,7 @@ def plot_distances(result_dict, rnd):
     plt.plot(
         x_values,
         absolute_distances,
-        label='Distance to minimum')
+        label=label)
     if rnd:
         plt.xlabel('Iteration number / #')
         plt.ylabel('Distance')
@@ -301,6 +302,7 @@ def plot_distances(result_dict, rnd):
         axis.set_aspect('auto', adjustable='box')
         axis.xaxis.set_major_locator(ticker.AutoLocator())
         plt.grid(True)
+        plt.title('Distance to minimum')
         plt.legend()
         plt.yscale('log')
         plt.tick_params(top=True, right=True, direction='in')
