@@ -120,7 +120,7 @@ def run_single_choice(
         print("Gradient descent")
         result_dict['gd_result'] = gd.gradient_descent(
             gd_settings,
-            parameter_dicts,
+            value_dicts,
             true_values,
             rt.initialize_values,
             rt.parameter_evaluation,
