@@ -250,6 +250,14 @@ def plot_performance_main(result_dict, to_plot, output_dir, value_dicts):
         plotting_main(pso_result, to_plot, 'PSO')
     output_path = os.path.join(
         output_dir, 'best_' + to_plot + '_performance.png')
+    axis = plt.gca()
+    axis.set_aspect('auto', adjustable='box')
+    axis.xaxis.set_major_locator(ticker.AutoLocator())
+    plt.grid(True)
+    plt.title('Best fitness')
+    plt.legend()
+    plt.yscale('log')
+    plt.tick_params(top=True, right=True, direction='in')
     plt.savefig(output_path, bbox_inches='tight')
     plt.close('all')
     if method == 'gd' or method == 'all':
@@ -275,14 +283,6 @@ def plot_fitnesses_history(result_dict, rnd, label):
     if rnd:
         plt.xlabel('Iteration number / #')
         plt.ylabel('Fitness')
-        axis = plt.gca()
-        axis.set_aspect('auto', adjustable='box')
-        axis.xaxis.set_major_locator(ticker.AutoLocator())
-        plt.grid(True)
-        plt.title('Best fitness')
-        plt.legend()
-        plt.yscale('log')
-        plt.tick_params(top=True, right=True, direction='in')
 
 
 def plot_distances(result_dict, rnd, label):
@@ -298,14 +298,7 @@ def plot_distances(result_dict, rnd, label):
     if rnd:
         plt.xlabel('Iteration number / #')
         plt.ylabel('Distance')
-        axis = plt.gca()
-        axis.set_aspect('auto', adjustable='box')
-        axis.xaxis.set_major_locator(ticker.AutoLocator())
-        plt.grid(True)
-        plt.title('Distance to minimum')
-        plt.legend()
-        plt.yscale('log')
-        plt.tick_params(top=True, right=True, direction='in')
+
 
 #####################################
 
