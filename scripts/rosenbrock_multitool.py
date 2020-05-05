@@ -50,6 +50,7 @@ def main(choice, method, output_dir):
         value_dicts, pso_settings['sample_size'])
     true_values = {'a': 1, 'b': 100}
     if choice == 'performance' or choice == 'both':
+        print("Testing performance")
         result_dict = run_single_choice(
                 ga_settings,
                 gd_settings,
@@ -59,11 +60,12 @@ def main(choice, method, output_dir):
                 value_dicts,
                 method
         )
-        plot_performance_main(result_dict, to_plot, output_dir)
-        plot_performance_main(result_dict, to_plot, output_dir)
+        plot_performance_main(result_dict, 'distance', output_dir)
+        plot_performance_main(result_dict, 'fitness', output_dir)
     elif choice == stability or choice == 'both':
         i = 0
         result_dicts = []
+        print("Testing stability")
         while i < 1000:
             np.random.seed(i)
             result_dict = run_single_choice(
@@ -91,6 +93,7 @@ def run_single_choice(
         method
 ):
     result_dict = {}
+    print("Random choice")
     result_dict['random_result'] = rt.run_random(
         parameter_dicts,
         true_values,
@@ -98,6 +101,7 @@ def run_single_choice(
         pso_settings
     )
     if method == 'ga' or method == 'all':
+        print("Genetic Algorithm")
         result_dict['ga_result'] = ga.evolution_rosenbrock(
             ga_settings,
             value_dicts,
@@ -105,6 +109,7 @@ def run_single_choice(
             rt.prepare_run_params,
             rt.ensemble_fitness)
     elif method == 'pso' or method == 'all':
+        print("Particle swarm optimization")
         result_dict['pso_result'] = rt.run_pso(
             parameter_dicts,
             true_values,
@@ -112,6 +117,7 @@ def run_single_choice(
             pso_settings,
         )
     elif method == 'gd' or method == 'all':
+        print("Gradient descent")
         result_dict['gd_result'] = gd.gradient_descent(
             gd_settings,
             parameter_dicts,
