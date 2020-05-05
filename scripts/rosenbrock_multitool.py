@@ -176,7 +176,7 @@ def plot_stabilities_main(
                 gd_best_fitnesses,
                 output_dir,
                 to_plot,
-                'Gradient decsent'
+                'Gradient descent'
         )
     output_path = os.path.join(output_dir, 'best_' + to_plot + '_stability.png')
     plt.savefig(output_path, bbox_inches='tight')
@@ -218,6 +218,8 @@ def plot_absolute_distances(absolute_distances, rnd, label):
         plt.title("Absolute distance from minimum")
         plt.xlabel("Distance")
         plt.ylabel("# cases")
+        plt.legend()
+        plt.yscale('log')
 
 
 def plot_fitness_values(best_fitnesses_list, rnd, label):
@@ -231,19 +233,21 @@ def plot_fitness_values(best_fitnesses_list, rnd, label):
         plt.title("Fitness values")
         plt.xlabel("Found minimum value")
         plt.ylabel("# cases")
+        plt.legend()
+        plt.yscale('log')
 
 
 #####################################################################
 
 def plot_performance_main(result_dict, to_plot, output_dir, value_dicts):
     random_result = result_dict['random_result']
-    plotting_main(random_result, to_plot, rnd=True)
+    plotting_main(random_result, to_plot, 'Rnd', rnd=True)
     if method == 'ga' or method == 'all':
         ga_result = result_dict['ga_result']
-        plotting_main(ga_result, to_plot)
+        plotting_main(ga_result, to_plot, 'GA')
     elif method == 'pso' or method == 'all':
         pso_result = result_dict['pso_result']
-        plotting_main(pso_result, to_plot)
+        plotting_main(pso_result, to_plot, 'PSO')
     output_path = os.path.join(
         output_dir, 'best_' + to_plot + '_performance.png')
     plt.savefig(output_path, bbox_inches='tight')
@@ -253,7 +257,7 @@ def plot_performance_main(result_dict, to_plot, output_dir, value_dicts):
         plot_gd(gd_result, output_dir, value_dicts)
 
 
-def plotting_main(result_dict, to_plot, rnd=False):
+def plotting_main(result_dict, to_plot, label, rnd=False):
     if to_plot == 'distance':
         plot_distances(result_dict, rnd)
     elif to_plot == 'fitness':
