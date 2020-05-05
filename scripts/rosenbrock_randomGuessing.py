@@ -9,6 +9,7 @@ import numpy as np
 import os
 from tthAnalysis.bdtHyperparameterOptimization import universal
 from tthAnalysis.bdtHyperparameterOptimization import rosenbrock_tools as rt
+from tthAnalysis.bdtHyperparameterOptimization import pso_main as pm
 
 np.random.seed(4)
 

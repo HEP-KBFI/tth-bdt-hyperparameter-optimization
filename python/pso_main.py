@@ -408,7 +408,7 @@ def run_pso(
     print(':::::::: Initializing :::::::::')
     settings_dir = os.path.join(output_dir, 'run_settings')
     global_settings = universal.read_settings(settings_dir, 'global')
-    pso_settings = read_weights(settings_dir)
+    pso_settings = universal.read_settings(settings_dir, 'pso')
     inertial_weight, inertial_weight_step = get_weight_step(pso_settings)
     iterations = pso_settings['iterations']
     compactness_threshold = pso_settings['compactness_threshold']

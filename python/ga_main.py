@@ -890,7 +890,7 @@ def evolution_rosenbrock(settings, parameters, data, create_set, evaluate):
         # subpopulations += finished_subpopulations
         population = merge_subpopulations(subpopulations)
 
-    iteration = 0
+    iteration = 1
     improvement = 1
     improvements = []
     avg_scores = []
@@ -926,8 +926,8 @@ def evolution_rosenbrock(settings, parameters, data, create_set, evaluate):
         if max(fitnesses) > result['best_fitness']:
             result['best_fitness'] = max(fitnesses)
             result['best_parameters'] = population_list(population)[np.argmax(fitnesses)]
-            result['list_of_old_bests'].append(result['best_parameters'])
-            result['list_of_best_fitnesses'].append(result['best_fitness'])
+        result['list_of_old_bests'].append(result['best_parameters'])
+        result['list_of_best_fitnesses'].append(result['best_fitness'])
         iteration += 1
 
     return result

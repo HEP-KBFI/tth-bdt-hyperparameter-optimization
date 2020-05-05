@@ -35,13 +35,14 @@ def main():
     value_dicts = universal.read_parameters(param_file)
     parameter_dicts = rt.prepare_run_params(
         value_dicts, pso_settings['sample_size'])
+    pso_settings.update(global_settings)
     true_values = {'a': 1, 'b': 100}
     result_dict = rt.run_pso(
         parameter_dicts,
         true_values,
         value_dicts,
         output_dir,
-        global_settings,
+        pso_settings,
         plot_pso_location=True
     )
     print(':::::::::: Saving results :::::::::::::')

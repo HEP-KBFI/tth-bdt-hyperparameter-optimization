@@ -64,9 +64,7 @@ def run_pso(
         parameter_dicts,
         true_values,
         value_dicts,
-        output_dir,
-        global_settings,
-        plot_pso_location=False
+        pso_settings,
 ):
     '''Performs the whole particle swarm optimization
 
@@ -86,10 +84,6 @@ def run_pso(
         best_fitnesses, avg_scores, pred_train, pred_test, data_dict
     '''
     print(':::::::: Initializing :::::::::')
-    output_dir = os.path.expandvars(global_settings['output_dir'])
-    settings_dir = os.path.join(output_dir, 'run_settings')
-    global_settings = universal.read_settings(settings_dir, 'global')
-    pso_settings = universal.read_settings(settings_dir, 'pso')
     inertial_weight, inertial_weight_step = pm.get_weight_step(pso_settings)
     iterations = pso_settings['iterations']
     i = 0
@@ -110,9 +104,6 @@ def run_pso(
     while i <= iterations or distance < 1e-8:
         print('---- Iteration: ' + str(i) + '----')
         parameter_dicts = new_parameters
-        if plot_pso_location and i % 500 == 0:
-            plot_particle_swarm(
-                parameter_dicts, true_values, i, output_dir, result_dict)
         fitnesses = ensemble_fitness(parameter_dicts, true_values)
         best_fitnesses = pm.find_best_fitness(fitnesses, best_fitnesses)
         personal_bests = pm.calculate_personal_bests(
@@ -147,55 +138,6 @@ def flatten_dict_list(result_dict):
             flattened_dict[key].append(old_best[key])
     return flattened_dict
 
-
-def plot_particle_swarm(
-        parameter_dicts,
-        true_values,
-        iteration,
-        output_dir,
-        result_dict
-):
-    iteration_pic_path = os.path.join(output_dir, 'pso_iteration_pictures')
-    if not os.path.exists(iteration_pic_path):
-        os.makedirs(iteration_pic_path)
-    true_parameters = {'x': true_values['a'], 'y': true_values['a']**2}
-    plot_out = os.path.join(
-        iteration_pic_path, 'iteration_' + str(iteration) + '.png')
-    for parameter_dict in parameter_dicts:
-        plt.plot(
-            parameter_dict['x'],
-            parameter_dict['y'],
-            color='k',
-            marker='o')
-    # for old_best in result_dict['list_of_old_bests']:
-    #     plt.plot(
-    #         old_best['x'],
-    #         old_best['y'],
-    #         color='g',
-    #         marker='o',
-    #         label='Previous bests')
-    # plt.plot(
-    #     result_dict['list_of_old_bests'][-1]['x'],
-    #     result_dict['list_of_old_bests'][-1]['y'],
-    #     color='b',
-    #     marker='o',
-    #     label='Current best')
-    plt.plot(
-        true_parameters['x'],
-        true_parameters['y'],
-        color='r',
-        marker='o',
-        label='Global minimum')
-    plt.ylim(-500, 500)
-    plt.xlim(-500, 500)
-    plt.grid(True)
-    plt.title('Iteration ' + str(iteration))
-    axis = plt.gca()
-    axis.set_aspect('auto', adjustable='box')
-    axis.xaxis.set_major_locator(ticker.AutoLocator())
-    plt.tick_params(top=True, right=True, direction='in')
-    plt.savefig(plot_out)
-    plt.close('all')
 
 
 def plot_progress(result_dict, true_values, output_dir):
@@ -434,8 +376,7 @@ def run_random(
         parameter_dicts,
         true_values,
         value_dicts,
-        output_dir,
-        global_settings
+        pso_settings
 ):
     '''Performs the whole particle swarm optimization
 
@@ -455,9 +396,6 @@ def run_random(
         best_fitnesses, avg_scores, pred_train, pred_test, data_dict
     '''
     print(':::::::: Initializing :::::::::')
-    output_dir = os.path.expandvars(global_settings['output_dir'])
-    settings_dir = os.path.join(output_dir, 'run_settings')
-    pso_settings = universal.read_settings(settings_dir, 'pso')
     iterations = pso_settings['iterations']
     i = 1
     new_parameters = parameter_dicts
@@ -489,43 +427,6 @@ def run_random(
     return result_dict
 
 
-def plot_3d_contour(
-        parameter_dicts,
-        true_values,
-        iteration,
-        output_dir,
-        result_dict,
-        max_unit=500,
-        count=100
-):
-    iteration_pic_path = os.path.join(output_dir, 'pso_3d_iteration_pictures')
-    if not os.path.exists(iteration_pic_path):
-        os.makedirs(iteration_pic_path)
-    true_parameters = {'x': true_values['a'], 'y': true_values['a']**2}
-    plot_out = os.path.join(
-        iteration_pic_path, 'iteration_' + str(iteration) + '.png')
-    X, Y, Z = create_meshgrid(max_unit, count)
-    fig = plt.figure()
-    ax = plt.axes(projection='3d')
-    ax.plot3D(
-        [true_parameters['x']],
-        [true_parameters['y']],
-        [parameter_evaluation(true_parameters)],
-        marker='o',
-        color='r'
-    )
-    ax.contour3D(X, Y, Z, 100, cmap='viridis')
-    for parameter_dict in parameter_dicts:
-        ax.plot3D(
-            [parameter_dict['x']],
-            [parameter_dict['y']],
-            [parameter_evaluation(parameter_dict)],
-            color='k',
-            marker='o')
-    plt.savefig(plot_out)
-    plt.close('all')
-
-
 def create_meshgrid(max_unit, count):
     x_values = np.linspace(-max_unit, max_unit, count)
     y_values = np.linspace(-max_unit, max_unit, count)
@@ -533,36 +434,6 @@ def create_meshgrid(max_unit, count):
     loc_2d = {'x': X, 'y': Y}
     Z = parameter_evaluation(loc_2d)
     return X, Y, Z
-
-
-def plot_2d_contour(
-        parameter_dicts,
-        true_values,
-        iteration,
-        output_dir,
-        result_dict,
-        max_unit=500,
-        count=100
-):
-    iteration_pic_path = os.path.join(output_dir, 'pso_2d_iteration_pictures')
-    if not os.path.exists(iteration_pic_path):
-        os.makedirs(iteration_pic_path)
-    true_parameters = {'x': true_values['a'], 'y': true_values['a']**2}
-    plot_out = os.path.join(
-        iteration_pic_path, 'iteration_' + str(iteration) + '.png')
-    X, Y, Z = create_meshgrid(max_unit, count)
-    plt.contour(X, Y, Z, 500)
-    plt.plot(true_parameters['x'], true_parameters['y'], marker='o', color='r')
-    for parameter_dict in parameter_dicts:
-        plt.plot(
-            [parameter_dict['x']],
-            [parameter_dict['y']],
-            [parameter_evaluation(parameter_dict)],
-            color='k',
-            marker='o')
-    plt.grid(True)
-    plt.savefig(plot_out)
-    plt.close('all')
 
 
 def calculate_distances_and_fitnesses(list_of_dicts, a=1, b=100):
