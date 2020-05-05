@@ -108,7 +108,7 @@ def run_single_choice(
             true_values,
             rt.prepare_run_params,
             rt.ensemble_fitness)
-    elif method == 'pso' or method == 'all':
+    if method == 'pso' or method == 'all':
         print("Particle swarm optimization")
         result_dict['pso_result'] = rt.run_pso(
             parameter_dicts,
@@ -116,7 +116,7 @@ def run_single_choice(
             value_dicts,
             pso_settings,
         )
-    elif method == 'gd' or method == 'all':
+    if method == 'gd' or method == 'all':
         print("Gradient descent")
         result_dict['gd_result'] = gd.gradient_descent(
             gd_settings,
@@ -244,7 +244,7 @@ def plot_performance_main(result_dict, to_plot, output_dir):
         pso_result = result_dict['pso_result']
         plotting_main(pso_result, to_plot)
     output_path = os.path.join(
-        utput_dir, 'best_' + to_plot + '_performance.png')
+        output_dir, 'best_' + to_plot + '_performance.png')
     plt.savefig(output_path, bbox_inches='tight')
     plt.close('all')
     if method == 'gd' or method == 'all':
