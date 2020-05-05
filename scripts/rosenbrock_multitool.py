@@ -62,7 +62,7 @@ def main(choice, method, output_dir):
         )
         plot_performance_main(result_dict, 'distance', output_dir, value_dicts)
         plot_performance_main(result_dict, 'fitness', output_dir, value_dicts)
-    elif choice == stability or choice == 'both':
+    if choice == 'stability' or choice == 'both':
         i = 0
         result_dicts = []
         print("Testing stability")
