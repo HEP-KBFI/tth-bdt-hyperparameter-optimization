@@ -280,6 +280,7 @@ def plot_fitnesses_history(result_dict, rnd):
 
 
 def plot_distances(result_dict, rnd):
+    best_parameters_list = result_dict['list_of_old_bests']
     x_distances = np.array([np.abs(i['x'] - 1) for i in best_parameters_list])
     y_distances = np.array([np.abs(i['y'] - 1) for i in best_parameters_list])
     absolute_distances = np.sqrt(x_distances**2 + y_distances**2)
