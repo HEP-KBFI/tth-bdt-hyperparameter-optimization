@@ -24,7 +24,7 @@ import docopt
 import matplotlib.ticker as ticker
 
 
-def main(choice):
+def main(choice, method, output_dir):
     print('::::::: Reading settings and parameters :::::::')
     cmssw_base_path = os.path.expandvars('$CMSSW_BASE')
     main_dir = os.path.join(
@@ -36,7 +36,6 @@ def main(choice):
     settings_dir = os.path.join(
         main_dir, 'data')
     global_settings = universal.read_settings(settings_dir, 'global')
-    output_dir = os.path.expandvars(global_settings['output_dir'])
     if not os.path.isdir(output_dir):
         os.makedirs(output_dir)
     param_file = os.path.join(settings_dir, 'rosenbrock_parameters.json')
@@ -308,3 +307,14 @@ def plot_gd(result_dict, output_dir):
     rt.plot_distance_history(result_dict, true_values, output_dir)
     rt.plot_fitness_history(result_dict, output_dir)
     rt.save_results(result_dict, output_dir)
+
+
+if __name__ == '__main__':
+    try:
+        arguments = docopt.docopt(__doc__)
+        choice = arguments['--choice']
+        method = arguments['--method']
+        output_dir = arguments['--output_dir']
+        main(choice, method, output_dir)
+    except docopt.DocoptExit as e:
+        print(e)
