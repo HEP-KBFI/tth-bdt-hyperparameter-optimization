@@ -107,7 +107,8 @@ def run_single_choice(
             value_dicts,
             true_values,
             rt.prepare_run_params,
-            rt.ensemble_fitness)
+            rt.ensemble_fitness
+        )
     if method == 'pso' or method == 'all':
         print("Particle swarm optimization")
         result_dict['pso_result'] = rt.run_pso(
@@ -156,7 +157,7 @@ def plot_stabilities_main(
                 to_plot,
                 'GA'
         )
-    elif method == 'pso' or method == 'all':
+    if method == 'pso' or method == 'all':
         pso_dicts = [d['pso_result'] for d in result_dicts]
         pso_best_param_list = [d['best_parameters'] for d in pso_dicts]
         pso_best_fitnesses = [d['best_fitness'] for d in pso_dicts]
@@ -167,7 +168,7 @@ def plot_stabilities_main(
                 to_plot,
                 'PSO'
         )
-    elif method == 'gd' or method == 'all':
+    if method == 'gd' or method == 'all':
         gd_dicts = [d['gd_result'] for d in result_dicts]
         gd_best_param_list = [d['best_parameters'] for d in gd_dicts]
         gd_best_fitnesses = [d['best_fitness'] for d in gd_dicts]
@@ -243,7 +244,7 @@ def plot_performance_main(result_dict, to_plot, output_dir, value_dicts):
     if method == 'ga' or method == 'all':
         ga_result = result_dict['ga_result']
         plotting_main(ga_result, to_plot, 'GA')
-    elif method == 'pso' or method == 'all':
+    if method == 'pso' or method == 'all':
         pso_result = result_dict['pso_result']
         plotting_main(pso_result, to_plot, 'PSO')
     output_path = os.path.join(
@@ -252,7 +253,6 @@ def plot_performance_main(result_dict, to_plot, output_dir, value_dicts):
     axis.set_aspect('auto', adjustable='box')
     axis.xaxis.set_major_locator(ticker.AutoLocator())
     plt.grid(True)
-    plt.title('Best fitness')
     plt.legend()
     plt.yscale('log')
     plt.tick_params(top=True, right=True, direction='in')

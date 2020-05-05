@@ -297,7 +297,7 @@ def fitness_calculation(population, settings, data, evaluate):
         args = inspect.getargspec(evaluate)
         if len(args[0]) == 2: #rosenbrock function optimization
             fitnesses = evaluate(population_list(eval_pop), data)
-            fitnesses = rosenbrock_fitnesses(fitnesses)
+            # fitnesses = rosenbrock_fitnesses(fitnesses)
             for i, member in enumerate(eval_pop):
                 member.add_result(fitnesses[i])
         else: #hyperparameter optimization
@@ -862,8 +862,8 @@ def evolution_rosenbrock(settings, parameters, data, create_set, evaluate):
                 if iteration == 0:
                     avg_scores[index] = []
                     improvements[index] = []
-                    result['best_fitness'] = max(fitnesses)
-                    result['best_parameters'] = population_list(subpopulation)[np.argmax(fitnesses)]
+                    result['best_fitness'] = min(fitnesses)
+                    result['best_parameters'] = population_list(subpopulation)[np.argmin(fitnesses)]
                     result['list_of_old_bests'] = [result['best_parameters']]
                     result['list_of_best_fitnesses'] = [result['best_fitness']]
                 avg_scores[index].append(np.mean(fitnesses))
@@ -874,9 +874,9 @@ def evolution_rosenbrock(settings, parameters, data, create_set, evaluate):
                         settings['threshold']
                     )
                 curr_improvements.append(curr_improvement)
-                if max(fitnesses) > result['best_fitness']:
-                    result['best_fitness'] = max(fitnesses)
-                    result['best_parameters'] = population_list(subpopulation)[np.argmax(fitnesses)]
+                if min(fitnesses) < result['best_fitness']:
+                    result['best_fitness'] = min(fitnesses)
+                    result['best_parameters'] = population_list(subpopulation)[np.argmin(fitnesses)]
             result['list_of_old_bests'].append(result['best_parameters'])
             result['list_of_best_fitnesses'].append(result['best_fitness'])
             # Remove a subpopulation that has reached a stopping
@@ -908,12 +908,12 @@ def evolution_rosenbrock(settings, parameters, data, create_set, evaluate):
             population, settings, data, evaluate)
         # Track scores and calculate stopping criteria
         fitnesses = fitness_list(population)
-        index = np.argmax(fitnesses)
+        index = np.argmin(fitnesses)
         if iteration == 0:
             avg_scores = []
             improvements = []
-            result['best_fitness'] = max(fitnesses)
-            result['best_parameters'] = population_list(population)[np.argmax(fitnesses)]
+            result['best_fitness'] = min(fitnesses)
+            result['best_parameters'] = population_list(population)[np.argmin(fitnesses)]
             result['list_of_old_bests'] = [result['best_parameters']]
             result['list_of_best_fitnesses'] = [result['best_fitness']]
         avg_scores.append(np.mean(fitnesses))
@@ -923,9 +923,9 @@ def evolution_rosenbrock(settings, parameters, data, create_set, evaluate):
                 improvements,
                 settings['threshold']
             )
-        if max(fitnesses) > result['best_fitness']:
-            result['best_fitness'] = max(fitnesses)
-            result['best_parameters'] = population_list(population)[np.argmax(fitnesses)]
+        if min(fitnesses) < result['best_fitness']:
+            result['best_fitness'] = min(fitnesses)
+            result['best_parameters'] = population_list(population)[np.argmin(fitnesses)]
         result['list_of_old_bests'].append(result['best_parameters'])
         result['list_of_best_fitnesses'].append(result['best_fitness'])
         iteration += 1
