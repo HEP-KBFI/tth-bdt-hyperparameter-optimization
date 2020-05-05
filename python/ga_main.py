@@ -896,7 +896,7 @@ def evolution_rosenbrock(settings, parameters, data, create_set, evaluate):
     avg_scores = []
 
     # Evolution loop for single population or merged population
-    while (iteration <= merge_subpopulations):
+    while (iteration <= merged_iterations):
            # and improvement > settings['threshold']):
         # Generate new population
         if iteration != 0:

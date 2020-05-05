@@ -12,7 +12,7 @@ from tthAnalysis.bdtHyperparameterOptimization import pso_main as pm
 from tthAnalysis.bdtHyperparameterOptimization import rosenbrock_tools as rt
 
 np.random.seed(1)
-
+import time
 
 def main():
     cmssw_base_path = os.path.expandvars('$CMSSW_BASE')
