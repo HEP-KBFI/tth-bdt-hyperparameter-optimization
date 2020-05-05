@@ -142,7 +142,7 @@ def plot_stabilities_main(
             rnd_best_fitnesses,
             output_dir,
             to_plot,
-            label,
+            'RND',
             rnd=True
     )
     if method == 'ga' or method == 'all':
@@ -154,7 +154,7 @@ def plot_stabilities_main(
                 ga_best_fitnesses,
                 output_dir,
                 to_plot,
-                label 
+                'GA'
         )
     elif method == 'pso' or method == 'all':
         pso_dicts = [d['pso_result'] for d in result_dicts]
@@ -165,7 +165,7 @@ def plot_stabilities_main(
                 pso_best_fitnesses,
                 output_dir,
                 to_plot,
-                label
+                'PSO'
         )
     elif method == 'gd' or method == 'all':
         gd_dicts = [d['gd_result'] for d in result_dicts]
@@ -176,7 +176,7 @@ def plot_stabilities_main(
                 gd_best_fitnesses,
                 output_dir,
                 to_plot,
-                label
+                'Gradient decsent'
         )
     output_path = os.path.join(output_dir, 'best_' + to_plot + '_stability.png')
     plt.savefig(output_path, bbox_inches='tight')
