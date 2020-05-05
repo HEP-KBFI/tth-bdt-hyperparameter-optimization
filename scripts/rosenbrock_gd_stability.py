@@ -10,6 +10,7 @@ import numpy as np
 from tthAnalysis.bdtHyperparameterOptimization import universal
 from tthAnalysis.bdtHyperparameterOptimization import gradient_tools as gd
 from tthAnalysis.bdtHyperparameterOptimization import rosenbrock_tools as rt
+import matplotlib.pyplot as plt
 
 
 np.random.seed(1)
