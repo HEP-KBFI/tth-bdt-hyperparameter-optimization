@@ -210,16 +210,16 @@ def produce_stability_plots(
         output_dir,
         to_plot,
         label,
-        dist_bins=None,
-        fitness_bins=None,
+        dist_bins=False,
+        fitness_bins=False,
         rnd=False
 ):
     x_distances = np.array([np.abs(i['x'] - 1) for i in best_parameters_list])
     y_distances = np.array([np.abs(i['y'] - 1) for i in best_parameters_list])
     absolute_distances = np.sqrt(x_distances**2 + y_distances**2)
-    if dist_bins == None:
+    if dist_bins == False:
         dist_bins = int(np.ceil(np.sqrt(len(absolute_distances))))
-    if fitness_bins == None:
+    if fitness_bins == False:
         fitness_bins = int(np.ceil(np.sqrt(len(best_fitnesses_list))))
     if to_plot == 'distance':
         dist_bins = plot_absolute_distances(
