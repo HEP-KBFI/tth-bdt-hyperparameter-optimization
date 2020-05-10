@@ -217,9 +217,9 @@ def produce_stability_plots(
     x_distances = np.array([np.abs(i['x'] - 1) for i in best_parameters_list])
     y_distances = np.array([np.abs(i['y'] - 1) for i in best_parameters_list])
     absolute_distances = np.sqrt(x_distances**2 + y_distances**2)
-    if dist_bins == False:
+    if rnd:
         dist_bins = int(np.ceil(np.sqrt(len(absolute_distances))))
-    if fitness_bins == False:
+    if rnd:
         fitness_bins = int(np.ceil(np.sqrt(len(best_fitnesses_list))))
     if to_plot == 'distance':
         dist_bins = plot_absolute_distances(
