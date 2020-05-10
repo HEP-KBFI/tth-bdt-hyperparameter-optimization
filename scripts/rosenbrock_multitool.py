@@ -21,6 +21,7 @@ from tthAnalysis.bdtHyperparameterOptimization import gradient_tools as gd
 from tthAnalysis.bdtHyperparameterOptimization import ga_main as ga
 import matplotlib.pyplot as plt
 import docopt
+import json
 import matplotlib.ticker as ticker
 
 
@@ -51,7 +52,7 @@ def main(choice, method, output_dir):
     true_values = {'a': 1, 'b': 100}
     if choice == 'performance' or choice == 'both':
         print("Testing performance")
-        result_dict = run_single_choice(
+        performance_dict = run_single_choice(
                 ga_settings,
                 gd_settings,
                 pso_settings,
@@ -60,13 +61,17 @@ def main(choice, method, output_dir):
                 value_dicts,
                 method
         )
-        plot_performance_main(result_dict, 'distance', output_dir, value_dicts)
-        plot_performance_main(result_dict, 'fitness', output_dir, value_dicts)
+        plot_performance_main(
+            performance_dict, 'distance', output_dir, value_dicts)
+        plot_performance_main(
+            performance_dict, 'fitness', output_dir, value_dicts)
+        performance_dir = os.path.join(output_dir, 'performance_results')
+        save_performance_info(performance_dict, performance_dir)
     if choice == 'stability' or choice == 'both':
         i = 0
         result_dicts = []
         print("Testing stability")
-        while i < 1000:
+        while i < 3:
             np.random.seed(i)
             result_dict = run_single_choice(
                 ga_settings,
@@ -138,7 +143,7 @@ def plot_stabilities_main(
     random_dicts = [d['random_result'] for d in result_dicts]
     rnd_best_param_list = [d['best_parameters'] for d in random_dicts]
     rnd_best_fitnesses = [d['best_fitness'] for d in random_dicts]
-    produce_stability_plots(
+    dist_bins, fitness_bins = produce_stability_plots(
             rnd_best_param_list,
             rnd_best_fitnesses,
             output_dir,
@@ -150,34 +155,40 @@ def plot_stabilities_main(
         ga_dicts = [d['ga_result'] for d in result_dicts]
         ga_best_param_list = [d['best_parameters'] for d in ga_dicts]
         ga_best_fitnesses = [d['best_fitness'] for d in ga_dicts]
-        produce_stability_plots(
+        dist_bins, fitness_bins = produce_stability_plots(
                 ga_best_param_list,
                 ga_best_fitnesses,
                 output_dir,
                 to_plot,
-                'GA'
+                'GA',
+                dist_bins=dist_bins,
+                fitness_bins=fitness_bins
         )
     if method == 'pso' or method == 'all':
         pso_dicts = [d['pso_result'] for d in result_dicts]
         pso_best_param_list = [d['best_parameters'] for d in pso_dicts]
         pso_best_fitnesses = [d['best_fitness'] for d in pso_dicts]
-        produce_stability_plots(
+        dist_bins, fitness_bins = produce_stability_plots(
                 pso_best_param_list,
                 pso_best_fitnesses,
                 output_dir,
                 to_plot,
-                'PSO'
+                'PSO',
+                dist_bins=dist_bins,
+                fitness_bins=fitness_bins
         )
     if method == 'gd' or method == 'all':
         gd_dicts = [d['gd_result'] for d in result_dicts]
         gd_best_param_list = [d['best_parameters'] for d in gd_dicts]
         gd_best_fitnesses = [d['best_fitness'] for d in gd_dicts]
-        produce_stability_plots(
+        dist_bins, fitness_bins = produce_stability_plots(
                 gd_best_param_list,
                 gd_best_fitnesses,
                 output_dir,
                 to_plot,
-                'Gradient descent'
+                'Gradient descent',
+                dist_bins=dist_bins,
+                fitness_bins=fitness_bins
         )
     plt.legend()
     plt.yscale('log')
@@ -199,42 +210,51 @@ def produce_stability_plots(
         output_dir,
         to_plot,
         label,
+        dist_bins=None,
+        fitness_bins=None,
         rnd=False
 ):
     x_distances = np.array([np.abs(i['x'] - 1) for i in best_parameters_list])
     y_distances = np.array([np.abs(i['y'] - 1) for i in best_parameters_list])
     absolute_distances = np.sqrt(x_distances**2 + y_distances**2)
+    if dist_bins == None:
+        dist_bins = int(np.ceil(np.sqrt(len(absolute_distances))))
+    if fitness_bins == None:
     if to_plot == 'distance':
-        plot_absolute_distances(absolute_distances, rnd, label)
+        dist_bins = plot_absolute_distances(
+            absolute_distances, rnd, label, dist_bins)
     if to_plot == 'fitness':
-        plot_fitness_values(best_fitnesses_list, rnd, label)
+        fitness_bins = plot_fitness_values(
+            best_fitnesses_list, rnd, label, fitness_bins)
+    return dist_bins, fitness_bins
 
 
-def plot_absolute_distances(absolute_distances, rnd, label):
-    plt.hist(
+def plot_absolute_distances(absolute_distances, rnd, label, bins):
+    bins = plt.hist(
         absolute_distances,
         histtype='step',
-        bins=int(np.ceil(np.sqrt(len(absolute_distances)))),
-        label=label
-    )
+        bins=bins,
+        label=label,
+    )[1]
     if rnd:
         plt.title("Absolute distance from minimum")
         plt.xlabel("Distance")
         plt.ylabel("# cases")
+    return bins
 
 
-def plot_fitness_values(best_fitnesses_list, rnd, label):
-    plt.hist(
+def plot_fitness_values(best_fitnesses_list, rnd, label, bins):
+    bins = plt.hist(
         best_fitnesses_list,
         histtype='step',
-        bins=int(np.ceil(np.sqrt(len(best_fitnesses_list)))),
+        bins=bins,
         label=label
-    )
+    )[1]
     if rnd:
         plt.title("Fitness values")
         plt.xlabel("Found minimum value")
         plt.ylabel("# cases")
-
+    return bins
 
 #####################################################################
 
@@ -313,6 +333,41 @@ def plot_gd(result_dict, output_dir, value_dicts):
     rt.plot_distance_history(result_dict, true_values, output_dir)
     rt.plot_fitness_history(result_dict, output_dir)
     rt.save_results(result_dict, output_dir)
+
+
+###################################
+
+def save_performance_info(performance_dict, output_dir):
+    if not os.path.exists(output_dir):
+        os.makedirs(output_dir)
+    keys = performance_dict.keys()
+    for key in keys:
+        method_dict = performance_dict[key]
+        method_info_path = os.path.join(output_dir, key + '.json')
+        with open(method_info_path, 'w') as out_file:
+            json.dump(method_dict, out_file)
+
+
+def save_stability_info(result_dicts, output_dir):
+    if not os.path.exists(output_dir):
+        os.makedirs(output_dir)
+    keys = result_dicts[0].keys()
+    for key in keys:
+        distances = []
+        fitnesses = []
+        for result_dict in result_dicts:
+            method_dict = result_dict[key]
+            x = method_dict['best_parameters']['x']
+            y = method_dict['best_parameters']['y']
+            dist = np.sqrt(np.abs(x - 1)**2 + np.abs(y - 1)**2)
+            distances.append(dist)
+            fitnesses.append(method_dict['best_fitness'])
+        output_path = os.path.join(output_dir, key + '.json')
+        with open(output_path, 'w') as out_file:
+            json.dump({"distances": distances}, out_file)
+            out_file.write('\n')
+            json.dump({"fitnesses": fitnesses}, out_file)
+
 
 
 if __name__ == '__main__':
