@@ -86,6 +86,8 @@ def main(choice, method, output_dir):
             i += 1
         plot_stabilities_main(result_dicts, method, 'distance', output_dir)
         plot_stabilities_main(result_dicts, method, 'fitness', output_dir)
+        stability_info_dir = os.path.join(output_dir, 'stability_results')
+        save_stability_info(result_dicts, stability_info_dir)
 
 
 def run_single_choice(
@@ -323,7 +325,7 @@ def plot_distances(result_dict, rnd, label):
 
 def plot_gd(result_dict, output_dir, value_dicts):
     true_values = {'a': 1, 'b': 100}
-    output_dir = os.path.join(output_dir, 'gradiend_descent')
+    output_dir = os.path.join(output_dir, 'gradient_descent')
     if not os.path.exists(output_dir):
         os.makedirs(output_dir)
     gd.write_history(result_dict, output_dir)
