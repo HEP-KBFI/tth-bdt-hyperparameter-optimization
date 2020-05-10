@@ -220,6 +220,7 @@ def produce_stability_plots(
     if dist_bins == None:
         dist_bins = int(np.ceil(np.sqrt(len(absolute_distances))))
     if fitness_bins == None:
+        fitness_bins = int(np.ceil(np.sqrt(len(best_fitnesses_list))))
     if to_plot == 'distance':
         dist_bins = plot_absolute_distances(
             absolute_distances, rnd, label, dist_bins)
