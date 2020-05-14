@@ -827,7 +827,7 @@ def evolution_rosenbrock(settings, parameters, data, create_set, evaluate):
 
     result = {}
     subpopulation_iterations = int(np.ceil(0.9 * settings['iterations']))
-    merged_iterations = settings['iterations'] - subpopulation_iterations
+
 
     # Evolution loop for subpopulations
     if settings['sub_pops'] > 1:
@@ -890,13 +890,12 @@ def evolution_rosenbrock(settings, parameters, data, create_set, evaluate):
         # subpopulations += finished_subpopulations
         population = merge_subpopulations(subpopulations)
 
-    iteration = 1
     improvement = 1
     improvements = []
     avg_scores = []
 
     # Evolution loop for single population or merged population
-    while (iteration <= merged_iterations):
+    while (iteration <= settings['iterations']):
            # and improvement > settings['threshold']):
         # Generate new population
         if iteration != 0:
@@ -909,7 +908,7 @@ def evolution_rosenbrock(settings, parameters, data, create_set, evaluate):
         # Track scores and calculate stopping criteria
         fitnesses = fitness_list(population)
         index = np.argmin(fitnesses)
-        if iteration == 0:
+        if iteration == 1:
             avg_scores = []
             improvements = []
             result['best_fitness'] = min(fitnesses)

@@ -194,6 +194,7 @@ def plot_stabilities_main(
         )
     plt.legend()
     plt.yscale('log')
+    plt.xscale('log')
     output_path = os.path.join(output_dir, 'best_' + to_plot + '_stability.png')
     plt.savefig(output_path, bbox_inches='tight')
     plt.close('all')

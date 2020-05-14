@@ -401,6 +401,7 @@ def encode_parent(parent, parameters):
     # Encoding values in parent
     for parameter in parameters:
         key = parameter['p_name']
+        maximum_allowed = parameter['range_end']
         try:
             true_int = parameter['true_int']
         except KeyError:
@@ -409,8 +410,16 @@ def encode_parent(parent, parameters):
             encoded_parent[key] = int_encoding(parent[key])
         else:
             encoded_parent[key] = float_encoding(parent[key])
-
+            maximum_length = get_encoded_max(maximum_allowed)
+            to_cut = len(encoded_parent[key]) - maximum_length
+            encoded_parent[key] = encoded_parent[key][to_cut:]
     return encoded_parent
+
+
+def get_encoded_max(maximum_allowed):
+    encoded_maximum = float_encoding(maximum_allowed)
+    shortened_max = encoded_maximum.lstrip('0')
+    return len(shortened_max)
 
 
 def decode_offspring(offspring, parameters):

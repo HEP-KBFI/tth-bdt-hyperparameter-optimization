@@ -214,6 +214,7 @@ def save_results(result_dict, output_dir):
     best_parameter_history_path = os.path.join(output_dir, 'history.json')
     with open(best_parameters_path, 'w') as file:
         json.dump(result_dict['best_parameters'], file)
+        file.write('\n')
         json.dump(result_dict['best_fitness'], file)
     with open(best_parameter_history_path, 'w') as file:
         json.dump(result_dict['list_of_old_bests'], file)
