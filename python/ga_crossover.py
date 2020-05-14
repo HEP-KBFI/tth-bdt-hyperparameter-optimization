@@ -188,11 +188,15 @@ def chromosome_mutate(chromosome, mutation_chance):
     '''
 
     # Initialization
+    ch_len = len(chromosome)
     mutated_chromosome = ''
 
     # Random mutation based on mutation_chance
-    for gene in chromosome:
-        if random.random() < mutation_chance:
+    for i, gene in enumerate(chromosome):
+        power = ch_len - i
+        modified_chance = mutation_chance * 0.95**power
+
+        if random.random() < modified_chance:
             try:
                 mutated_chromosome += str(abs(int(gene) - 1))
             except ValueError:
