@@ -412,7 +412,8 @@ def new_population(
         data,
         create_set,
         evaluate,
-        subpop=0
+        subpop=0,
+        rosenbrock=False
     ):
     '''Create the next generation population.
 
@@ -445,6 +446,8 @@ def new_population(
     offsprings = []
     next_population = elitism(population, settings)
     fitnesses = fitness_list(population)
+    if rosenbrock:
+        fitnesses = np.array(fitnesses)*(-1)
     # Generate offspring to fill the new generation
     while len(offsprings) < (len(population) - len(next_population)):
         parents = select.tournament(population_list(population), fitnesses)
@@ -846,7 +849,8 @@ def evolution_rosenbrock(settings, parameters, data, create_set, evaluate):
                         data,
                         create_set,
                         evaluate,
-                        subpopulation[0].subpop
+                        subpopulation[0].subpop,
+                        rosenbrock=True
                     )
                     new_subpopulations.append(new_subpopulation)
                 population = unite_subpopulations(new_subpopulations)
@@ -901,7 +905,8 @@ def evolution_rosenbrock(settings, parameters, data, create_set, evaluate):
         if iteration != 0:
             print('::::: Iteration:     ' + str(iteration) + ' :::::')
             population = new_population(
-                population, settings, parameters, data, create_set, evaluate)
+                population, settings, parameters, data, create_set, evaluate,
+                rosenbrock=True)
         # Calculate fitness scores
         population = fitness_calculation(
             population, settings, data, evaluate)

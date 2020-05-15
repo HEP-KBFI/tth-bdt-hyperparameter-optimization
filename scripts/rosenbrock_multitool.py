@@ -62,9 +62,9 @@ def main(choice, method, output_dir):
                 method
         )
         plot_performance_main(
-            performance_dict, 'distance', output_dir, value_dicts)
+            performance_dict, 'distance', output_dir, value_dicts, method)
         plot_performance_main(
-            performance_dict, 'fitness', output_dir, value_dicts)
+            performance_dict, 'fitness', output_dir, value_dicts, method)
         performance_dir = os.path.join(output_dir, 'performance_results')
         save_performance_info(performance_dict, performance_dir)
     if choice == 'stability' or choice == 'both':
@@ -233,12 +233,13 @@ def produce_stability_plots(
     return dist_bins, fitness_bins
 
 
-def plot_absolute_distances(absolute_distances, rnd, label, bins):
+def plot_absolute_distances(absolute_distances, rnd, label, bins, hatch=None):
     bins = plt.hist(
         absolute_distances,
-        histtype='step',
+        alpha=0.2,
         bins=bins,
         label=label,
+        hatch=hatch
     )[1]
     if rnd:
         plt.title("Absolute distance from minimum")
@@ -247,12 +248,13 @@ def plot_absolute_distances(absolute_distances, rnd, label, bins):
     return bins
 
 
-def plot_fitness_values(best_fitnesses_list, rnd, label, bins):
+def plot_fitness_values(best_fitnesses_list, rnd, label, bins, hatch=None):
     bins = plt.hist(
         best_fitnesses_list,
-        histtype='step',
+        alpha=0.2,
         bins=bins,
-        label=label
+        label=label,
+        hatch=hatch
     )[1]
     if rnd:
         plt.title("Fitness values")
@@ -262,7 +264,9 @@ def plot_fitness_values(best_fitnesses_list, rnd, label, bins):
 
 #####################################################################
 
-def plot_performance_main(result_dict, to_plot, output_dir, value_dicts):
+def plot_performance_main(
+        result_dict, to_plot, output_dir, value_dicts, method
+):
     random_result = result_dict['random_result']
     plotting_main(random_result, to_plot, 'Rnd', rnd=True)
     if method == 'ga' or method == 'all':
@@ -373,6 +377,114 @@ def save_stability_info(result_dicts, output_dir):
             json.dump({"fitnesses": fitnesses}, out_file)
 
 
+##############################################################
+
+
+def read_stability_files(output_dir, methods='all'):
+    input_dir = os.path.join(output_dir, 'stability_results')
+    method_list = ['ga', 'gd', 'pso', 'random']
+    method_dicts = {}
+    if methods == 'all':
+        for method in method_list:
+            method_dicts = load_one_stability_file(
+                method, input_dir, method_dicts)
+    else:
+        for method in methods:
+            method_dicts = load_one_stability_file(
+                method, input_dir, method_dicts)
+    return method_dicts
+
+
+def load_one_stability_file(method, input_dir, method_dicts):
+    method_dicts[method] = {}
+    result_path = os.path.join(input_dir, method + '_result.json')
+    with open(result_path, 'rt') as infile:
+        for line in infile:
+            method_dicts[method].update(json.loads(line))
+    return method_dicts
+
+
+def plot_loaded_stability_main(method_dicts, output_dir):
+    plot_loaded_stabilities(method_dicts, output_dir, 'fitnesses')
+    plot_loaded_stabilities(method_dicts, output_dir, 'distances')
+
+
+def plot_loaded_stabilities(method_dicts, output_dir, to_plot):
+    keys = list(method_dicts.keys())
+    if to_plot == 'fitnesses':
+        bins = np.logspace(-8, 5, 15)
+    else:
+        bins = np.logspace(-4, np.log10(np.sqrt(2)*500), 15)
+    # bins = int(np.sqrt(len(method_dicts[keys[1]]['distances'])))
+    hatches = ['/', 'o', '*', 'X', '+']
+    for i, key in enumerate(keys):
+        if key == 'random':
+            rnd = True
+        else:
+            rnd = False
+        if to_plot == 'distances':
+            method_distances = method_dicts[key]['distances']
+            bins = plot_absolute_distances(
+                method_distances, rnd, key, bins, hatch=hatches[i])
+        else:
+            method_fitnesses = method_dicts[key]['fitnesses']
+            bins = plot_fitness_values(
+                method_fitnesses, rnd, key, bins, hatch=hatches[i])
+    plt.legend()
+    plt.xscale('log')
+    output_path = os.path.join(output_dir, 'best_' + to_plot + '.png')
+    plt.savefig(output_path)
+    plt.close('all')
+
+
+
+
+###############################################################
+
+
+def read_performance_files(output_dir, methods='all'):
+    input_dir = os.path.join(output_dir, 'performance_results')
+    method_list = ['ga', 'gd', 'pso', 'random']
+    method_dicts = {}
+    if methods == 'all':
+        for method in method_list:
+            method_dicts = load_one_performance_file(
+                method, input_dir, method_dicts)
+    else:
+        for method in methods:
+            method_dicts = load_one_performance_file(
+                method, input_dir, method_dicts)
+    return method_dicts
+
+
+def load_one_performance_file(method, input_dir, method_dicts):
+    method_dicts[method] = {}
+    result_path = os.path.join(input_dir, method + '_result.json')
+    with open(result_path, 'rt') as infile:
+        for line in infile:
+            method_dicts[method].update(json.loads(line))
+    return method_dicts
+
+
+def plot_loaded_performances(method_dicts, output_dir, to_plot):
+    keys = list(method_dicts.keys())
+    for key in keys:
+        if key == 'random':
+            rnd = True
+        else:
+            rnd = False
+        if to_plot == 'distances':
+            plot_distances(method_dicts[key], rnd, key)
+        else:
+            plot_fitnesses_history(method_dicts[key], rnd, key)
+    plt.legend()
+    plt.xscale('log')
+
+def plot_loaded_stability_main(method_dicts, output_dir):
+    plot_loaded_performances(method_dicts, output_dir, 'fitnesses')
+    plot_loaded_performances(method_dicts, output_dir, 'distances')
+
+###############################################################
 
 if __name__ == '__main__':
     try:
